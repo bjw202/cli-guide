@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T06 평행 우주를 만드는 법: 브랜치 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="브랜치를 '평행 우주'라는 비유로 시작해 branch, switch, checkout, HEAD, detached HEAD까지 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T06 · 브랜치·병합</p>
+  <h1 class="page-header__title">같은 시점에서 갈라지는 또 하나의 세계 — 브랜치</h1>
+  <p class="page-header__subhead">원본을 망가뜨리지 않고 실험하고 싶을 때, Git은 '평행 우주'를 만들어 줘요. 그 우주의 이름을 브랜치(branch)라고 불러요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T06 → T1-02 디자이너, T1-06 음악가) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>디자이너는 '버튼을 파랑으로 할까, 코랄로 할까' 두 안을 브랜치로 나눠 동시에 실험해요. 음악가도 '이 곡을 어쿠스틱 편곡으로, 전자 음악으로' 갈래를 만들어 따로 작업한답니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-02">디자이너 대안 실험 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t1-06">음악가 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">소설을 쓰다가 결말을 둘로 써보고 싶다면</h2>
+      <div class="tut-section__body">
+        <p>소설을 쓰다가 '결말을 행복하게 할까, 비극적으로 할까' 고민된다고 해요. 원고를 복사해 두 개 파일로 나누면 되지만, 나중에 어느 쪽이 최신인지 헷갈리고 두 파일을 번갈아 고치다 꼬이기 쉽죠. Git은 이 고민을 '평행 우주'로 풀어줘요.</p>
+        <p>원본 우주(main)는 그대로 두고, 거기서 갈라진 <strong>새로운 우주</strong>를 하나 만드는 거예요. 이 우주에서는 마음껏 실험해도 원본이 흔들리지 않아요. 실험이 마음에 들면 원본으로 합치면 되고(T07에서 배워요), 아니면 그 우주를 그냥 버리면 돼요. 이 '갈라진 우주'를 <strong>브랜치(branch)</strong>라고 불러요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>브랜치는 '원본을 손대지 않고 실험하는 복제 방'이에요. 실험이 맘에 들면 원본 방으로 가져오면 되고, 맘에 안 들면 그 복제 방을 그냥 닫아버리면 끝이에요.</p>
+    </div>
+
+    <section class="tut-section" id="commands" data-reveal>
+      <h2 class="tut-section__title">평행 우주 만들기, 옮겨가기, 없애기</h2>
+      <div class="tut-section__body">
+        <p>브랜치를 다루는 기본 명령은 다섯 개예요. 본문에서는 명령어를 알약 모양(<span class="cmd-pill">git branch</span>)로 표시할게요.</p>
+        <p>먼저 새 우주를 만들 때는 <span class="cmd-pill">git branch &lt;이름&gt;</span>이에요. 만들기만 할 뿐 아직 그쪽으로 안 간다는 점에 주의하세요. 그쪽으로 발을 옮기려면 <span class="cmd-pill">git switch &lt;이름&gt;</span>이 필요해요. 옛날 명령인 <span class="cmd-pill">git checkout &lt;이름&gt;</span>도 같은 일을 하지만, 요즘은 더 명확한 <span class="cmd-pill">git switch</span>를 권해요.</p>
+        <p>만들면서 바로 그쪽으로 가고 싶다면 <span class="cmd-pill">git switch -c &lt;이름&gt;</span>을 한 번에 쓰면 돼요. 우주가 몇 개 있는지 보려면 그냥 <span class="cmd-pill">git branch</span>, 지우려면 <span class="cmd-pill">git branch -d &lt;이름&gt;</span>이에요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스 -->
+    <div class="side-note side-note--warn" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>아직 main에 안 합친 브랜치를 <span class="cmd-pill">git branch -D</span>(대문자 D, 강제 삭제)로 지우면 그 우주의 작업이 날아가요. 실수로 날리는 걸 막으려면 소문자 <span class="cmd-pill">-d</span>를 쓰세요. 안 합친 게 있으면 Git이 지우지 못하게 막아준답니다.</p>
+    </div>
+
+    <section class="tut-section" id="head" data-reveal>
+      <h2 class="tut-section__title">HEAD: '나 지금 이 우주에 있어'라는 깃발</h2>
+      <div class="tut-section__body">
+        <p>T01에서 잠깐 봤던 <span data-term="head"><strong>HEAD</strong></span>를 다시 만나요. HEAD는 '지금 내가 발을 딛고 있는 사진(우주)'을 가리키는 깃발이에요. <span class="cmd-pill">git switch</span>로 브랜치를 옮길 때마다 HEAD가 '이쪽이야' 하고 옮겨 붙어요. 그래서 같은 저장소에서 작업하다가 브랜치를 바꾸면, 파일들이 그 우주의 모습으로 바뀌는 걸 눈으로 볼 수 있어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="detached" data-reveal>
+      <h2 class="tut-section__title">detached HEAD: 브랜치가 아니라 '사진' 위에 서 있을 때</h2>
+      <div class="tut-section__body">
+        <p>보통 HEAD는 브랜치 이름표를 통해 사진을 가리켜요. 그런데 옛날 특정 사진에 직접 서고 싶을 때가 있어요. 그러면 HEAD가 브랜치에서 떨어져 나온 채로 한 장의 사진을 가리키게 돼요. 이걸 <span data-term="detached-head"><strong>detached HEAD(분리된 HEAD)</strong></span>라고 불러요.</p>
+        <p>이 상태에서는 '과거를 구경하는 관광'은 안전해요. 다만 여기서 새 작업을 커밋하면 어느 브랜치에도 속하지 않는 떠돌이 사진이 될 수 있어요. 구경만 할 거라면 아무 문제 없지만, 작업은 보통 새 브랜치를 만들어 그 위에서 하세요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>브랜치는 '사진을 복사'하는 게 아니에요. 그저 '이름표 → 사진' 하나의 포인터일 뿐이에요. 그래서 브랜치를 수백 개 만들어도 용량을 거의 안 먹고, 옮겨 다니는 것도 찰나예요. Git이 가벼운 건 이 때문이랍니다.</p>
+    </div>
+
+    <section class="tut-section" id="graph" data-reveal>
+      <h2 class="tut-section__title">가지가 뻗어나가는 그래프 상상하기</h2>
+      <div class="tut-section__body">
+        <p>커밋들이 한 줄로 늘어선 걸 생각해 보세요. 거기서 어느 시점에서 가지를 쳐 옆으로 새 줄이 뻗어나가요. 원본 줄은 계속 앞으로 가고, 갈라진 줄도 각자 앞으로 나아가요. 이 모양이 바로 Git 그래프예요. <span class="cmd-pill">git log --graph --oneline</span>을 치면 터미널에서 이 가지 모양을 직접 볼 수 있어요.</p>
+        <p>이 그래프를 한 번 눈에 익히면, 다음 장(T07 병합)에서 두 줄이 다시 하나로 합쳐지는 모습이 자연스럽게 와닿을 거예요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>브랜치 이름은 '무엇을 하려는지' 적는 게 나중에 봤을 때 편해요. <code>feature/login</code>, <code>fix/typo-readme</code>처럼 접두어를 붙이는 팀이 많아요. 띄어쓰기는 안 돼요 — 빈칸 대신 하이폰(<code>-</code>)을 쓰세요.</p>
+    </div>
+
+    <!-- SPEC-IMPL-006 자산: GitGraphVisualizer -->
+    <section class="asset git-graph" data-asset="git-graph" data-reveal aria-label="commit 그래프 인터랙티브">
+      <h2 class="asset__title">🌿 가지가 갈라지는 그래프</h2>
+      <p class="asset__hint">단계별로 main에서 feature 가지가 갈라지는 걸 보세요. (← → 키로도 조작)</p>
+      <div class="asset__controls">
+        <button class="asset__btn" type="button" data-graph-step="0">main</button>
+        <button class="asset__btn" type="button" data-graph-step="1">branch</button>
+        <button class="asset__btn" type="button" data-graph-step="2">commit</button>
+        <button class="asset__btn" type="button" data-graph-step="3">merge</button>
+        <button class="asset__btn" type="button" data-graph-step="4">rebase</button>
+      </div>
+      <svg class="git-graph__svg" viewBox="0 0 520 260" role="img" aria-label="commit 그래프"></svg>
+      <p class="asset__caption" data-graph-caption></p>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T06 한 장 요약</h2>
+      <p class="cheat-card__sub">브랜치 다루기 기본 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git branch &lt;이름&gt;</span><span class="cheat-card__desc">새 평행 우주(브랜치) 만들기. 이동은 별도.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git switch &lt;이름&gt;</span><span class="cheat-card__desc">그 우주로 이동. checkout &lt;이름&gt;과 같은 일.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git switch -c &lt;이름&gt;</span><span class="cheat-card__desc">만들면서 바로 그쪽으로 이동.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git branch</span><span class="cheat-card__desc">브랜치 목록 보기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git branch -d &lt;이름&gt;</span><span class="cheat-card__desc">브랜치 삭제(-d 안전, -D 강제).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">HEAD</span><span class="cheat-card__desc">'지금 내가 서 있는 사진/우주'를 가리키는 깃발.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">detached HEAD</span><span class="cheat-card__desc">브랜치가 아닌 특정 사진에 직접 서 있는 상태.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T05, 다음=T07) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-history.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T05 역사를 돌아보기</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-merge.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T07 두 세계가 하나로: 병합과 충돌</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">평행 우주 비유</a>
+      <a class="sidebar-toc__link" href="#commands">브랜치 기본 명령</a>
+      <a class="sidebar-toc__link" href="#head">HEAD 깃발</a>
+      <a class="sidebar-toc__link" href="#detached">detached HEAD</a>
+      <a class="sidebar-toc__link" href="#graph">가지 그래프</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → 자산. FakeTerminal 미사용. -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/git-graph.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

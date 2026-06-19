@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R03 FAQ — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git/GitHub FAQ. reset 차이, revert vs reset, force push 위험, .env 실수 push, 충돌 해결, reflog 복구 등 초보자 실제 질문 15종을 아코디언으로." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">참조 허브 · R03</p>
+  <h1 class="page-header__title">자주 묻는 질문 (FAQ)</h1>
+  <p class="page-header__subhead">당황하지 마세요, 다 해결책이 있어요. 초보자가 실제로 부딪히는 상황 15가지를 한 줄 결론 + 설명으로. <code>#faq-1</code>처럼 항목 앵커로 직접 링크.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-ref">
+
+    <!-- 주제 필터 (단순 토글 보여주기형; 각 항목은 data-topic 보유) -->
+    <div class="ref-filter-bar" role="region" aria-label="FAQ 주제">
+      <div class="ref-filter__group">
+        <span class="ref-filter__label">주제</span>
+        <button type="button" class="ref-filter__chip is-active" data-group="topic" data-value="all">전체</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="recovery">되돌리기</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="conflict">충돌</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="remote">원격/push</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="branch">브랜치</button>
+      </div>
+    </div>
+
+    <!-- FAQ 아코디언 (tmux 패턴 독립 재구현, REQ-012) -->
+    <div class="faq js-ref-list">
+
+      <div class="faq-item js-ref-item" id="faq-1" data-topic="recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q1</span><span class="js-search-text">reset --soft / --mixed / --hard 차이가 뭔가요?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>되돌리는 '강도' 차이예요. <strong>soft</strong>=HEAD만 뒤로(변경은 대기방에), <strong>mixed</strong>=대기방까지(기본값, 변경은 작업방에), <strong>hard</strong>=작업방까지 싹 버림(복구 불가 주의).</p>
+            <p>아직 커밋을 <em>올리기 전</em> 상태라면 soft·mixed로 변경을 살려 다시 고칠 수 있어요. 반면 <code>--hard</code>는 작업방의 수정까지 버리니, 정말 버려도 되을 때만 쓰세요.</p>
+            <a class="faq-more" href="../tutorial/git-undo.html">→ T11 되돌리기 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-2" data-topic="recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q2</span><span class="js-search-text">revert와 reset의 차이? 언제 뭘 쓰나요?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><strong>reset</strong>은 과거로 시계를 되감는 것(역사를 고쳐쓰기), <strong>revert</strong>는 '부정'하는 새 커밋을 추가하는 것(역사를 안전하게 보존).</p>
+            <p>아무도 모르는 내 커밋이면 reset으로 깔끔하게. 이미 <strong>push해서 남들이 보는 내역</strong>이면 revert로 되돌려야 남들의 역사가 꼬이지 않아요.</p>
+            <a class="faq-more" href="../tutorial/git-undo.html">→ T11 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-3" data-topic="remote recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q3</span><span class="js-search-text">이미 push한 커밋을 취소하려면?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><code>git revert &lt;커밋&gt;</code>으로 취소 커밋을 만들고 다시 push하세요. 역사를 고쳐쓰지 않아 남들에게 안전합니다.</p>
+            <p>이미 공개된 내역을 <code>reset</code>+<code>push --force</code>로 고치면 동료의 역사와 충돌이 나요. 혼자 쓰는 브랜치가 아니라면 revert가 정답입니다.</p>
+            <span class="cmd-pill">git revert &lt;커밋&gt;</span>
+            <a class="faq-more" href="../tutorial/git-undo.html">→ T11 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-4" data-topic="remote">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q4</span><span class="js-search-text">force push가 위험한 이유? --force-with-lease는?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><code>--force</code>는 원격 역사를 내 것으로 덮어써 동료의 커밋을 통째로 날릴 수 있어요. <code>--force-with-lease</code>는 원격이 바뀌었으면 거부해 사고를 막아줍니다.</p>
+            <p>force가 필요한 상황(rebase·amend 후)이라도 항상 <code>--force-with-lease</code>를 쓰는 습관을 들이세요.</p>
+            <span class="cmd-pill">git push --force-with-lease</span>
+            <a class="faq-more" href="../tutorial/git-remote.html">→ T09 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-5" data-topic="remote recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q5</span><span class="js-search-text">.env 파일을 실수로 push했어요. 어떡하죠?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>노출된 비밀은 <strong>무조건 폐기하고 새로 발급</strong>하세요. 그 다음 <code>git filter-repo</code>로 역사에서 파일을 통째로 씻어내고 다시 push.</p>
+            <p>역사에서 지운다고 해서 "없던 일"이 되진 않아요 — 이미 복사된 사본이 있을 수 있으므로 비밀번호/토큰 교체가 가장 중요합니다. 앞으로는 <code>.gitignore</code>에 <code>.env</code>를 꼭 적어두세요.</p>
+            <a class="faq-more" href="../tutorial/github-security.html">→ T19 보안 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-6" data-topic="conflict">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q6</span><span class="js-search-text">merge 충돌이 났어요. 어떻게 푸나요?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>충돌 표시(<code>&lt;&lt;&lt;</code>/<code>===</code>/<code>&gt;&gt;&gt;</code>)를 지우고 최종 모습으로 직접 고친 뒤, <code>git add</code> → 커밋(또는 <code>--continue</code>)하면 끝.</p>
+            <p>같은 줄을 양쪽이 다르게 고쳤을 때만 충돌이 나요. 어느 쪽이 맞는지(또는 둘 다 섞을지)는 사람이 판단합니다. 편집기나 GitHub의 충돌 해결 UI가 도와줘요.</p>
+            <a class="faq-more" href="../tutorial/git-merge.html">→ T07 충돌 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-7" data-topic="recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q7</span><span class="js-search-text">방금 한 커밋 메시지에 오타가 났어요.</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>아직 안 올렸다면 <code>git commit --amend</code>로 직전 커밋의 메시지(또는 내용)를 고쳐요.</p>
+            <p>이미 push한 커밋이라면 amend 후 <code>--force-with-lease</code> push가 필요하고, 남들과 공유 중이면 amend 대신 새 커밋으로 처리하는 게 안전합니다.</p>
+            <span class="cmd-pill">git commit --amend</span>
+            <a class="faq-more" href="../tutorial/git-basics.html">→ T03 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-8" data-topic="recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q8</span><span class="js-search-text">reset --hard 했는데 필요한 커밋이었어요.</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><code>git reflog</code>로 HEAD가 지나간 흔적을 찾아, 그 커밋 해시로 <code>git reset --hard &lt;해시&gt;</code>하면 되돌아올 수 있어요.</p>
+            <p>reflog는 '숨은 발자취'라서 지워진 것처럼 보여도 잠시(기본 도달 가능 90일) 남아 있습니다. 다만 <code>--hard</code>로 지운 커밋은 시간이 지나면 정리되니 빠를수록 좋아요.</p>
+            <span class="cmd-pill">git reflog</span>
+            <a class="faq-more" href="../tutorial/git-undo.html">→ T11 reflog 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-9" data-topic="branch recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q9</span><span class="js-search-text">잘못된 브랜치에서 커밋했어요.</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>올바른 브랜치로 가서 <code>git cherry-pick &lt;해당 커밋&gt;</code>으로 가져오거나, 아직 안 올렸다면 그 커밋에서 새 브랜치를 만들면 돼요.</p>
+            <p>원래(잘못된) 브랜치에서는 그 커밋을 revert/reset으로 정리하면 깔끔합니다.</p>
+            <a class="faq-more" href="../tutorial/git-advanced.html">→ T12 cherry-pick 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-10" data-topic="remote recovery">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q10</span><span class="js-search-text">공개 저장소에 비밀번호를 올렸어요.</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>1순위는 <strong>비밀번호를 즉시 변경/토큰 폐기</strong>. 그 다음 <code>git filter-repo</code>로 역사에서 제거하고 강제 push, 마지막으로 GitHub의 secret scanning 경고도 확인.</p>
+            <p>역사에서 지워도 누군가 이미 복사했을 수 있으니 '없던 일'로 믿지 마세요. 비밀 교체가 유일한 확실한 조치입니다.</p>
+            <a class="faq-more" href="../tutorial/github-security.html">→ T19 보안 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-11" data-topic="branch">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q11</span><span class="js-search-text">branch와 fork의 차이?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><strong>branch</strong>는 한 저장소 안의 평행 우주, <strong>fork</strong>는 남의 저장소 전체를 내 계정로 통째로 복사(다른 저장소)하는 거예요.</p>
+            <p>내 저장소에서 실험은 branch, 남의 프로젝트에 기여할 때는 fork 후 PR이 보통의 흐름입니다.</p>
+            <a class="faq-more" href="../tutorial/github-repo.html">→ T15 fork 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-12" data-topic="remote">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q12</span><span class="js-search-text">pull과 fetch의 차이?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><code>fetch</code>는 원격 변경을 '받아만' 오고(작업방 건드림 없음), <code>pull</code>은 받아서 바로 합치기(fetch+merge)까지 해요.</p>
+            <p>먼저 뭘 받았는지 살펴보고 싶으면 fetch, 바로 내 작업에 반영하려면 pull. pull은 브랜치가 꼬일 수 있으니 확인 후 쓰면 안전합니다.</p>
+            <a class="faq-more" href="../tutorial/git-remote.html">→ T09 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-13" data-topic="branch conflict">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q13</span><span class="js-search-text">merge와 rebase의 차이?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><strong>merge</strong>는 두 갈래를 합쳐 병합 커밋을 남기고(역사 보존), <strong>rebase</strong>는 내 커밋들을 한 줄로 다시 나열해 역사를 깔끔하게 정리해요.</p>
+            <p>"사실이 남은 기록"이 중요하면 merge, "읽기 좋은 한 줄 역사"가 중요하면 rebase. 단 이미 공유한 커밋은 rebase 금지.</p>
+            <a class="faq-more" href="../tutorial/git-rebase.html">→ T08 트레이드오프 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-14" data-topic="remote branch">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q14</span><span class="js-search-text">clone과 fork의 차이?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p><code>clone</code>은 원격 저장소를 내 컴퓨터로 다운로드(복사), <strong>fork</strong>는 GitHub 서버 위에서 내 계정로 저장소를 복사하는 거예요.</p>
+            <p>fork는 보통 그 직후 내 포크를 clone해 로컬에서 작업합니다. fork=서버 복사, clone=내 PC 복사.</p>
+            <a class="faq-more" href="../tutorial/github-repo.html">→ T15 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item js-ref-item" id="faq-15" data-topic="branch remote">
+        <button class="faq-trigger" aria-expanded="false">
+          <span><span class="faq-q-tag">Q15</span><span class="js-search-text">PR이 뭔가요? 어떻게 만드나요?</span></span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-content">
+          <div class="faq-content__inner">
+            <span class="answer-label">한 줄 결론</span>
+            <p>PR(pull request)은 "제 브랜치 변경을 받아주세요" 하고 리뷰·검사·병합을 거치는 제안이에요. 브랜치를 push하고 GitHub에서 'Compare &amp; pull request'를 누르면 만들어요.</p>
+            <p>터미널이면 <code>gh pr create</code> 한 줄로도 됩니다. 리뷰→승인→squash/rebase/merge 순으로 병합돼요.</p>
+            <span class="cmd-pill">gh pr create</span>
+            <a class="faq-more" href="../tutorial/github-issues-pr.html">→ T16 PR 자세히 보기</a>
+          </div>
+        </div>
+      </div>
+
+      <p class="ref-empty">해당 주제의 질문이 없어요. '전체'를 선택해 보세요.</p>
+    </div>
+
+    <div class="side-note side-note--warn" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>이미 <strong>push해서 남들과 공유 중인 커밋</strong>은 reset/rebase/amend로 고쳐쓰지 마세요. 동료 역사가 꼬입니다. 공개 내역은 revert로 안전하게 되돌리세요.</p>
+    </div>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">질문 바로가기</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#faq-1">reset 차이</a>
+      <a class="sidebar-toc__link" href="#faq-3">push한 커밋 취소</a>
+      <a class="sidebar-toc__link" href="#faq-4">force push</a>
+      <a class="sidebar-toc__link" href="#faq-5">.env 실수</a>
+      <a class="sidebar-toc__link" href="#faq-8">reflog 복구</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/ref-filter.js" defer></script>
+<script src="../js/faq-accordion.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T12 한 단계 더 깊이: 고급 기법 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="cherry-pick, stash, bisect, submodule, worktree, git filter-repo까지. 필요할 때 찾게 되는 고급 도구들을 비유로 가볍게 훑어봅니다." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T12 · 고급 기법</p>
+  <h1 class="page-header__title">필요할 때 찾게 되는 고급 도구들</h1>
+  <p class="page-header__subhead">이 도구들은 매일 안 써도 '아, 그때 이걸 알았으면!' 하는 순간이 반드시 와요. 지금은 가볍게 훑어만 보세요. 필요해질 때 다시 돌아오면 돼요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: T12 → T1-03, T2-04) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>연구자는 논문에 버그가 생긴 시점을 bisect로 이진 탐색하고, 거대 프로젝트는 submodule로 여러 저장소를 한 곳에 끼워 넣어 관리해요. '고급'이지만 현장에서는 일상 도구예요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-03">연구자 bisect 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-04">모노레포 submodule 사례 보기 →</a></span>
+    </div>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>고급 도구들은 주방의 <strong>특수 도구</strong> 같아요. 매일 쓰는 칼·프라이팬은 아니지만, '이탈리아 면 만들 때', '케이크 장식할 때' 딱 필요한 순간이 와요. 이름과 용도만 알아도 충분해요.</p>
+    </div>
+
+    <section class="tut-section" id="cherry-pick" data-reveal>
+      <h2 class="tut-section__title">cherry-pick — 체리 한 알만 따오기</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git cherry-pick &lt;커밋&gt;</span>는 다른 브랜치의 사진 중 딱 하나만 내 브랜치로 가져와요. 비유하자면 나무에서 체리 한 알만 골라 따는 거예요. '이 기능만 이 브랜치에도 넣고 싶다' 할 때 유용해요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="stash" data-reveal>
+      <h2 class="tut-section__title">stash — 작업을 잠시 서랍에</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git stash</span>는 작업 중인 변경을 잠시 서랍에 넣어요. '방 청소하느라 물건 잠시 서랍에'처럼요. 브랜치를 바꿔야 하는데 아직 커밋하기엔 이를 때 쓰고, 돌아와서 <span class="cmd-pill">git stash pop</span>으로 다시 꺼내요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>stash는 '잠깐 비켜' 명령어예요. 브랜치를 바꿔야 하는데 커밋하기엔 이른 변경이 있을 때, stash로 잠시 치워두고 나중에 다시 꺼내 쓰세요. 커밋보다 가볍고, 임시 보관 느낌이에요.</p>
+    </div>
+
+    <section class="tut-section" id="bisect" data-reveal>
+      <h2 class="tut-section__title">bisect — 반씩 쪼개며 범인 찾기</h2>
+      <div class="tut-section__body">
+        <p>어느 날부터 버그가 생겼는지 모를 때 <span class="cmd-pill">git bisect</span>가 빛을 발해요. '좋은 사진'과 '나쁜 사진'을 알려주면, Git이 사진첩을 반씩 쪼개가며 '범인(처음 버그가 생긴 사진)'을 이진 탐색으로 찾아줘요. 수백 장의 사진 속에서도 10번 안에 찾아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="submodule-worktree" data-reveal>
+      <h2 class="tut-section__title">submodule &amp; worktree — 사진첩 안의 사진첩, 여러 책상</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git submodule</span>은 한 사진첩 안에 다른 사진첩을 끼워 넣는 거예요. '책 안에 다른 책을 부록으로' 넣는 것처럼요. 큰 프로젝트가 여러 저장소를 모아 쓸 때 쓰여요.</p>
+        <p><span class="cmd-pill">git worktree</span>는 같은 사진첩을 여러 폴더에서 동시에 열어요. '같은 책을 여러 책상에 펴놓기'예요. 브랜치 여러 개를 동시에 봐야 할 때 폴더를 바꾸는 번거로움을 줄여줘요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="filter-repo" data-reveal>
+      <h2 class="tut-section__title">git filter-repo — 역사 전체에서 한 사람 모자이크</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git filter-repo</span>는 사진첩 전체에서 특정 파일이나 비밀번호를 제거해요. 모든 사진을 뒤져 '이 사람 모자이크'처럼 흔적을 지워요. 비밀번호를 실수로 커밋했을 때 꼭 필요해요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스 -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p>비밀번호를 실수로 커밋했다면 filter-repo로 역사에서 제거해야 해요. 그리고 <strong>그 비밀번호를 바꿔야 해요</strong>. reset만으로는 원격에 이미 남아있기 때문이에요. 한 번 올라간 비밀은 '없었던 일'로 만들 수 없어요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T12 한 장 요약</h2>
+      <p class="cheat-card__sub">고급 기법 핵심 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git cherry-pick &lt;커밋&gt;</span><span class="cheat-card__desc">다른 브랜치의 사진 한 장만 따오기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git stash</span><span class="cheat-card__desc">작업 중 변경을 잠시 서랍에 보관.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git stash pop</span><span class="cheat-card__desc">보관해둔 변경 다시 꺼내기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git bisect</span><span class="cheat-card__desc">이진 탐색으로 버그 범인 찾기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git submodule</span><span class="cheat-card__desc">사진첩 안에 다른 사진첩 끼워 넣기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git worktree</span><span class="cheat-card__desc">같은 사진첩을 여러 폴더에서 열기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git filter-repo</span><span class="cheat-card__desc">역사 전체에서 파일/비밀번호 제거.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (T11 ← T12 → T13) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-undo.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T11 실수했어요? 되돌리기</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-config-files.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T13 Git을 내 입맛대로: 설정과 파일들</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#cherry-pick">cherry-pick</a>
+      <a class="sidebar-toc__link" href="#stash">stash</a>
+      <a class="sidebar-toc__link" href="#bisect">bisect</a>
+      <a class="sidebar-toc__link" href="#submodule-worktree">submodule &amp; worktree</a>
+      <a class="sidebar-toc__link" href="#filter-repo">filter-repo</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

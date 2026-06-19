@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T14 Git은 도구, GitHub는 마을 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git과 GitHub를 혼동하기 쉬운 두 단어부터 정리해요. Git은 사진첩 프로그램, GitHub는 그 사진첩을 모아두는 인터넷 마을." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T14 · GitHub 협업</p>
+  <h1 class="page-header__title">Git은 도구, GitHub는 마을</h1>
+  <p class="page-header__subhead">비슷한 이름이라 늘 헷갈리죠. Git은 내 컴퓨터에서 사진첩을 정리하는 '연필'이고, GitHub는 그 사진첩을 모아두고 함께 보는 '인터넷 마을'이에요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T14 → T2-01 리눅스 커널, T2-06 정부 공공) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>리눅스 커널부터 정부 공공 데이터까지, 수많은 프로젝트가 GitHub라는 마을에 모여 살아요. 혼자 쓰는 도구에서 '함께 만드는 광장'으로 — 버전 관리가 마을이 되면 힘이 커진답니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-01">리눅스 커널 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-06">정부·공공 데이터 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="two-words" data-reveal>
+      <h2 class="tut-section__title">헷갈리는 두 단어부터 정리할게요</h2>
+      <div class="tut-section__body">
+        <p>사람들은 "GitHub에 올렸어요"라고 말할 때, 사실은 "Git으로 사진첩을 만들고, 그걸 GitHub라는 마을에 올렸어요"라고 말하는 거예요. 두 단어는 붙어 다니지만, 역할이 달라요.</p>
+        <p><strong>Git</strong>은 T01에서 배운 그 사진첩 프로그램이에요. 내 컴퓨터에서 혼자 쓰는 도구예요. 인터넷 없이도 작동해요. 반면 <strong>GitHub</strong>는 그 사진첩을 인터넷에 올려놓고 다른 사람과 함께 보는 <strong>마을</strong>이에요. Git 없이 GitHub는 성립하지 않지만, Git만 있다고 마을이 되진 않아요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Git이 '연필'이라면, GitHub는 '모두가 글을 올리는 게시판'이에요. 연필로 쓴 글을 게시판에 붙이면 남들이 읽고, 복사(fork)하고, 의견을 달고, 함께 고칠 수 있죠. 연필은 혼자 쓰는 도구지만, 게시판은 함께 쓰는 공간이랍니다.</p>
+    </div>
+
+    <section class="tut-section" id="comparison" data-reveal>
+      <h2 class="tut-section__title">한 표로 비교해 볼게요</h2>
+      <div class="tut-section__body">
+        <p>두 단어의 차이를 표로 보면 훨씬 명확해요.</p>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col">구분</th>
+              <th scope="col">Git</th>
+              <th scope="col">GitHub</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">생김새</th>
+              <td>사진첩 프로그램</td>
+              <td>사진첩을 모아두는 인터넷 마을</td>
+            </tr>
+            <tr>
+              <th scope="row">위치</th>
+              <td>내 컴퓨터에서</td>
+              <td>클라우드(인터넷)에서</td>
+            </tr>
+            <tr>
+              <th scope="row">성격</th>
+              <td>도구(tool)</td>
+              <td>서비스(도구 위에 얹힌)</td>
+            </tr>
+            <tr>
+              <th scope="row">인터넷 필요?</th>
+              <td>아니오</td>
+              <td>예</td>
+            </tr>
+            <tr>
+              <th scope="row">혼자 쓸 때</th>
+              <td>충분</td>
+              <td>있으면 더 편하지만 필수는 아님</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tut-section" id="hosting" data-reveal>
+      <h2 class="tut-section__title">GitHub는 '호스팅 플랫폼'이에요</h2>
+      <div class="tut-section__body">
+        <p>전문 용어로 GitHub는 <strong>코드 호스팅 플랫폼(code hosting platform)</strong>이에요. '남의 사진첩을 인터넷에 올려주는 창고'라는 뜻이에요. 비유하자면, Git이 '책을 만드는 인쇄소'라면 GitHub는 '그 책을 진열하고 파는 서점'이에요.</p>
+        <p>이런 창고는 GitHub만 있는 건 아니에요. <strong>GitLab</strong>, <strong>Bitbucket</strong>도 같은 역할을 해요. 다만 GitHub가 가장 많은 사람이 쓰고, '소셜' 기능이 풍부해서 대세가 됐어요. 어떤 창고를 쓰든 아래쪽은 Git이라는 도구가 똑같이 깔려 있어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="social-coding" data-reveal>
+      <h2 class="tut-section__title">마을이 특별한 이유: 소셜 코딩</h2>
+      <div class="tut-section__body">
+        <p>GitHub는 단순한 창고가 아니에요. <strong>social coding(소셜 코딩)</strong>이라는 문화를 만든 곳이에요. 코드에 '좋아요'를 누르고(star), 남의 프로젝트를 내 계정으로 복사하고(fork), 고친 걸 제안하고(pull request), 문제를 논의하고(issue) — 코드를 '함께 만드는' 공간이 된 거예요.</p>
+        <p>이런 대화 기능이 GitHub를 단순 저장소 이상의 협업 광장으로 만들어요. T15에서는 저장소를, T16에서는 Issue와 PR을, T17에서는 코드 리뷰를 차례로 배워요. 마을의 규칙을 하나씩 익히는 셈이에요.</p>
+      </div>
+    </section>
+
+    <!-- 역사 박스 -->
+    <div class="side-note side-note--history" data-reveal>
+      <span class="side-note__label">옛날 이야기</span>
+      <p>GitHub는 2008년 샌프란시스코에서 시작됐어요. 'Git을 더 쉽게 함께 쓰자'는 아이디어였죠. 그 전에는 SourceForge, Google Code 같은 마을이 먼저 있었어요. 2018년에는 Microsoft가 GitHub를 인수했고, 지금은 전 세계 1억 명이 넘는 개발자가 이 마을에 살고 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="github-not-git" data-reveal>
+      <h2 class="tut-section__title">한 가지 더: GitHub ≠ Git</h2>
+      <div class="tut-section__body">
+        <p>가장 흔한 오해 하나. "GitHub에서 배우면 Git을 배우는 거냐"고 물으면 — 반만 맞아요. Git은 도구 그 자체이고, GitHub는 그 도구를 얹은 마을이에요. 마을의 규칙(Pull Request, Issue, branch protection)은 GitHub만의 것이지, Git 자체의 규칙은 아니에요.</p>
+        <p>그래서 GitLab이나 Bitbucket으로 옮겨도, Git 명령어는 똑같이 쓰지만 마을의 모양은 달라요. 우리는 이 시리즈에서 Git(T01~T13)을 먼저 익혔고, 이제 GitHub라는 마을(T14~T21)의 규칙을 배울 차례예요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>GitHub 말고도 비슷한 마을이 있어요. GitLab(자체 서버 운영에 강함), Bitbucket(Atlassian 제품군과 연동), Gitea(가볍게 직접 설치). 회사에 따라 쓰는 마을이 달라요. 하지만 'Git으로 사진첩을 만든다'는 본질은 모두 같답니다.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T14 한 장 요약</h2>
+      <p class="cheat-card__sub">Git과 GitHub의 관계</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Git</span><span class="cheat-card__desc">사진첩 프로그램. 내 컴퓨터에서 작동하는 도구. 인터넷 불필요.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">GitHub</span><span class="cheat-card__desc">사진첩을 모아두는 인터넷 마을. 도구 위에 얹힌 서비스.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">호스팅 플랫폼</span><span class="cheat-card__desc">코드를 인터넷에 올려주는 창고. GitLab, Bitbucket도 같은 부류.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">social coding</span><span class="cheat-card__desc">코드에 좋아요·복사·제안·논의로 '함께 만드는' GitHub 문화.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">2008년 출시</span><span class="cheat-card__desc">샌프란시스코에서 시작. 2018년 Microsoft 인수.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">GitHub ≠ Git</span><span class="cheat-card__desc">Git은 도구, GitHub는 마을. 마을 규칙은 GitHub 고유.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T13, 다음=T15) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-config-files.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T13 Git, 내 입맛에 맞게 설정</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-repo.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T15 나의 첫 저장소</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#two-words">두 단어 정리</a>
+      <a class="sidebar-toc__link" href="#comparison">비교 표</a>
+      <a class="sidebar-toc__link" href="#hosting">호스팅 플랫폼</a>
+      <a class="sidebar-toc__link" href="#social-coding">소셜 코딩</a>
+      <a class="sidebar-toc__link" href="#github-not-git">GitHub ≠ Git</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

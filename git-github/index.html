@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git & GitHub 안내서 — 비개발자를 위한 따뜻한 튜토리얼</title>
+  <meta name="description" content="비개발자를 위한 Git & GitHub 따뜻한 튜토리얼. 일상 비유로 시작하는 단계별 학습 가이드.">
+
+  <!-- Pretendard Variable CDN -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+  <!-- REQ-002: CSS 로드 순서 (tokens → base → layout → components → pages) -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <!-- 읽기 진행률 바 -->
+  <div class="reading-bar"
+       role="progressbar"
+       aria-valuenow="0"
+       aria-valuemin="0"
+       aria-valuemax="100"
+       aria-label="읽기 진행률"></div>
+
+  <!-- GlobalHeader -->
+  <header class="global-header">
+    <div class="global-header__inner">
+      <a class="gh-logo" href="index.html">Git &amp; GitHub 안내서</a>
+
+      <nav class="gh-nav" aria-label="주요 메뉴">
+        <!-- 학습트랙 드롭다운 -->
+        <div class="gh-nav__item">
+          <button class="gh-nav__trigger"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            학습트랙 <span aria-hidden="true">▾</span>
+          </button>
+          <div class="gh-dropdown" role="menu">
+            <a class="gh-dropdown__link" href="tutorial/git-concept.html">Git이란 무엇인가</a>
+            <a class="gh-dropdown__link" href="tutorial/git-basics.html">첫 커밋 만들기</a>
+            <a class="gh-dropdown__link" href="tutorial/git-branch.html">브랜치 기초</a>
+            <a class="gh-dropdown__link" href="tutorial/github-issues-pr.html">풀 리퀘스트 보내기</a>
+          </div>
+        </div>
+
+        <!-- 참조 드롭다운 -->
+        <div class="gh-nav__item">
+          <button class="gh-nav__trigger"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            참조 <span aria-hidden="true">▾</span>
+          </button>
+          <div class="gh-dropdown" role="menu">
+            <a class="gh-dropdown__link" href="ref/cheatsheet.html">명령어 치트시트</a>
+            <a class="gh-dropdown__link" href="ref/glossary.html">용어 사전</a>
+            <a class="gh-dropdown__link" href="tutorial/git-merge.html">충돌 해결 가이드</a>
+          </div>
+        </div>
+
+        <!-- 사례 드롭다운 -->
+        <div class="gh-nav__item">
+          <button class="gh-nav__trigger"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            사례 <span aria-hidden="true">▾</span>
+          </button>
+          <div class="gh-dropdown" role="menu">
+            <a class="gh-dropdown__link" href="cases/index.html">사례 갤러리 전체</a>
+            <a class="gh-dropdown__link" href="cases/index.html#t1-02">디자인 팀 사례</a>
+            <a class="gh-dropdown__link" href="cases/index.html#t1-01">문서 작성 팀 사례</a>
+          </div>
+        </div>
+
+        <!-- 검색 버튼 (search.js가 Ctrl+K/Cmd+K, '/' 와 함께 바인딩) -->
+        <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+
+      <!-- 시리즈 링크 -->
+        <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+      </nav>
+
+      <!-- 햄버거 (768px 이하) -->
+      <button class="gh-hamburger"
+              type="button"
+              aria-expanded="false"
+              aria-controls="mobile-drawer"
+              aria-label="메뉴 열기">
+        ☰ <span class="sr-only">메뉴</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 모바일 드로어 -->
+  <div class="mobile-drawer" id="mobile-drawer" role="dialog" aria-modal="true" aria-label="모바일 메뉴">
+    <div class="mobile-drawer__panel">
+      <div class="mobile-drawer__section">
+        <p class="mobile-drawer__title">학습트랙</p>
+        <a class="mobile-drawer__link" href="tutorial/git-concept.html">Git이란 무엇인가</a>
+        <a class="mobile-drawer__link" href="tutorial/git-basics.html">첫 커밋 만들기</a>
+        <a class="mobile-drawer__link" href="tutorial/git-branch.html">브랜치 기초</a>
+        <a class="mobile-drawer__link" href="tutorial/github-issues-pr.html">풀 리퀘스트 보내기</a>
+      </div>
+      <div class="mobile-drawer__section">
+        <p class="mobile-drawer__title">참조</p>
+        <a class="mobile-drawer__link" href="ref/cheatsheet.html">명령어 치트시트</a>
+        <a class="mobile-drawer__link" href="ref/glossary.html">용어 사전</a>
+        <a class="mobile-drawer__link" href="tutorial/git-merge.html">충돌 해결 가이드</a>
+      </div>
+      <div class="mobile-drawer__section">
+        <p class="mobile-drawer__title">사례</p>
+        <a class="mobile-drawer__link" href="cases/index.html">사례 갤러리 전체</a>
+        <a class="mobile-drawer__link" href="cases/index.html#t1-02">디자인 팀 사례</a>
+        <a class="mobile-drawer__link" href="cases/index.html#t1-01">문서 작성 팀 사례</a>
+      </div>
+      <div class="mobile-drawer__section">
+        <p class="mobile-drawer__title">시리즈</p>
+        <a class="mobile-drawer__link" href="../tmux/index.html">tmux 안내서</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb (홈이므로 nav.js가 "홈" 표시) -->
+  <nav class="breadcrumb" aria-label="경로"></nav>
+
+  <!-- 본문: 홈 허브 (P2) -->
+  <main class="tpl-home">
+
+    <!-- HeroBlock -->
+    <section class="home-hero" data-reveal>
+      <div class="home-hero__inner">
+        <p class="home-hero__eyebrow">비개발자를 위한 튜토리얼 시리즈</p>
+        <h1 class="home-hero__title">
+          Git과 GitHub,<br>
+          한 권의 <span class="accent">친절한</span> 안내서
+        </h1>
+        <p class="home-hero__subhead">
+          두 길을 드려요 — 차근차근 튜토리얼로 배우거나, 필요할 때마다 참조·사례에서 찾거나.
+        </p>
+
+        <!-- 검색 입력 (히어로) -->
+        <form class="home-hero__search" role="search" onsubmit="return false;">
+          <label for="search-input" class="sr-only">사이트 검색</label>
+          <input type="search"
+                 id="search-input"
+                 class="home-hero__search-input"
+                 placeholder="검색: git merge, PR, 되돌리기…"
+                 aria-label="사이트 검색"
+                 autocomplete="off">
+          <button type="button" class="home-hero__search-btn" aria-label="검색 열기">
+            검색
+          </button>
+        </form>
+
+        <!-- 일러스트 자리표시자: commit 그래프가 나무처럼 뻗는 자리 -->
+        <div class="home-hero__art" aria-hidden="true">
+          <!-- @MX:NOTE: [AUTO] commit 그래프-나무 단색 SVG placeholder. 실제 일러스트는 후속 단계에서 교체. -->
+          <svg viewBox="0 0 480 200" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <!-- 메인 줄기 -->
+            <line x1="60" y1="170" x2="60" y2="100" stroke="currentColor" stroke-width="2"/>
+            <!-- 첫 번째 가지 (왼쪽 위) -->
+            <line x1="60" y1="120" x2="180" y2="60" stroke="currentColor" stroke-width="2"/>
+            <!-- 두 번째 가지 (오른쪽 위) -->
+            <line x1="60" y1="110" x2="300" y2="40" stroke="currentColor" stroke-width="2"/>
+            <!-- 세 번째 가지 (가운데 위) -->
+            <line x1="60" y1="100" x2="420" y2="80" stroke="currentColor" stroke-width="2"/>
+            <!-- commit 노드들 -->
+            <circle cx="60" cy="170" r="7" fill="currentColor"/>
+            <circle cx="60" cy="120" r="7" fill="currentColor"/>
+            <circle cx="180" cy="60" r="7" fill="currentColor"/>
+            <circle cx="300" cy="40" r="7" fill="currentColor"/>
+            <circle cx="420" cy="80" r="7" fill="currentColor"/>
+            <!-- 병합 지점 표시 -->
+            <circle cx="60" cy="100" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <p class="home-hero__art-caption">commit 그래프가 나무처럼 뻗는 자리</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ThreeDoors: 어디서 시작할까요? -->
+    <section class="section three-doors" data-reveal>
+      <h2 class="section__title">어디서 시작할까요?</h2>
+      <div class="three-doors__grid">
+
+        <!-- Door 1: 튜토리얼 트랙 -->
+        <a class="door" href="tutorial/git-concept.html">
+          <div class="door__icon" aria-hidden="true">📖</div>
+          <h3 class="door__title">튜토리얼 트랙</h3>
+          <p class="door__sub">T01부터 21페이지 순서대로</p>
+          <p class="door__desc">처음부터 끝까지 차근차근. 개념→설치→기초→브랜치→원격→GitHub까지.</p>
+        </a>
+
+        <!-- Door 2: 참조 허브 -->
+        <a class="door" href="ref/command-dictionary.html">
+          <div class="door__icon" aria-hidden="true">📚</div>
+          <h3 class="door__title">참조 허브</h3>
+          <p class="door__sub">명령어 사전·용어집·FAQ·치트시트</p>
+          <p class="door__desc">필요할 때마다 찾아보는 사전. 명령어·용어·자주 묻는 질문을 한곳에.</p>
+        </a>
+
+        <!-- Door 3: 사례 갤러리 -->
+        <a class="door" href="cases/index.html">
+          <div class="door__icon" aria-hidden="true">🌟</div>
+          <h3 class="door__title">사례 갤러리</h3>
+          <p class="door__sub">소설가부터 리눅스 커널까지, 이렇게도 써요</p>
+          <p class="door__desc">비개발자 14종 + 전문가 12종 사례. 다양한 직업이 Git을 어떻게 쓰는지.</p>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- CasePreview: 사례 미리보기 -->
+    <section class="section case-preview" data-reveal>
+      <h2 class="section__title">사례 미리보기</h2>
+      <div class="case-preview__grid">
+
+        <!-- Case 1: 소설가 -->
+        <a class="case-card" href="cases/index.html#t1-01">
+          <span class="case-card__tag">T1-01 · 소설가</span>
+          <h3 class="case-card__title">원고 버전 관리</h3>
+          <p class="case-card__summary">소설 원고 초안·수정·완결을 버전별로 보관하며, 언제든 과거 초안으로 돌아갈 수 있습니다.</p>
+          <span class="case-card__more">더 보기 →</span>
+        </a>
+
+        <!-- Case 2: 법률가 -->
+        <a class="case-card" href="cases/index.html#t1-04">
+          <span class="case-card__tag">T1-04 · 법률가</span>
+          <h3 class="case-card__title">계약서 변경 추적</h3>
+          <p class="case-card__summary">계약서 개정안을 변경 이력으로 추적해, 누가 언제 어떤 조항을 바꿨는지 한눈에 봅니다.</p>
+          <span class="case-card__more">더 보기 →</span>
+        </a>
+
+        <!-- Case 3: 리눅스 커널 -->
+        <a class="case-card" href="cases/index.html#t2-01">
+          <span class="case-card__tag">T2-01 · 리눅스 커널</span>
+          <h3 class="case-card__title">Git의 탄생지</h3>
+          <p class="case-card__summary">리누스 토르발스가 리눅스 커널을 관리하려고 만든 Git. 그 시작점을 돌아봅니다.</p>
+          <span class="case-card__more">더 보기 →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- SeriesLink: 이 시리즈의 다른 글 -->
+    <section class="section series-link" data-reveal>
+      <h2 class="section__title">이 시리즈의 다른 글</h2>
+      <div class="series-link__grid">
+
+        <!-- tmux 자매 사이트 -->
+        <a class="series-card" href="../tmux/index.html">
+          <span class="series-card__tag">자매 사이트</span>
+          <h3 class="series-card__title">터미널 친구들 · tmux 한 장 정리</h3>
+          <p class="series-card__desc">같은 시리즈의 다른 안내서. 터미널을 띄우고 나누고 붙이는 tmux 사용법.</p>
+        </a>
+
+        <!-- 현재 사이트 -->
+        <a class="series-card series-card--current" href="index.html" aria-current="page">
+          <span class="series-card__tag">지금 보는 중</span>
+          <h3 class="series-card__title">Git &amp; GitHub 안내서</h3>
+          <p class="series-card__desc">지금 보고 있어요. 두 길(튜토리얼·참조)이 함께 있는 따뜻한 안내서.</p>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- SearchOverlay DOM (search.js가 제어) -->
+  <div class="search-overlay" id="search-overlay" role="dialog" aria-modal="true" aria-label="사이트 검색" hidden>
+    <div class="search-overlay__panel">
+      <input type="search"
+             id="search-overlay-input"
+             class="search-overlay__input"
+             placeholder="검색어를 입력하세요…"
+             aria-label="검색어 입력"
+             autocomplete="off">
+      <div class="search-tabs" id="search-tabs" role="tablist" aria-label="결과 종류">
+        <button class="search-tab is-active" type="button" role="tab" data-tab="all" aria-selected="true">전체</button>
+        <button class="search-tab" type="button" role="tab" data-tab="tutorial" aria-selected="false">튜토리얼</button>
+        <button class="search-tab" type="button" role="tab" data-tab="reference" aria-selected="false">참조</button>
+        <button class="search-tab" type="button" role="tab" data-tab="case" aria-selected="false">사례</button>
+        <button class="search-tab" type="button" role="tab" data-tab="command" aria-selected="false">명령어</button>
+      </div>
+      <div id="search-status" class="sr-only" aria-live="polite" role="status"></div>
+      <div class="search-results" id="search-results" role="listbox" aria-label="검색 결과"></div>
+    </div>
+  </div>
+
+  <!-- GlobalFooter -->
+  <footer class="global-footer">
+    <div class="global-footer__inner">
+      <span>© 2026 Git &amp; GitHub 안내서. 따뜻한 튜토리얼 시리즈.</span>
+      <a href="../tmux/index.html" style="border-bottom: none;">시리즈: tmux 안내서 →</a>
+    </div>
+  </footer>
+
+  <!-- REQ-009: 검색 인덱스 인라인 임베드 (fetch 금지, file:// CORS 회피) -->
+  <script type="application/json" id="search-index">
+[
+  {"type":"home","id":"home","title":"홈 — Git과 GitHub 안내서","summary":"비개발자를 위한 따뜻한 튜토리얼 시리즈 현관. 튜토리얼·참조·사례 세 갈래.","url":"index.html","keywords":["홈","시작","home"]},
+
+  {"type":"tutorial","id":"t01","title":"버전 관리가 뭔가요?","summary":"Git이 무엇인지, 왜 쓰는지. '변경 이력'이라는 비유로 시작.","url":"tutorial/git-concept.html","keywords":["버전관리","개념","git란","version control"]},
+  {"type":"tutorial","id":"t02","title":"Git, 설치하고 첫 인사까지","summary":"Git 설치, 최초 설정, 첫 커밋까지.","url":"tutorial/git-setup.html","keywords":["설치","install","초기설치","config"]},
+  {"type":"tutorial","id":"t03","title":"수정 → 묶기 → 기록","summary":"add, commit 기본 사이클. 수정을 묶어 기록하는 법.","url":"tutorial/git-basics.html","keywords":["add","commit","기초","기본"]},
+  {"type":"tutorial","id":"t04","title":"3개의 방: 작업·대기·기록","summary":"작업 디렉토리·스테이징·저장소 3영역 모델.","url":"tutorial/git-staging.html","keywords":["staging","스테이징","영역","working directory","index"]},
+  {"type":"tutorial","id":"t05","title":"과거로 여행하기","summary":"log, diff로 과거 기록 탐험.","url":"tutorial/git-history.html","keywords":["log","diff","히스토리","history","과거"]},
+  {"type":"tutorial","id":"t06","title":"평행 우주를 만드는 법: 브랜치","summary":"branch로 평행 우주(작업 줄기) 만들기.","url":"tutorial/git-branch.html","keywords":["branch","브랜치","평행","가지"]},
+  {"type":"tutorial","id":"t07","title":"두 세계가 하나로: 병합과 충돌","summary":"merge로 브랜치 합치기, 충돌 해결. --no-ff 옵션.","url":"tutorial/git-merge.html","keywords":["merge","병합","머지","충돌","conflict","no-ff"]},
+  {"type":"tutorial","id":"t08","title":"역사를 깔끔하게 다시 쓰기: 리베이스","summary":"rebase로 커밋 역사 재정렬. merge와 비교.","url":"tutorial/git-rebase.html","keywords":["rebase","리베이스","재작성"]},
+  {"type":"tutorial","id":"t09","title":"세상과 연결되기: 원격 저장소","summary":"remote, push, pull, fetch로 원격 저장소 연동.","url":"tutorial/git-remote.html","keywords":["remote","원격","push","pull","fetch","origin"]},
+  {"type":"tutorial","id":"t10","title":"버전, 딱 붙이기: 태그","summary":"tag로 릴리스 버전 표시.","url":"tutorial/git-tag.html","keywords":["tag","태그","버전","release","v1"]},
+  {"type":"tutorial","id":"t11","title":"실수했다고요? 괜찮아요: 되돌리기","summary":"reset, revert로 실수 복구. 'Oh Shit Git' 상황.","url":"tutorial/git-undo.html","keywords":["undo","되돌리기","reset","revert","실수","복구","rollback"]},
+  {"type":"tutorial","id":"t12","title":"한 단계 더 깊이: 고급 기법","summary":"stash, cherry-pick, bisect, reflog 고급 기법.","url":"tutorial/git-advanced.html","keywords":["stash","cherry-pick","bisect","reflog","고급","advanced"]},
+  {"type":"tutorial","id":"t13","title":"Git을 내 입맛대로: 설정과 파일들","summary":"config, .gitignore, 전역/로컬 설정 파일.","url":"tutorial/git-config-files.html","keywords":["config","gitignore","설정","설정파일","global"]},
+  {"type":"tutorial","id":"t14","title":"Git은 도구, GitHub는 마을","summary":"Git과 GitHub의 차이. GitHub라는 협업 마을.","url":"tutorial/github-concept.html","keywords":["github","개념","마을","차이","협업"]},
+  {"type":"tutorial","id":"t15","title":"나의 첫 저장소","summary":"GitHub 저장소 만들기, clone, 첫 푸시.","url":"tutorial/github-repo.html","keywords":["repo","repository","저장소","clone","생성"]},
+  {"type":"tutorial","id":"t16","title":"대화로 코드를 만드는 법: Issue와 PR","summary":"Issue로 문제 제기, Pull Request로 변경 제안.","url":"tutorial/github-issues-pr.html","keywords":["issue","pr","pull request","풀리퀘스트","이슈"]},
+  {"type":"tutorial","id":"t17","title":"코드 리뷰, 서로 키워주는 시간","summary":"PR 리뷰, 승인(approve), 변경 요청.","url":"tutorial/github-review.html","keywords":["review","리뷰","승인","approve","피드백"]},
+  {"type":"tutorial","id":"t18","title":"로봇 비서를 고용하세요: GitHub Actions","summary":"CI/CD 자동화 워크플로우. workflow.yml.","url":"tutorial/github-actions.html","keywords":["actions","ci","cd","자동화","workflow","파이프라인"]},
+  {"type":"tutorial","id":"t19","title":"안전한 협업의 기술: 보안","summary":"SSH 키, 2FA, 토큰, 권한 관리.","url":"tutorial/github-security.html","keywords":["security","보안","ssh","2fa","token","권한"]},
+  {"type":"tutorial","id":"t20","title":"어떻게 일할 것인가: 워크플로우 모델 비교","summary":"GitFlow vs Trunk-based vs Fork 워크플로우 비교.","url":"tutorial/github-workflow-models.html","keywords":["workflow","워크플로우","gitflow","trunk","fork","모델","비교"]},
+  {"type":"tutorial","id":"t21","title":"GitHub, 더 넓은 세계","summary":"Pages, Codespaces, Copilot, 프로필 README.","url":"tutorial/github-extras.html","keywords":["pages","codespaces","copilot","프로필","extras"]},
+
+  {"type":"reference","id":"r01","title":"명령어 사전","summary":"git 명령어·옵션 검색/필터 사전 (알파벳/주제/난이도).","url":"ref/command-dictionary.html","keywords":["명령어","사전","dictionary","command","레퍼런스"]},
+  {"type":"reference","id":"r02","title":"용어집 — 두려운 단어 사전","summary":"commit/branch/rebase/PR 등 용어 + 비유 + 정의.","url":"ref/glossary.html","keywords":["용어집","glossary","사전","단어"]},
+  {"type":"reference","id":"r03","title":"자주 묻는 질문 (FAQ)","summary":"초보자 실제 질문: 실수·충돌·잃어버림.","url":"ref/faq.html","keywords":["faq","질문","자주","q&a"]},
+  {"type":"reference","id":"r04","title":"한눈에 보는 치트시트 모음","summary":"주제별 인쇄용 치트시트 카드.","url":"ref/cheatsheet.html","keywords":["cheatsheet","치트시트","요약","카드"]},
+
+  {"type":"case","id":"cases-page","title":"이렇게도 쓸 수 있어요 — 사례 갤러리","summary":"Tier 1(비개발자 14) + Tier 2(전문가 12) 사례 카드 그리드 + 필터.","url":"cases/index.html","keywords":["사례","갤러리","cases","케이스","활용"]},
+
+  {"type":"command","id":"git-merge","title":"git merge","summary":"브랜치를 병합한다. --no-ff로 병합 커밋 강제.","url":"ref/command-dictionary.html#git-merge","keywords":["merge","병합","머지","no-ff","병합커밋"]},
+  {"type":"command","id":"git-merge-no-ff","title":"git merge --no-ff","summary":"fast-forward가 아니어도 병합 커밋을 남긴다.","url":"ref/command-dictionary.html#git-merge-no-ff","keywords":["merge","no-ff","병합"]},
+  {"type":"command","id":"git-rebase","title":"git rebase","summary":"커밋 베이스를 옮겨 역사를 재정렬.","url":"ref/command-dictionary.html#git-rebase","keywords":["rebase","리베이스","재작성"]},
+  {"type":"command","id":"git-reset","title":"git reset","summary":"HEAD를 지정 커밋으로 옮긴다. --hard/--soft/--mixed.","url":"ref/command-dictionary.html#git-reset","keywords":["reset","되돌리기","취소","hard","soft"]},
+  {"type":"command","id":"git-revert","title":"git revert","summary":"지정 커밋을 되돌리는 새 커밋 생성 (히스토리 보존).","url":"ref/command-dictionary.html#git-revert","keywords":["revert","되돌리기","취소"]},
+  {"type":"command","id":"git-add","title":"git add","summary":"변경을 스테이징 영역에 올린다.","url":"ref/command-dictionary.html#git-add","keywords":["add","스테이징","stage"]},
+  {"type":"command","id":"git-commit","title":"git commit","summary":"스테이징된 변경을 커밋으로 기록.","url":"ref/command-dictionary.html#git-commit","keywords":["commit","커밋","기록"]},
+  {"type":"command","id":"git-status","title":"git status","summary":"작업 디렉토리·스테이징 상태 확인.","url":"ref/command-dictionary.html#git-status","keywords":["status","상태","확인"]},
+  {"type":"command","id":"git-log","title":"git log","summary":"커밋 히스토리 조회.","url":"ref/command-dictionary.html#git-log","keywords":["log","히스토리","조회"]},
+  {"type":"command","id":"git-branch-cmd","title":"git branch","summary":"브랜치 생성/목록/삭제.","url":"ref/command-dictionary.html#git-branch-cmd","keywords":["branch","브랜치","가지"]},
+  {"type":"command","id":"git-checkout","title":"git checkout / git switch","summary":"브랜치/커밋 전환.","url":"ref/command-dictionary.html#git-checkout","keywords":["checkout","switch","전환","이동"]},
+  {"type":"command","id":"git-push","title":"git push","summary":"로컬 커밋을 원격에 올린다.","url":"ref/command-dictionary.html#git-push","keywords":["push","푸시","업로드","원격"]},
+  {"type":"command","id":"git-pull","title":"git pull","summary":"원격 변경을 가져와 병합.","url":"ref/command-dictionary.html#git-pull","keywords":["pull","풀","가져오기"]},
+  {"type":"command","id":"git-fetch","title":"git fetch","summary":"원격 변경을 가져오기만(병합 안 함).","url":"ref/command-dictionary.html#git-fetch","keywords":["fetch","패치","가져오기"]},
+  {"type":"command","id":"git-clone","title":"git clone","summary":"원격 저장소 복제.","url":"ref/command-dictionary.html#git-clone","keywords":["clone","복제","다운로드"]},
+  {"type":"command","id":"git-remote-cmd","title":"git remote","summary":"원격 저장소 관리. origin 추가/변경.","url":"ref/command-dictionary.html#git-remote-cmd","keywords":["remote","원격","origin"]},
+  {"type":"command","id":"git-tag-cmd","title":"git tag","summary":"태그(릴리스 버전) 생성.","url":"ref/command-dictionary.html#git-tag-cmd","keywords":["tag","태그","버전"]},
+  {"type":"command","id":"git-stash","title":"git stash","summary":"변경을 임시 보관.","url":"ref/command-dictionary.html#git-stash","keywords":["stash","임시","보관"]},
+  {"type":"command","id":"git-cherry-pick","title":"git cherry-pick","summary":"특정 커밋만 가져와 적용.","url":"ref/command-dictionary.html#git-cherry-pick","keywords":["cherry-pick","체리픽"]},
+  {"type":"command","id":"git-init","title":"git init","summary":"현재 디렉토리를 Git 저장소로 초기화.","url":"ref/command-dictionary.html#git-init","keywords":["init","초기화","생성"]},
+
+  {"type":"glossary","id":"repository","title":"repository (저장소)","summary":"Git이 변경 이력을 관리하는 디렉토리/공간.","url":"ref/glossary.html#repository","keywords":["repository","저장소","repo","레포"]},
+  {"type":"glossary","id":"commit","title":"commit (커밋)","summary":"변경을 기록하는 하나의 스냅샷 단위.","url":"ref/glossary.html#commit","keywords":["commit","커밋","스냅샷","기록"]},
+  {"type":"glossary","id":"staging-area","title":"staging area (스테이징 영역)","summary":"커밋 대기실. add로 올린 변경이 대기.","url":"ref/glossary.html#staging-area","keywords":["staging","스테이징","대기","index"]},
+  {"type":"glossary","id":"head","title":"HEAD","summary":"현재 작업 중인 커밋/브랜치를 가리키는 포인터.","url":"ref/glossary.html#head","keywords":["head","헤드","포인터","현재"]},
+  {"type":"glossary","id":"branch-glossary","title":"branch (브랜치)","summary":"평행 작업 줄기. 독립된 커밋 역사.","url":"ref/glossary.html#branch-glossary","keywords":["branch","브랜치","가지","평행"]},
+  {"type":"glossary","id":"merge-glossary","title":"merge (병합)","summary":"두 브랜치의 변경을 하나로 합치는 작업.","url":"ref/glossary.html#merge-glossary","keywords":["merge","병합","머지","합치기"]},
+  {"type":"glossary","id":"rebase-glossary","title":"rebase (리베이스)","summary":"커밋 베이스를 옮겨 역사 재정렬.","url":"ref/glossary.html#rebase-glossary","keywords":["rebase","리베이스","재정렬"]},
+  {"type":"glossary","id":"pull-request","title":"pull request (PR)","summary":"병경을 반영해달라는 제안. 리뷰→병합 흐름.","url":"ref/glossary.html#pull-request","keywords":["pull request","pr","풀리퀘스트","제안"]},
+  {"type":"glossary","id":"fork","title":"fork (포크)","summary":"남의 저장소를 내 계정으로 복사.","url":"ref/glossary.html#fork","keywords":["fork","포크","복사"]},
+  {"type":"glossary","id":"clone-glossary","title":"clone (복제)","summary":"원격 저장소를 로컬로 복제.","url":"ref/glossary.html#clone-glossary","keywords":["clone","복제","클론"]},
+  {"type":"glossary","id":"remote-glossary","title":"remote (원격)","summary":"원격 서버의 저장소 참조. origin.","url":"ref/glossary.html#remote-glossary","keywords":["remote","원격","origin"]},
+  {"type":"glossary","id":"origin","title":"origin","summary":"기본 원격 저장소의 관습적 이름.","url":"ref/glossary.html#origin","keywords":["origin","오리진","기본원격"]},
+  {"type":"glossary","id":"tag-glossary","title":"tag (태그)","summary":"특정 커밋에 붙이는 버전 표식.","url":"ref/glossary.html#tag-glossary","keywords":["tag","태그","버전","릴리스"]},
+  {"type":"glossary","id":"conflict","title":"conflict (충돌)","summary":"병합 시 같은 줄이 달라 자동 합치기 실패.","url":"ref/glossary.html#conflict","keywords":["conflict","충돌","충돌해결"]},
+  {"type":"glossary","id":"diff","title":"diff (차이)","summary":"두 상태 간 변경 차이.","url":"ref/glossary.html#diff","keywords":["diff","디프","차이","비교"]},
+
+  {"type":"case","id":"t1-01","title":"T1-01. 소설가·작가 — 원고 버전 관리","summary":"소설 원고 초안·수정·완결을 버전별로 보관.","url":"cases/index.html#t1-01","keywords":["소설가","작가","원고","글"]},
+  {"type":"case","id":"t1-02","title":"T1-02. 디자이너 — 에셋·SVG·Figma 내보내기 히스토리","summary":"디자인 에셋 버전과 내보내기 이력 관리.","url":"cases/index.html#t1-02","keywords":["디자이너","에셋","svg","figma"]},
+  {"type":"case","id":"t1-03","title":"T1-03. 연구자·학생 — 논문 + 데이터셋 + 재현 가능 연구","summary":"논문·데이터·코드로 재현 가능 연구.","url":"cases/index.html#t1-03","keywords":["연구자","논문","데이터셋","재현","학생"]},
+  {"type":"case","id":"t1-04","title":"T1-04. 법률가 — 계약서 변경 추적","summary":"계약서 개정안을 변경 이력으로 추적.","url":"cases/index.html#t1-04","keywords":["법률가","계약서","변호사","추적"]},
+  {"type":"case","id":"t1-05","title":"T1-05. 행정직원 — 문서 개정 이력, 회의록","summary":"문서 개정 이력과 회의록 버전 관리.","url":"cases/index.html#t1-05","keywords":["행정","문서","회의록","개정"]},
+  {"type":"case","id":"t1-06","title":"T1-06. 음악가·작곡가 — 악보·가사 버전 관리","summary":"악보·가사·데모 버전 관리.","url":"cases/index.html#t1-06","keywords":["음악가","작곡가","악보","가사","데모"]},
+  {"type":"case","id":"t1-07","title":"T1-07. 요리사·레시피 개발자 — 레시피 반복 개선","summary":"레시피를 반복 개선하며 버전별 보관.","url":"cases/index.html#t1-07","keywords":["요리사","레시피","조리"]},
+  {"type":"case","id":"t1-08","title":"T1-08. 게이머 — 세이지·모드 버전 관리, 롤백","summary":"게임 세이지·모드 버전 관리와 문제 발생 시 롤백. T07(병합)과 연계.","url":"cases/index.html#t1-08","keywords":["게이머","세이지","모드","롤백","rollback","merge","병합"]},
+  {"type":"case","id":"t1-09","title":"T1-09. 닷파일 (Dotfiles) — 여러 컴퓨터 설정 동기화","summary":"여러 컴퓨터의 설정 파일 동기화.","url":"cases/index.html#t1-09","keywords":["dotfiles","닷파일","설정","동기화"]},
+  {"type":"case","id":"t1-10","title":"T1-10. 블로거·뉴스레터 작가 — 글 버전 관리 + GitHub Pages 발행","summary":"글 버전 관리와 Pages 자동 발행.","url":"cases/index.html#t1-10","keywords":["블로거","뉴스레터","글","pages","발행"]},
+  {"type":"case","id":"t1-11","title":"T1-11. 이력서·포트폴리오 — GitHub Pages 이력서 + profile README","summary":"Pages 이력서 + 프로필 README.","url":"cases/index.html#t1-11","keywords":["이력서","포트폴리오","profile","readme"]},
+  {"type":"case","id":"t1-12","title":"T1-12. 일기·가계부 — 개인 데이터 버전 관리","summary":"개인 기록 데이터 버전 관리.","url":"cases/index.html#t1-12","keywords":["일기","가계부","개인","데이터"]},
+  {"type":"case","id":"t1-13","title":"T1-13. 교사 — 강의자료·시험지 버전 관리, 학생 과제 PR","summary":"강의자료 버전 관리 + 학생 과제 PR 흐름.","url":"cases/index.html#t1-13","keywords":["교사","강의자료","시험지","과제","pr"]},
+  {"type":"case","id":"t1-14","title":"T1-14. 번역가 — 번역 메모리 버전 관리","summary":"번역 메모리·용어집 버전 관리.","url":"cases/index.html#t1-14","keywords":["번역가","번역","메모리","용어"]},
+  {"type":"case","id":"t2-01","title":"T2-01. 리눅스 커널 — Git의 탄생지","summary":"Git이 탄생한 리눅스 커널 개발 흐름.","url":"cases/index.html#t2-01","keywords":["리눅스","커널","linux","탄생"]},
+  {"type":"case","id":"t2-02","title":"T2-02. Trunk-based Development — Google·Meta 규모","summary":"대규모 조직의 trunk-based 개발.","url":"cases/index.html#t2-02","keywords":["trunk","trunk-based","google","meta"]},
+  {"type":"case","id":"t2-03","title":"T2-03. GitFlow 원조 — Vincent Driessen 2010","summary":"GitFlow 브랜칭 모델 원조.","url":"cases/index.html#t2-03","keywords":["gitflow","vincent driessen","2010"]},
+  {"type":"case","id":"t2-04","title":"T2-04. 모노레포 (Monorepo) — Google·Meta·Microsoft","summary":"거대 조직의 모노레포 전략.","url":"cases/index.html#t2-04","keywords":["monorepo","모노레포","google","microsoft"]},
+  {"type":"case","id":"t2-05","title":"T2-05. 오픈소스 기여 흐름 — fork→PR→review→merge","summary":"오픈소스 기여 표준 흐름.","url":"cases/index.html#t2-05","keywords":["오픈소스","fork","pr","review","기여"]},
+  {"type":"case","id":"t2-06","title":"T2-06. 정부·공공 데이터 — 18F, 미국 정부, 공공데이터","summary":"정부·공공 데이터 Git 활용.","url":"cases/index.html#t2-06","keywords":["정부","공공","18f","데이터"]},
+  {"type":"case","id":"t2-07","title":"T2-07. 학계 — 데이터 공유, arXiv + git, 오픈 저널","summary":"학계 데이터 공유와 재현.","url":"cases/index.html#t2-07","keywords":["학계","arxiv","데이터공유","저널"]},
+  {"type":"case","id":"t2-08","title":"T2-08. 책·문서 — GitBook, Pro Git","summary":"GitBook, Pro Git 등 문서를 Git으로.","url":"cases/index.html#t2-08","keywords":["gitbook","pro git","문서","책"]},
+  {"type":"case","id":"t2-09","title":"T2-09. Oh Shit, Git!?! — 실수 복구 현상","summary":"실수 복구 커뮤니티 현상과 패턴.","url":"cases/index.html#t2-09","keywords":["oh shit git","실수","복구","롤백"]},
+  {"type":"case","id":"t2-10","title":"T2-10. GitHub Actions CI/CD — 실제 팀 자동화","summary":"실제 팀의 Actions CI/CD 사례.","url":"cases/index.html#t2-10","keywords":["actions","ci","cd","자동화","팀"]},
+  {"type":"case","id":"t2-11","title":"T2-11. 프로필 README + contribution 그래프 — 구직 활용","summary":"프로필 README와 contribution 그래프 활용.","url":"cases/index.html#t2-11","keywords":["프로필","readme","contribution","구직"]},
+  {"type":"case","id":"t2-12","title":"T2-12. Codespaces·Copilot — 현대 워크플로우 변화","summary":"Codespaces·Copilot이 바꾼 워크플로우.","url":"cases/index.html#t2-12","keywords":["codespaces","copilot","현대","워크플로우"]}
+]
+  </script>
+
+  <!-- REQ-001: JS 로드 순서 (nav → progress → reveal → search) -->
+  <script src="js/nav.js" defer></script>
+  <script src="js/progress.js" defer></script>
+  <script src="js/reveal.js" defer></script>
+  <script src="js/search.js" defer></script>
+</body>
+</html>

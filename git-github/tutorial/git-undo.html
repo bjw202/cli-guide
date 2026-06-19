@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T11 실수했다고요? 괜찮아요: 되돌리기 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git에서는 거의 모든 걸 되돌릴 수 있어요. reset --soft/mixed/hard, revert, restore, clean, reflog 복구, 'Oh Shit Git' 패턴까지 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T11 · 되돌리기</p>
+  <h1 class="page-header__title">실수했다고요? 괜찮아요 — Git에서는 거의 다 되돌릴 수 있어요</h1>
+  <p class="page-header__subhead">이 페이지가 어쩌면 제일 중요할지도 몰라요. 비개발자가 Git을 두려워하는 가장 큰 이유가 '실수하면 다 날아가지 않을까'인데, 방법만 알면 Git은 꽤 안전한 편이에요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: T11 → T1-04, T2-09) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>법률가도 '계약서 예전 버전으로 돌아가야 할 때' 버전 관리 덕에 안전하게 되돌려요. 그리고 실수 복구 패턴을 모아둔 'Oh Shit, Git!?!' 사이트는 전 세계 개발자의 구명조끼예요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-04">법률가 — 계약서 이전 버전 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-09">Oh Shit Git 사례 보기 →</a></span>
+    </div>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Git의 사진첩은 한 번 찍은 사진을 <strong>안전한 쓰레기통(reflog)</strong>에도 복사해 둬요. 도달 가능한 사진은 기본 90일, 그렇지 않은 사진도 30일간 보관돼요. 쓰레기통을 비우지 않는 한 거의 다 꺼낼 수 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="reset" data-reveal>
+      <h2 class="tut-section__title">reset — 사진첩에서 사진 몇 장 떼어내기</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git reset</span>은 현재 위치에서 '몇 장 뒤로 갈지' 정하는 명령이에요. 세 가지 강도가 있어요.</p>
+        <p><strong>--soft</strong>: HEAD만 뒤로. 사진은 떼어지지만 내 작업 방과 대기 방은 그대로예요. '방금 찍은 사진을 다시 고쳐 찍고 싶을 때'.<br>
+        <strong>--mixed</strong> (기본값): HEAD를 뒤로 옮기고 대기 방(staging)까지 비워요. 작업 방 파일은 그대로. '대기 방에 잘못 올린 걸 내릴 때'.<br>
+        <strong>--hard</strong>: HEAD를 뒤로 옮기고 대기 방과 작업 방까지 완전히 덮어써요. 커밋하지 않은 변경은 정말로 사라져요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스 (핵심) -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p><span class="cmd-pill">git reset --hard</span>는 작업 방의 파일까지 덮어써요. 아직 사진으로 안 찍은(커밋 안 한) 변경은 정말 날아가요. 커밋하지 않은 변경이 있을 땐 절대 쓰지 마세요.</p>
+    </div>
+
+    <section class="tut-section" id="revert" data-reveal>
+      <h2 class="tut-section__title">revert — '취소합니다'라는 새 사진 찍기</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git revert &lt;커밋&gt;</span>는 사진을 떼어내는 게 아니라, <strong>'이 사진 취소합니다'라는 취소 사진을 새로 찍는</strong> 거예요. 역사를 안 지우기 때문에 이미 다른 사람과 공개한 저장소에서 안전해요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스: reset vs revert -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p><strong>이미 push한 건 revert로, 아직 안 올린 건 reset으로.</strong> reset은 역사를 지워버리니까 공개된 저장소에 쓰면 동료의 사진첩이 꼬여요. 로컬에서만 reset, 공개 뒤엔 revert. 이 원칙만 기억하세요.</p>
+    </div>
+
+    <section class="tut-section" id="restore-clean" data-reveal>
+      <h2 class="tut-section__title">restore &amp; clean — 파일 단위 되돌리기</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git restore &lt;파일&gt;</span>은 파일을 마지막 사진 상태로 되돌려요. <span class="cmd-pill">git restore --staged &lt;파일&gt;</span>는 대기 방에서 빼내 원래 작업 방으로 돌려요. (예전에는 <span class="cmd-pill">git checkout &lt;파일&gt;</span>로 썼어요.)</p>
+        <p><span class="cmd-pill">git clean -fd</span>는 Git이 추적하지 않는 새 파일·빈 폴더를 삭제해요. 주의! 한 번 지운 건 reflog에도 안 남아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="reflog" data-reveal>
+      <h2 class="tut-section__title">reflog — 잃어버린 사진 찾기</h2>
+      <div class="tut-section__body">
+        <p>실수로 <code>reset --hard</code>를 해도 끝이 아니에요. <span class="cmd-pill">git reflog</span>는 '내가 최근에 머물렀던 모든 위치'를 기록해 둬요. 거기서 원래 사진의 해시를 찾아 <span class="cmd-pill">git reset --hard &lt;해시&gt;</span>로 다시 돌아가면 돼요. 쓰레기통에서 꺼내는 거랍니다.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은: Oh Shit Git -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><strong>'Oh Shit, Git!?!'</strong> 패턴 — 자주 묻는 복구 시나리오:<br>
+      • '잘못 브랜치에서 커밋했어요' → <span data-term="cherry-pick">cherry-pick</span> 또는 새 브랜치 만들고 reset.<br>
+      • 'reset --hard 했는데 필요했어요' → reflog에서 복구.<br>
+      • 'force push 해서 동료 작업 날아갔어요' → 정말 조심. reflog와 동료 협조로 일부 복구 가능.</p>
+    </div>
+
+    <!-- SPEC-IMPL-006 자산: OhShitGitSimulator (시그니처) -->
+    <section class="asset" data-asset="oh-shit-git" data-reveal aria-label="실수 복구 시뮬레이터">
+      <h2 class="asset__title">🛟 "아 망할!" — 실수 복구 시뮬레이터</h2>
+      <p class="asset__hint">상황을 고르면 복구 명령과 "왜 작동하나"가 나와요. (ohshitgit.com 오마주)</p>
+      <div class="ohshit__menu" data-ohshit-menu></div>
+      <div class="ohshit__panel" data-ohshit-panel></div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T11 한 장 요약</h2>
+      <p class="cheat-card__sub">되돌리기 핵심 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git reset --soft &lt;커밋&gt;</span><span class="cheat-card__desc">HEAD만 뒤로. 작업·대기 방 유지.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git reset --mixed &lt;커밋&gt;</span><span class="cheat-card__desc">기본값. HEAD 뒤로 + 대기 방 비움.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git reset --hard &lt;커밋&gt;</span><span class="cheat-card__desc">HEAD + 대기 + 작업 방까지 완전히. 주의!</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git revert &lt;커밋&gt;</span><span class="cheat-card__desc">취소 사진을 새로 찍기. 공개 저장소에 안전.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git restore &lt;파일&gt;</span><span class="cheat-card__desc">파일을 마지막 사진 상태로 되돌리기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git restore --staged &lt;파일&gt;</span><span class="cheat-card__desc">대기 방에서 빼내기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git clean -fd</span><span class="cheat-card__desc">추적 안 되는 새 파일·빈 폴더 삭제. 주의!</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git reflog</span><span class="cheat-card__desc">최근 머문 위치 기록. 잃어버린 커밋 찾기.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (T10 ← T11 → T12) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-tag.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T10 버전 딱 붙이기: 태그</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-advanced.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T12 한 단계 더 깊이: 고급 기법</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#reset">reset 세 가지</a>
+      <a class="sidebar-toc__link" href="#revert">revert</a>
+      <a class="sidebar-toc__link" href="#restore-clean">restore &amp; clean</a>
+      <a class="sidebar-toc__link" href="#reflog">reflog 복구</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/oh-shit-git.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

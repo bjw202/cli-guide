@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T04 3개의 방: 작업·대기·기록 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git은 파일의 상태를 작업 방·대기 방·기록 방 세 군데로 나눠요. staging area의 의미와 git diff의 다양한 변형을 가짜 터미널과 함께." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T04 · Git 심화</p>
+  <h1 class="page-header__title">Git에는 방이 3개 있어요</h1>
+  <p class="page-header__subhead">T01에서 "방이 3개 있다"고만 짚고 넘어갔죠. 이번엔 그 방의 정체를 제대로 파헤쳐요. 작업 방, 대기 방, 기록 방 — 이 세 방이 어떻게 연결되고, 왜 '대기 방(staging)'이 필요한지 알아봐요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T04 → T1-02 디자이너) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>디자이너도 작업이 한꺼번에 끝나지 않아요. 오늘은 로고, 내일은 색 팔레트, 모레는 타이포. 변경을 주제별로 나눠 묶어 두면 나중에 '이때 로고만 롤백하자'처럼 정교하게 되돌리기 쉬워요. Git의 대기 방은 바로 그 '주제별 묶음'을 준비하는 자리예요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-02">디자이너 사례 보기 →</a>
+    </div>
+
+    <section class="tut-section" id="three-rooms" data-reveal>
+      <h2 class="tut-section__title">세 방의 이름과 역할</h2>
+      <div class="tut-section__body">
+        <p>Git은 파일을 셋으로 나눠 봐요. 각 방에 이름이 있어요.</p>
+        <ul>
+          <li><strong>작업 방(working directory)</strong> — 지금 내가 직접 고치고 있는 곳. 에디터로 파일을 열어 타이핑하는 그 공간이에요.</li>
+          <li><strong>대기 방(<span data-term="staging-area">staging area</span>)</strong> — '다음 사진에 넣겠다'고 표시한 파일들이 모이는 곳. <code>git add</code>를 치면 이 방으로 파일이 들어와요.</li>
+          <li><strong>기록 방(repository)</strong> — 사진첩 그 자체. <code>git commit</code>으로 도장을 찍으면, 대기 방의 내용이 이 방에 영구히 한 장으로 남아요.</li>
+        </ul>
+        <p>파일은 이렇게 흘러요: <strong>작업 방 → (add) → 대기 방 → (commit) → 기록 방</strong>. 한 방향으로만 흐르고, 중간의 '대기 방'이 왜 필요한지는 곧 알게 돼요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>대기 방(staging)은 <strong>'사진을 찍기 전에 인물을 정렬하는 무대'</strong> 같아요. 무대에 올린 사람만 사진에 찍혀요. 올리기 전엔 얼마든지 다시 빼고, 무대에 없는 사람은 이번 사진에서 빠진 채로 찍히죠.</p>
+    </div>
+
+    <section class="tut-section" id="why-staging" data-reveal>
+      <h2 class="tut-section__title">왜 굳이 '대기 방'이 필요할까?</h2>
+      <div class="tut-section__body">
+        <p>"작업 방에서 바로 기록 방으로 가면 안 되나요?" 하는 의문, 자연스러워요. 대기 방이 필요한 이유는 <strong>한 사진에 무엇을 넣을지 정교하게 고를 수 있기</strong> 때문이에요.</p>
+        <p>예를 들어 오늘 로고도 고치고, 오타도 고치고, 설정 파일도 손봤어요. 이걸 한 사진에 다 때려 넣으면, 두 달 뒤에 "이때 뭘 바꿨더라?" 했을 때 섞여서 알아보기 힘들어요. 대기 방에서 로고만 골라 한 사진으로 찍고, 그다음 오타만 골라 또 한 사진으로 찍으면 — 사진첩이 '로고 바꿈', '오타 수정'처럼 주제별로 깔끔하게 정리돼요.</p>
+        <p>즉 대기 방은 <strong>'주제별 묶음을 준비하는 프레임'</strong>이에요. T03에서 배운 <code>git add</code>는 사실 이 방에 파일을 보내는 명령이었고, <code>git commit</code>은 이 방의 내용을 사진으로 찍는 명령이었어요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>한 사진에 너무 많은 변경을 한 번에 넣지 마세요. <strong>주제별로 나눠 찍으면</strong> 나중에 되돌리기 쉽고, 동료가 리뷰하기도 편해요. "이 사진은 로고만" "이 사진은 문서만"처럼 한 일을 한 사진에 담는 습관이 숙련자의 비결이에요.</p>
+    </div>
+
+    <section class="tut-section" id="diff" data-reveal>
+      <h2 class="tut-section__title">세 방 사이의 '차이'를 보는 도구 — diff</h2>
+      <div class="tut-section__body">
+        <p>세 방이 있으니, "어느 방과 어느 방을 비교할까?"에 따라 <code>git diff</code>가 여러 모습으로 쓰여요. 아래 터미널은 대기 방과 기록 방(마지막 사진) 사이의 차이를 보는 예시예요.</p>
+
+        <!-- FakeTerminal: diff 예시 시퀀스 -->
+        <div class="fake-terminal" data-terminal-script='[
+          {"cmd":"echo \"버전 1\" &gt; readme.md &amp;&amp; git add readme.md &amp;&amp; git commit -m \"v1\"","out":[{"t":"ok","s":"[main a1b2c3d] v1"}]},
+          {"cmd":"echo \"버전 2 (제목 수정)\" &gt;&gt; readme.md","out":[]},
+          {"cmd":"git diff","out":[{"t":"out","s":"diff --git a/readme.md b/readme.md"},{"t":"out","s":"+버전 2 (제목 수정)"}]},
+          {"cmd":"git add readme.md","out":[]},
+          {"cmd":"git diff --staged","out":[{"t":"out","s":"diff --git a/readme.md b/readme.md"},{"t":"hi","s":"+버전 2 (제목 수정)"}]}
+        ]'>
+          <div class="fterm__bar"><span class="fterm__dots"><span class="fterm__dot fterm__dot--r"></span><span class="fterm__dot fterm__dot--y"></span><span class="fterm__dot fterm__dot--g"></span></span><span class="fterm__title">터미널 — diff 변형 비교</span></div>
+          <div class="fterm__body"><div class="fterm__out">스크롤하면 재생됩니다…</div></div>
+        </div>
+
+        <p>기본 <span class="cmd-pill">git diff</span>는 <strong>작업 방 vs 대기 방</strong>을 비교해요. "뭘 더 대기 방에 안 넣었나?"를 보여주죠. 반면 <span class="cmd-pill">git diff --staged</span>(또는 <span class="cmd-pill">git diff --cached</span>, 같은 뜻)는 <strong>대기 방 vs 마지막 사진</strong>을 비교해요. "이번에 넣으려는 게 뭔가?"를 보여줘요.</p>
+        <p>다른 자주 쓰는 변형들:</p>
+        <ul>
+          <li><span class="cmd-pill">git diff HEAD</span> — 작업 방 vs 마지막 사진 (전체 차이).</li>
+          <li><span class="cmd-pill">git diff --stat</span> — 줄 단위가 아니라 파일별 요약(몇 줄 바뀌었는지)으로.</li>
+          <li><span class="cmd-pill">git diff &lt;파일&gt;</span> — 특정 파일만 비교.</li>
+          <li><span class="cmd-pill">git diff --word-diff</span> — 줄이 아니라 단어 단위로 바뀐 점을 표시.</li>
+          <li><span class="cmd-pill">git diff branch1..branch2</span> — 두 브랜치(T06) 사이의 차이.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><code>--staged</code>와 <code>--cached</code>는 <strong>완전히 같은 뜻</strong>이에요. Git의 오래된 이름이 'cache'였던 흔적이 남아 있어서 두 단어 모두 쓸 수 있어요. 요즘은 의미가 더 명확한 <code>--staged</code>를 더 많이 써요.</p>
+    </div>
+
+    <!-- SPEC-IMPL-006 자산: StagingFlowDiagram -->
+    <section class="asset" data-asset="staging-flow" data-reveal aria-label="3개 방 파일 이동 다이어그램">
+      <h2 class="asset__title">🚪 세 개의 방 — 파일이 어떻게 옮겨갈까</h2>
+      <p class="asset__hint">add와 commit을 눌러 파일이 작업 → 대기 → 기록 방으로 옮겨가는 걸 보세요.</p>
+      <div class="asset__controls">
+        <button class="asset__btn" type="button" data-staging-action="add">git add</button>
+        <button class="asset__btn" type="button" data-staging-action="commit">git commit</button>
+        <button class="asset__btn" type="button" data-staging-action="reset">초기화</button>
+      </div>
+      <div class="staging-flow__rooms">
+        <div class="staging-room" data-room="working">
+          <p class="staging-room__title">작업 방 (working)</p>
+          <p class="staging-room__count" data-room-count></p>
+          <div data-room-files></div>
+        </div>
+        <div class="staging-room" data-room="staging">
+          <p class="staging-room__title">대기 방 (staging)</p>
+          <p class="staging-room__count" data-room-count></p>
+          <div data-room-files></div>
+        </div>
+        <div class="staging-room" data-room="repo">
+          <p class="staging-room__title">기록 방 (repo)</p>
+          <p class="staging-room__count" data-room-count></p>
+          <div data-room-files></div>
+        </div>
+      </div>
+      <p class="staging-flow__log" data-staging-log>버튼을 눌러 파일을 옮겨보세요.</p>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T04 한 장 요약</h2>
+      <p class="cheat-card__sub">세 방과 diff 변형 정리</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">3개의 방</span><span class="cheat-card__desc">작업 방(working) · 대기 방(staging) · 기록 방(repository).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git diff</span><span class="cheat-card__desc">작업 방 vs 대기 방. "뭘 더 안 넣었나?".</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git diff --staged / --cached</span><span class="cheat-card__desc">대기 방 vs 마지막 사진. "뭘 넣으려나?" (둘은 같은 뜻).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git diff HEAD</span><span class="cheat-card__desc">작업 방 vs 마지막 사진. 전체 차이.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git diff --stat</span><span class="cheat-card__desc">파일별 요약. 줄 수 위주로.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git diff --word-diff</span><span class="cheat-card__desc">줄 단위가 아니라 단어 단위로 변경 표시.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T03, 다음=T05) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-basics.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T03 수정 → 묶기 → 기록</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-history.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T05 과거로 여행하기</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC (스크롤 스파이는 향후 확장; 현재는 정적 링크) -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#three-rooms">세 방의 이름과 역할</a>
+      <a class="sidebar-toc__link" href="#why-staging">왜 대기 방이 필요한가</a>
+      <a class="sidebar-toc__link" href="#diff">diff 변형들</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → fake-terminal → 자산. -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/fake-terminal.js" defer></script>
+<script src="../js/staging-flow.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

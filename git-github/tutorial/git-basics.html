@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T03 수정 → 묶기 → 기록 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git의 하루는 세 단어로 끝나요. status로 확인하고, add로 묶고, commit으로 사진첩에 한 장으로 붙이는 기본 사이클을 가짜 터미널과 함께." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T03 · Git 기초</p>
+  <h1 class="page-header__title">세 단어의 마법 — status, add, commit</h1>
+  <p class="page-header__subhead">Git의 하루는 사실 세 단어로 끝나요. 지금 뭐가 바뀌었는지 보고(status), 바뀐 걸 하나로 묶어서(add), 사진첩에 한 장으로 붙이기(commit). 이 세 단계만 알면 Git의 절반은 한 거랍니다.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T03 → T1-01 소설가, T1-07 요리사) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>소설가도 챕터가 끝날 때마다 원고를 '한 장'으로 묶어 저장하죠. 요리사도 레시피를 단계별로 정리해서 '오늘의 메뉴'로 묶어요. Git의 add·commit은 글쓰기와 요리 모두에 쓰이는 '한 단락 마무리하기' 흐름이에요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-01">소설가·작가 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t1-07">요리사 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="three-words" data-reveal>
+      <h2 class="tut-section__title">Git 하루의 세 단어</h2>
+      <div class="tut-section__body">
+        <p>복잡해 보이는 Git도, 매일 반복하는 핵심은 딱 세 단계예요. 먼저 큰 그림으로 보면:</p>
+        <ol>
+          <li><strong>status</strong> — "지금 뭐가 바뀌었고, 사진첩에 안 붙인 게 뭐야?"</li>
+          <li><strong>add</strong> — "이 바뀐 파일, 다음 사진에 넣어줘."</li>
+          <li><strong>commit</strong> — "메시지를 적어서 사진첩에 한 장으로 붙여."</li>
+        </ol>
+        <p>이 세 단어를 한 바퀴 도는 게 Git의 '기본 사이클'이에요. 처음엔 이 흐름을 손에 익히는 게 전부랍니다.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><code>add</code>는 '한 묶음으로 포장하기', <code>commit</code>은 '포장한 묶음에 도장 찍어 사진첩에 붙이기'예요. 포장하기 전에는 얼마든지 뺄 수 있고, 도장을 찍은 뒤에는 사진첩에 영구히 남아요.</p>
+    </div>
+
+    <section class="tut-section" id="cycle" data-reveal>
+      <h2 class="tut-section__title">한 번에 보는 기본 사이클</h2>
+      <div class="tut-section__body">
+        <p>아래 터미널을 천천히 스크롤해 보세요. 빈 사진첩을 만들고(<code>git init</code>), 파일이 생겼는지 확인하고(<code>git status</code>), 묶어서(<code>git add</code>) 사진첩에 붙이는(<code>git commit</code>) 흐름이 한눈에 펼쳐져 있어요.</p>
+
+        <!-- FakeTerminal: git 기본 흐름 데모 -->
+        <div class="fake-terminal" data-terminal-script='[
+          {"cmd":"git init","out":[{"t":"ok","s":"Initialized empty Git repository in /project/.git/"}]},
+          {"cmd":"git status","out":[{"t":"out","s":"On branch main"},{"t":"out","s":"No commits yet"},{"t":"warn","s":"Untracked files: readme.md"}]},
+          {"cmd":"git add readme.md","out":[]},
+          {"cmd":"git commit -m \"첫 커밋: 프로젝트 시작\"","out":[{"t":"ok","s":"[main (root-commit) a1b2c3d] 첫 커밋"},{"t":"out","s":" 1 file changed, 1 insertion(+)"}]},
+          {"cmd":"git log --oneline","out":[{"t":"hi","s":"a1b2c3d 첫 커밋: 프로젝트 시작"}]}
+        ]'>
+          <div class="fterm__bar"><span class="fterm__dots"><span class="fterm__dot fterm__dot--r"></span><span class="fterm__dot fterm__dot--y"></span><span class="fterm__dot fterm__dot--g"></span></span><span class="fterm__title">터미널 — git 기본 흐름</span></div>
+          <div class="fterm__body"><div class="fterm__out">스크롤하면 재생됩니다…</div></div>
+        </div>
+
+        <p>단계별로 풀어볼게요. <strong>git status</strong>는 지금 작업 방(working directory)의 상태를 보여줘요. 새로 만든 파일은 '추적 안 됨(Untracked)'로 빨간색으로 떠요. <strong>git add readme.md</strong>로 그 파일을 '다음 사진에 넣겠다'고 표시하면, 초록색으로 바뀌죠. 그리고 <strong>git commit -m "메시지"</strong>로 도장을 찍으면, 사진첩에 한 장으로 영구히 남아요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>처음엔 <code>git status</code>를 아주 자주 치세요. Git이 친절하게 "지금 뭘 해야 할지"를 알려줘요. "이 파일은 아직 안 넣었어", "이건 넣을 준비 됐어" 같은 안내가 뜨니까, 막막할 땐 일단 <code>git status</code>부터.</p>
+    </div>
+
+    <section class="tut-section" id="look-back" data-reveal>
+      <h2 class="tut-section__title">붙인 사진 다시 보기 — log와 show</h2>
+      <div class="tut-section__body">
+        <p>사진을 붙이고 나면, "내가 지금까지 뭘 붙였더라?"가 궁금해져요. 이때 두 명령이 나와요.</p>
+        <p><strong>git log</strong>는 사진첩의 목차예요. 가장 최근 사진이 위에, 처음 사진이 아래에 나열돼요. <code>git log --oneline</code>을 붙이면 한 줄 요약으로 쫙 보여줘요. 터미널 데모의 마지막 줄이 바로 이 모습이에요.</p>
+        <p><strong>git show</strong>는 사진 한 장을 확대해 보는 도구예요. <code>git show</code>만 치면 가장 최근 사진을, <code>git show a1b2c3d</code>처럼 특정 사진 번호(SHA)를 주면 그 사진을 자세히 보여줘요. 무엇이 바뀌었는지(diff)까지 같이요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="amend" data-reveal>
+      <h2 class="tut-section__title">방금 찍은 사진의 메시지 고치기 — amend</h2>
+      <div class="tut-section__body">
+        <p>커밋 메시지에 오타가 났거나, 내용이 마음에 안 들 때. 아직 사진첩에 붙인 직후라면 고칠 수 있어요.</p>
+        <pre class="code-block"><code>git commit --amend -m "새로운 메시지"</code></pre>
+        <p>이 명령은 <strong>'방금 찍은 사진 하나'를 새로 찍어 덮어쓰는</strong> 거예요. 사진첩의 다른 사진엔 영향이 없어요. 다만, <strong>이미 인터넷(GitHub)에 올린 사진은 amend하면 안 돼요</strong> — 다른 사람과 사진첩이 엇갈릴 수 있거든요. 자세한 건 T09(remote)와 T11(undo)에서 다뤄요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스 -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">잠깐, 주의!</span>
+      <p>커밋 메시지는 '무엇을 바꿨는지'보다 <strong>'왜 바꿨는지'</strong>를 적는 게 나중에 큰 도움이 돼요. "readme 수정"보다 "프로젝트 목적을 처음 방문자에게 명확히"가, 두 달 뒤의 나와 동료에게 훨씬 친절한 메시지랍니다.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T03 한 장 요약</h2>
+      <p class="cheat-card__sub">수정 → 묶기 → 기록의 기본 사이클</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git status</span><span class="cheat-card__desc">지금 뭐가 바뀌었는지, 사진첩에 안 붙인 게 뭔지 보기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git add &lt;파일&gt;</span><span class="cheat-card__desc">바뀐 파일을 다음 사진에 넣겠다고 포장하기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git commit -m "메시지"</span><span class="cheat-card__desc">포장한 묶음에 도장 찍어 사진첩에 한 장으로 붙이기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git log</span><span class="cheat-card__desc">지금까지 붙인 사진 목록 보기 (--oneline 추천).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git show [커밋]</span><span class="cheat-card__desc">특정 사진(기본=최근) 자세히 보기. diff까지.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git commit --amend</span><span class="cheat-card__desc">방금 찍은 사진의 메시지/내용 고치기 (안 올린 사진만).</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T02, 다음=T04) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-setup.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T02 Git 설치와 첫 인사</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-staging.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T04 3개의 방: 작업·대기·기록</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC (스크롤 스파이는 향후 확장; 현재는 정적 링크) -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#three-words">세 단어의 마법</a>
+      <a class="sidebar-toc__link" href="#cycle">기본 사이클 데모</a>
+      <a class="sidebar-toc__link" href="#look-back">log와 show</a>
+      <a class="sidebar-toc__link" href="#amend">amend로 고치기</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → fake-terminal. T03은 FakeTerminal 사용. -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/fake-terminal.js" defer></script>
+</body>
+</html>

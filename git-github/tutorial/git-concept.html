@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T01 버전 관리가 뭔가요? — Git &amp; GitHub 안내서</title>
+<meta name="description" content="버전 관리를 '시간 여행 사진첩'이라는 비유로 시작해 VCS, 분산 vs 중앙, 스냅샷, 커밋, SHA-1, 불변성, HEAD까지 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T01 · Git 기초</p>
+  <h1 class="page-header__title">시간을 되돌릴 수 있는 사진첩 — 버전 관리란</h1>
+  <p class="page-header__subhead">문서를 고칠 때마다 '최종', '진짜최종', '진짜진짜최종' 파일을 만드셨나요? 버전 관리는 그 짓을 안 해도 되게 해 주는, 시간 여행 사진첩이에요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T01 → T1-01 소설가, T2-01 리눅스 커널) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>소설가도 원고 초안·수정·완결을 버전별로 보관하고, 리눅스 커널 개발자들도 같은 원리로 수만 명의 변경을 한데 모아요. 버전 관리는 글쓰기부터 운영체제 개발까지 쓰이는 같은 도구랍니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-01">소설가·작가 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-01">리눅스 커널 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">먼저, 사진첩으로 시작할게요</h2>
+      <div class="tut-section__body">
+        <p>컴퓨터 파일이 '책의 한 페이지'라 상상해 보세요. 수정할 때마다 그 페이지를 통째로 복사해서 사진첩에 한 장씩 붙이는 거예요. 언제든 과거 페이지로 돌아갈 수 있고, 두 페이지를 나란히 비교할 수도 있어요. 이 사진첩이 바로 <strong>버전 관리 시스템(Version Control System, VCS)</strong>이에요.</p>
+        <p>연결해서 외워요. 사진첩 전체를 <strong>저장소(repository)</strong>라 부르고, 사진 한 장을 <strong>커밋(commit)</strong>이라 불러요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>옛날엔 '최종_진짜최종_v3_이게마지막.docx'처럼 파일 이름에 버전을 적었죠. 버전 관리는 그게 필요 없어요. 컴퓨터가 알아서 사진첩에 정리해 주니까요.</p>
+    </div>
+
+    <section class="tut-section" id="distributed" data-reveal>
+      <h2 class="tut-section__title">한 곳에 모으냐, 여러 군데에 나누냐</h2>
+      <div class="tut-section__body">
+        <p>사진첨의 생김새는 두 가지예요. <strong>중앙 집중식</strong>은 사진첩이 딱 하나뿐이라 모두가 그 한 곳을 오가며 사진을 붙이는 방식이고, <strong>분산식</strong>은 참여자마다 사진첩 사본을 통째로 갖는 방식이에요. Git은 분산식이에요 — 덕분에 인터넷이 끊겨도 내 사진첩에 사진을 붙일 수 있고, 나중에 서로 사본을 맞춰요.</p>
+      </div>
+    </section>
+
+    <!-- 역사 박스 -->
+    <div class="side-note side-note--history" data-reveal>
+      <span class="side-note__label">옛날 이야기</span>
+      <p>Git이 있기 전에는 CVS, SVN 같은 '중앙 집중식' 사진첨이 먼저였어요. 2005년, 리눅스를 만든 Linus Torvalds가 '더 빠르고 분산된 사진첩이 필요하다'며 10일 만에 만든 게 Git의 시작이에요.</p>
+    </div>
+
+    <section class="tut-section" id="snapshot" data-reveal>
+      <h2 class="tut-section__title">Git은 '달라진 점'이 아니라 '그 순간 전체'를 찍어요</h2>
+      <div class="tut-section__body">
+        <p>오래된 시스템은 파일에서 '무엇이 달라졌는지(diff)'만 적어요. Git은 달라요. 사진을 찍을 때 <strong>그 순간의 파일 전체 모습(스냅샷)</strong>을 저장해요. 큰 그림에서는 스냅샷이 더 빠르고, 과거 어느 시점이든 통째로 꺼내보기 쉬워요.</p>
+        <p>그리고 각 사진에는 <strong>SHA-1</strong>이라는 40글자 지문이 찍혀요. 내용이 조금이라도 다르면 지문이 완전히 달라져서, 같은 사진인지 한눈에 알 수 있어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="immutable" data-reveal>
+      <h2 class="tut-section__title">한 번 붙인 사진은 바뀌지 않아요</h2>
+      <div class="tut-section__body">
+        <p>사진첩에 붙인 사진은 <strong>불변(immutable)</strong>이에요. 고칠 수 없다는 뜻 같지만, 사실 '안전하다'는 뜻이에요. 잘못 붙여도 원래 모습이 어딘가에 온전히 남아 있어서 언제든 되돌아갈 수 있거든요. '되돌리기'도 사진을 지우는 게 아니라 '새 사진을 붙여 반대 방향으로 가는' 거예요.</p>
+        <p>이때 <strong>HEAD</strong>라는 표시가 '지금 내가 서 있는 사진'을 가리켜요. HEAD는 '나 여기 있어'라는 깃발이랍니다. 뒤에서 브랜치(T06)를 배울 때 다시 만날 거예요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>Git은 '이상한 영어 단어'가 아니에요. 영국식 발음으로 '깃'인데, 원래 '바보 같은'이라는 뜻의 속어에서 왔대요. Linus의 유머랍니다.</p>
+    </div>
+
+    <section class="tut-section" id="three-areas" data-reveal>
+      <h2 class="tut-section__title">잠깐, Git에는 방이 3개 있다고만 알아두세요</h2>
+      <div class="tut-section__body">
+        <p>지금은 외울 필요 없어요. 그냥 'Git이 파일을 작업 방·대기 방·기록 방 세 군데로 나눠 본다'는 것만 머릿속에 두세요. 자세한 건 <a href="git-staging.html">T04 3개의 방</a>에서 다뤄요. 이 세 방을 오가는 흐름이 앞으로 배울 모든 명령의 뼈대랍니다.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T01 한 장 요약</h2>
+      <p class="cheat-card__sub">이 페이지에서 배운 핵심 개념</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">VCS</span><span class="cheat-card__desc">버전 관리 시스템 — 파일 변경 이력을 관리하는 '시간 여행 사진첩'.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">분산 vs 중앙</span><span class="cheat-card__desc">Git은 분산식. 참여자마다 사진첩 사본을 통째로 갖는다.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">스냅샷</span><span class="cheat-card__desc">Git은 diff가 아닌 그 순간 전체 파일 모습을 저장.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">commit + SHA-1</span><span class="cheat-card__desc">사진 한 장(commit)에 40글자 지문(SHA-1)이 찍힌다.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">불변성</span><span class="cheat-card__desc">한 번 붙인 사진은 바뀌지 않아 언제든 되돌아갈 수 있다.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">HEAD</span><span class="cheat-card__desc">'지금 내가 서 있는 사진'을 가리키는 깃발.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=홈, 다음=T02) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="../index.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">홈 허브</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-setup.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T02 Git, 설치하고 첫 인사까지</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC (스크롤 스파이는 향후 확장; 현재는 정적 링크) -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">사진첩으로 시작</a>
+      <a class="sidebar-toc__link" href="#distributed">분산 vs 중앙</a>
+      <a class="sidebar-toc__link" href="#snapshot">스냅샷과 SHA-1</a>
+      <a class="sidebar-toc__link" href="#immutable">불변성과 HEAD</a>
+      <a class="sidebar-toc__link" href="#three-areas">방 3개 소개</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal. T01은 FakeTerminal 미사용. -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

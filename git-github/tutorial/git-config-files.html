@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T13 Git을 내 입맛대로: 설정과 파일들 — Git &amp; GitHub 안내서</title>
+<meta name="description" content=".gitignore, .gitattributes, hooks, Git LFS, aliases까지. Git을 나에게 맞게 조립하는 설정 파일들을 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T13 · 설정과 파일</p>
+  <h1 class="page-header__title">Git, 나에게 맞게 조립하기 — 설정과 파일들</h1>
+  <p class="page-header__subhead">Git은 설정 파일, 무시 파일, 훅, 대용량 파일 처리로 입맛대로 조립할 수 있어요. 어떤 파일이 어떤 역할을 하는지 가볍게 익혀둡시다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: T13 → T1-09, T2-08) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>개발자는 .gitignore와 aliases로 자기 환경을 dotfiles로 관리하고, GitBook 같은 문서 도구는 Git 설정과 무시 파일을 기반으로 책을 만들어요. 작은 설정 파일 하나가 협업 효율을 크게 바꿔요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-09">dotfiles 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-08">GitBook 사례 보기 →</a></span>
+    </div>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Git 설정 파일들은 <strong>'내 주방 운영 수칙'</strong> 같아요. '이 재료는 냉장고에 넣지 마(.gitignore)', '이 재료는 이렇게 보관해(.gitattributes)', '요리 시작 전 손 씻기(hook)'. 한 번 정해두면 매번 알아서 지켜져요.</p>
+    </div>
+
+    <section class="tut-section" id="gitignore" data-reveal>
+      <h2 class="tut-section__title">.gitignore — '이 파일들은 사진첩에 넣지 마!'</h2>
+      <div class="tut-section__body">
+        <p><strong>.gitignore</strong>는 '이 파일은 사진첩에 넣지 마'라는 무시 목록이에요. 비밀번호 파일, 빌드 결과물, 임시 파일 등을 적어두면 Git이 알아서 무시해요. 아래는 흔히 쓰는 예시예요.</p>
+        <pre class="code-block"><code># 비밀 정보 — 절대 올리면 안 됨
+.env
+.env.local
+
+# 의존성 폴더 (다시 받으면 됨)
+node_modules/
+
+# 빌드 결과물
+build/
+dist/
+
+# 로그 파일
+*.log
+
+# OS 쓰레기 파일
+.DS_Store
+Thumbs.db</code></pre>
+      </div>
+    </section>
+
+    <!-- 주의 박스 (핵심) -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p><strong>.env</strong>처럼 비밀이 든 파일은 반드시 .gitignore에! 실수로 push하면 비밀이 공개돼요. 이미 올렸다면 역사에서 지우고(T12 filter-repo), <strong>비밀번호를 바꿔야 해요</strong>. (T19 보안과 연계)</p>
+    </div>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p><code>github.com/github/gitignore</code>에 흔한 언어·프레임워크별 .gitignore 템플릿이 있어요. Python, Node, macOS 등 골라서 복사하면 시작이 빨라요.</p>
+    </div>
+
+    <section class="tut-section" id="gitattributes" data-reveal>
+      <h2 class="tut-section__title">.gitattributes — 파일 성질 알려주기</h2>
+      <div class="tut-section__body">
+        <p><strong>.gitattributes</strong>는 파일의 '성질'을 Git에게 알려줘요. 줄바꿈 처리(윈도우/맥 차이), 바이너리 판별, 병합 방법 등을 정해요. 여러 운영체제에서 같은 사진첩을 쓸 때 줄바꿈이 꼬이는 걸 막아줘요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="hooks" data-reveal>
+      <h2 class="tut-section__title">hooks — 커밋 전에 자동으로 할 일</h2>
+      <div class="tut-section__body">
+        <p><strong>hooks(client-side)</strong>는 커밋 전, 푸시 전에 자동으로 실행되는 작은 스크립트예요. 예를 들어 '커밋하기 전에 문법 검사 돌려라'를 걸어두면 실수를 미리 막아줘요. <code>.git/hooks/</code> 폴더에 넣어요. 아래는 커밋 전(pre-commit) 스크립트 예시.</p>
+        <pre class="code-block"><code>#!/bin/sh
+# .git/hooks/pre-commit
+# 커밋 전에 간단한 검사 실행
+echo "커밋 전 검사 중..."
+npm test
+if [ $? -ne 0 ]; then
+  echo "테스트 실패 — 커밋 중단"
+  exit 1
+fi</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="lfs-aliases" data-reveal>
+      <h2 class="tut-section__title">Git LFS &amp; aliases — 큰 파일과 짧은 명령</h2>
+      <div class="tut-section__body">
+        <p><strong>Git LFS(Large File Storage)</strong>는 큰 파일(이미지, 영상, 모델)을 특별 저장소에 따로 보관해요. 사진첩이 무거워지는 걸 막아줘요.</p>
+        <p><strong>aliases</strong>는 긴 명령을 짧게 줄여 쓰는 거예요. <span class="cmd-pill">git config --global alias.l "log --oneline"</span> 한 번이면 앞으로 <span class="cmd-pill">git l</span>만 쳐도 긴 로그가 한 줄씩 나와요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>aliases는 <code>--global</code>을 붙이면 그 컴퓨터의 모든 사진첩에, 안 붙이면 현재 사진첩에만 적용돼요. 자주 쓰는 명령은 글로벌로, 프로젝트 전용은 로컬로. 깔끔하게 나눠 쓰세요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T13 한 장 요약</h2>
+      <p class="cheat-card__sub">설정 파일 핵심</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">.gitignore</span><span class="cheat-card__desc">'이 파일은 사진첩에 넣지 마' 무시 목록.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">.gitattributes</span><span class="cheat-card__desc">줄바꿈·바이너리 등 파일 성질 지정.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">.git/hooks/</span><span class="cheat-card__desc">커밋/푸시 전 자동 실행 스크립트.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Git LFS</span><span class="cheat-card__desc">큰 파일(이미지·영상) 특별 저장소 보관.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git config alias.l "log --oneline"</span><span class="cheat-card__desc">긴 명령 짧은 별명으로.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git config --global</span><span class="cheat-card__desc">컴퓨터 전체 설정. 생략하면 현재 사진첩만.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (T12 ← T13 → T14) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-advanced.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T12 한 단계 더 깊이: 고급 기법</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-concept.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T14 GitHub가 뭔가요?</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#gitignore">.gitignore</a>
+      <a class="sidebar-toc__link" href="#gitattributes">.gitattributes</a>
+      <a class="sidebar-toc__link" href="#hooks">hooks</a>
+      <a class="sidebar-toc__link" href="#lfs-aliases">Git LFS &amp; aliases</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

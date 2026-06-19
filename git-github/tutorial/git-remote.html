@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T09 세상과 연결되기: 원격 저장소 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="내 사진첩을 다른 컴퓨터와 공유하는 '원격 저장소'를 구름 위 사진첩이라는 비유로 시작해 remote, fetch, pull, push, clone, pull --rebase, force push 주의까지 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T09 · 원격 저장소</p>
+  <h1 class="page-header__title">내 사진첩, 구름 위로 올리기 — 원격 저장소</h1>
+  <p class="page-header__subhead">지금까지는 내 컴퓨터 안에서만 사진첩을 봤어요. 이제 그 사진첩을 GitHub라는 '구름 위의 사진첩'에 올려서 다른 컴퓨터, 다른 사람과 나눠 보겠어요.</p>
+</header>
+
+<!-- 2단 레이아웃 -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T09 → T1-09 dotfiles) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>개발자들은 집 컴퓨터와 회사 컴퓨터의 설정 파일(dotfiles)을 GitHub에 올려두고 어디서든 자기 환경을 그대로 불러와요. 원격 저장소가 있어서 가능한 일이에요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-09">dotfiles — 여러 컴퓨터 설정 동기화 사례 보기 →</a>
+    </div>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>원격 저장소는 <strong>'구름 위의 사진첩'</strong>이에요. <span class="cmd-pill">git push</span>는 사진을 구름으로 올리는 거고, <span class="cmd-pill">git pull</span>은 구름에서 사진을 받아오는 거예요. 같은 사진첩을 여러 기기에서 동기화할 수 있죠.</p>
+    </div>
+
+    <section class="tut-section" id="what-is-remote" data-reveal>
+      <h2 class="tut-section__title">원격 저장소(remote)가 뭔가요?</h2>
+      <div class="tut-section__body">
+        <p>지금까지 우리 사진첩은 '내 컴퓨터'라는 서랍 안에만 있었어요. 이제 그 사진첩을 인터넷 너머의 다른 컴퓨터로 보내서, 다른 컴퓨터도 같은 사진첩을 갖게 만들 수 있어요. 그 '다른 컴퓨터 쪽의 사진첩'을 <strong>원격 저장소(remote repository)</strong>라고 불러요.</p>
+        <p>가장 유명한 원격 저장소 서비스가 바로 <strong>GitHub</strong>예요. 그 외에도 GitLab, Bitbucket 같은 친구들이 있어요. Git은 원격 저장소를 가리키는 짧은 이름을 붙이는데, 관례상 첫 원격은 <strong>origin</strong>이라고 불러요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스: force push -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p><span class="cmd-pill">git push --force</span>는 원격의 역사를 '내 것'으로 덮어써요. 동료가 올려둔 사진이 통째로 사라질 수 있어요. 정말 필요할 때만, 그리고 안전장치가 있는 <span class="cmd-pill">git push --force-with-lease</span>를 대신 쓰세요.</p>
+    </div>
+
+    <section class="tut-section" id="connect-and-push" data-reveal>
+      <h2 class="tut-section__title">연결하고, 올리고, 받고 — 네 개의 기본 동작</h2>
+      <div class="tut-section__body">
+        <p>원격과 주고받는 동작은 크게 네 가지예요. 먼저 <strong>연결</strong>하고 (<span class="cmd-pill">git remote add origin &lt;주소&gt;</span>), 내 사진을 <strong>올리고</strong> (<span class="cmd-pill">git push</span>), 상대 사진을 <strong>받아오고</strong> (<span class="cmd-pill">git fetch</span> / <span class="cmd-pill">git pull</span>), 통째로 <strong>복사해 오고</strong> (<span class="cmd-pill">git clone</span>). 아래 터미널을 스크롤하면 한 번에 흐름이 보여요.</p>
+      </div>
+    </section>
+
+    <!-- FakeTerminal (T09 전용) -->
+    <div class="fake-terminal" data-terminal-script='[
+      {"cmd":"git remote add origin https://github.com/you/project.git","out":[{"t":"out","s":"(원격 사진첩을 origin이라는 이름으로 연결했어요)"}]},
+      {"cmd":"git fetch","out":[{"t":"out","s":"remote: Enumerating objects: 12, done."},{"t":"out","s":"remote: Counting objects: 100% (12/12), done."},{"t":"ok","s":"From github.com:you/project"},{"t":"hi","s":" * [new branch]      main       -> origin/main"}]},
+      {"cmd":"git pull","out":[{"t":"ok","s":"Updating 3a1f2c0..7b8d9e0"},{"t":"out","s":"Fast-forward"},{"t":"out","s":" notes.txt | 4 ++++"},{"t":"out","s":" 1 file changed, 4 insertions(+)"},{"t":"ok","s":"pull 완료 — 받아온 사진까지 합쳤어요"}]},
+      {"cmd":"git push -u origin main","out":[{"t":"out","s":"Enumerating objects: 8, done."},{"t":"out","s":"Writing objects: 100% (8/8), 1.24 KiB"},{"t":"ok","s":"To github.com:you/project.git"},{"t":"hi","s":" * [new branch]      main -> main"}]}
+    ]'>
+      <div class="fterm__bar"><span class="fterm__dots"><span class="fterm__dot fterm__dot--r"></span><span class="fterm__dot fterm__dot--y"></span><span class="fterm__dot fterm__dot--g"></span></span><span class="fterm__title">터미널 — 원격 연결</span></div>
+      <div class="fterm__body"><div class="fterm__out">스크롤하면 재생됩니다…</div></div>
+    </div>
+
+    <!-- 알아두면 좋은: fetch vs pull -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><strong>fetch는 '엿보기'</strong>, <strong>pull은 '엿보고 합치기'</strong>예요. pull이 편하지만, 변경을 먼저 살펴보고 합칠지 결정하고 싶을 땐 fetch로 먼저 보세요. pull은 사실 <code>fetch + merge</code> 두 단계를 한 번에 하는 거랍니다.</p>
+    </div>
+
+    <section class="tut-section" id="pull-rebase" data-reveal>
+      <h2 class="tut-section__title">받아올 때 '병합' 대신 '리베이스'로</h2>
+      <div class="tut-section__body">
+        <p><span class="cmd-pill">git pull</span>은 기본적으로 받아온 사진을 병합(merge) 방식으로 합쳐요. 그러면 '병합했습니다'라는 사진이 하나 더 생겨요. 역사를 깔끔하게 한 줄로 유지하고 싶다면 <span class="cmd-pill">git pull --rebase</span>를 써 보세요. 받아온 사진 위에 내 사진을 다시 올려놓는(rebase) 방식이라 병합 사진이 안 생겨요. T08에서 배운 리베이스와 같은 원리예요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="clone" data-reveal>
+      <h2 class="tut-section__title">처음부터 통째로 가져오기: clone</h2>
+      <div class="tut-section__body">
+        <p>내 컴퓨터에 아무것도 없고 원격 사진첩만 있다면, <span class="cmd-pill">git clone &lt;주소&gt;</span> 한 번이면 원격 사진첩 전체를 내 컴퓨터로 통째로 복사해 와요. 연결(origin)까지 자동으로 잡혀요. 남이 공개해 둔 프로젝트를 처음 가져올 때 쓰는 첫 명령이에요.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T09 한 장 요약</h2>
+      <p class="cheat-card__sub">원격 저장소 핵심 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git remote add origin &lt;주소&gt;</span><span class="cheat-card__desc">원격 사진첩을 origin이라는 이름으로 연결.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git fetch</span><span class="cheat-card__desc">원격의 변경을 '가져와서 보기만' (적용 안 함).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git pull</span><span class="cheat-card__desc">fetch + merge. 가져와서 합치기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git pull --rebase</span><span class="cheat-card__desc">병합 대신 리베이스로 합치기. 역사 한 줄 유지.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git push</span><span class="cheat-card__desc">내 사진을 원격으로 올리기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git push --force-with-lease</span><span class="cheat-card__desc">강제 push의 안전 버전. 동료 작업 보호.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git clone &lt;주소&gt;</span><span class="cheat-card__desc">원격 사진첩을 통째로 복사해 오기.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (T08 ← T09 → T10) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-rebase.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T08 역사를 한 줄로: 리베이스</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-tag.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T10 버전 딱 붙이기: 태그</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#what-is-remote">원격 저장소란</a>
+      <a class="sidebar-toc__link" href="#connect-and-push">네 개의 기본 동작</a>
+      <a class="sidebar-toc__link" href="#pull-rebase">pull --rebase</a>
+      <a class="sidebar-toc__link" href="#clone">통째로 복사: clone</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → fake-terminal. -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/fake-terminal.js" defer></script>
+</body>
+</html>

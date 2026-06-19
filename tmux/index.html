@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tmux 한 장 정리 — 비개발자를 위한 따뜻한 튜토리얼</title>
+<meta name="description" content="코딩을 몰라도 한 번의 스크롤로 tmux를 이해할 수 있는 따뜻한 튜토리얼. 방·책상·쪽지 비유로 터미널 멀티플렉서를 한눈에." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- 읽기 진행률 바 -->
+<div class="progress-bar" role="progressbar" aria-label="읽기 진행률" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
+<!-- ============================================================
+     [NAV] 스티키 내비게이션
+     ============================================================ -->
+<header class="nav">
+  <div class="nav__inner">
+    <a href="#hero" class="nav__logo" aria-label="처음으로">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="3" y="3" width="11" height="11" rx="2.5" fill="#FF8A5B"/>
+        <rect x="18" y="3" width="11" height="11" rx="2.5" fill="#3D5FE0"/>
+        <rect x="3" y="18" width="11" height="11" rx="2.5" fill="#26A69A"/>
+        <rect x="18" y="18" width="11" height="11" rx="2.5" fill="#FFD0B8" stroke="#FF8A5B" stroke-width="1.5"/>
+      </svg>
+      <span>tmux 한 장 정리</span>
+    </a>
+    <nav class="nav__links" aria-label="섹션 바로가기">
+      <a href="#concept" class="nav__link">개념</a>
+      <a href="#why" class="nav__link">왜?</a>
+      <a href="#install" class="nav__link">설치</a>
+      <a href="#model" class="nav__link">구조</a>
+      <a href="#core" class="nav__link">핵심 사용법</a>
+      <a href="#keys" class="nav__link">단축키</a>
+      <a href="#copy" class="nav__link">복사 모드</a>
+      <a href="#config" class="nav__link">설정</a>
+      <a href="#plugins" class="nav__link">플러그인</a>
+      <a href="#apps" class="nav__link">실생활</a>
+      <a href="#faq" class="nav__link">FAQ</a>
+    </nav>
+    <a href="#apps" class="nav__cta">실전 예시 보기 →</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================================================
+     [0] HERO
+     ============================================================ -->
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="hero__inner">
+    <div class="hero__text">
+      <span class="hero__eyebrow">코딩 없이 이해하는 터미널 이야기</span>
+      <p class="hero__eyebrow-note">※ 여기서 '터미널'은 글자만 보이는 작은 화면을 뜻해요</p>
+      <h1 class="hero__title" id="hero-title">
+        터미널 하나로,<br>
+        <span class="accent">방 하나를 통째로</span> 쓰는 법
+      </h1>
+      <p class="hero__subtitle">
+        컴퓨터를 끄지 않아도, 인터넷이 끊겨도, 내 작업은 그 자리에 살아 있어요.
+      </p>
+      <div class="hero__actions">
+        <a href="#concept" class="btn btn--primary">
+          한 번에 이해하기
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#install" class="btn btn--ghost">바로 설치해보기</a>
+      </div>
+      <div class="hero__meta">
+        <div><strong>14</strong>개 섹션</div>
+        <div><strong>40+</strong>개 주제</div>
+        <div><strong>0</strong>개의 코드 요구</div>
+      </div>
+    </div>
+    <div class="hero__art" aria-hidden="true">
+      <!-- 따뜻한 방 일러스트: 여러 창문이 떠 있는 책상 -->
+      <svg viewBox="0 0 480 440" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#FFE3CE"/>
+          </linearGradient>
+          <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#E8D5BD"/><stop offset="1" stop-color="#D8C0A0"/>
+          </linearGradient>
+          <linearGradient id="deskG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#C9956A"/><stop offset="1" stop-color="#A9764E"/>
+          </linearGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#2D2A26" flood-opacity="0.08"/>
+          </filter>
+        </defs>
+        <!-- 벽 -->
+        <rect x="20" y="20" width="440" height="300" rx="20" fill="url(#wallG)" filter="url(#soft)"/>
+        <!-- 바닥 -->
+        <path d="M20 320 L460 320 L460 420 L20 420 Z" fill="url(#floorG)"/>
+        <!-- 창문 3개 (panes 비유) -->
+        <g filter="url(#soft)">
+          <rect x="56" y="60" width="110" height="120" rx="8" fill="#E2E8FB" stroke="#3D5FE0" stroke-width="3"/>
+          <rect x="68" y="74" width="86" height="92" rx="4" fill="#F4F7FE"/>
+          <text x="111" y="128" font-family="JetBrains Mono, monospace" font-size="11" fill="#3D5FE0" text-anchor="middle">$ tmux</text>
+        </g>
+        <g filter="url(#soft)">
+          <rect x="186" y="60" width="110" height="120" rx="8" fill="#FFE3D4" stroke="#FF8A5B" stroke-width="3"/>
+          <rect x="198" y="74" width="86" height="92" rx="4" fill="#FFF6EC"/>
+          <text x="241" y="110" font-family="JetBrains Mono, monospace" font-size="10" fill="#E66E3F" text-anchor="middle">server</text>
+          <text x="241" y="128" font-family="JetBrains Mono, monospace" font-size="10" fill="#E66E3F" text-anchor="middle">logs...</text>
+          <text x="241" y="146" font-family="JetBrains Mono, monospace" font-size="10" fill="#E66E3F" text-anchor="middle">run</text>
+        </g>
+        <g filter="url(#soft)">
+          <rect x="316" y="60" width="110" height="120" rx="8" fill="#E6F7F4" stroke="#26A69A" stroke-width="3"/>
+          <rect x="328" y="74" width="86" height="92" rx="4" fill="#F4FBFA"/>
+          <text x="371" y="128" font-family="JetBrains Mono, monospace" font-size="11" fill="#26A69A" text-anchor="middle">edit</text>
+        </g>
+        <!-- 테이블 lamp (따뜻한 빛) -->
+        <ellipse cx="240" cy="320" rx="160" ry="22" fill="#2D2A26" opacity="0.08"/>
+        <rect x="120" y="270" width="240" height="50" rx="6" fill="url(#deskG)"/>
+        <rect x="120" y="266" width="240" height="6" rx="3" fill="#9B6E48"/>
+        <!-- 램프 -->
+        <path d="M150 270 L150 230 L170 220 L190 230 L190 270 Z" fill="#FFB089"/>
+        <circle cx="170" cy="245" r="22" fill="#FFE3A0" opacity="0.6"/>
+        <!-- 포스트잇 (panes) -->
+        <rect x="220" y="240" width="42" height="42" rx="3" fill="#FFE066" transform="rotate(-4 241 261)"/>
+        <rect x="268" y="238" width="42" height="42" rx="3" fill="#A0E7E1" transform="rotate(3 289 259)"/>
+        <rect x="314" y="244" width="42" height="42" rx="3" fill="#FFB3D0" transform="rotate(-2 335 265)"/>
+        <!-- 활성 표시 -->
+        <rect x="218" y="238" width="46" height="46" rx="5" fill="none" stroke="#FF8A5B" stroke-width="2.5" stroke-dasharray="4 3" transform="rotate(-4 241 261)"/>
+        <!-- 컵 -->
+        <rect x="370" y="252" width="22" height="26" rx="2" fill="#FFFFFF" stroke="#D8C0A0" stroke-width="2"/>
+        <path d="M370 256 Q374 252 378 256" stroke="#7A726B" stroke-width="1.5" fill="none"/>
+        <!-- 진행 표시 점 -->
+        <circle cx="170" cy="195" r="4" fill="#FF8A5B"/>
+        <circle cx="240" cy="190" r="4" fill="#3D5FE0"/>
+        <circle cx="320" cy="195" r="4" fill="#26A69A"/>
+      </svg>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">scroll</div>
+</section>
+
+<!-- ============================================================
+     [1] CONCEPT
+     ============================================================ -->
+<section id="concept" aria-labelledby="concept-title">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-index">01 · 개념</span>
+      <h2 class="section-title" id="concept-title">창문이 많은 방, 그리고 창문을 더 만들 수 있는 책상</h2>
+      <p class="section-subtitle">tmux는 한 화면 안에서 여러 화면을 동시에 띄워두는 도구예요. 먼저 비유로 시작할게요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <p class="lead">
+        컴퓨터 화면 하나를 <strong>'방'</strong>이라 상상해 보세요. 방에는 창문이 여러 개 달릴 수 있고,
+        창문 하나하나에는 서로 다른 풍경이 보여요. tmux는 이 방 안에서 창문을 마음껏 늘리거나,
+        나누거나, 다른 쪽으로 돌려놓을 수 있게 해 주는 <strong>'창문 관리 도구'</strong>예요.
+      </p>
+      <p class="mt-md">
+        비유를 조금 옮겨보면 이렇게 대응돼요. <strong>방</strong>이 터미널 창(window),
+        <strong>창문 안의 조각</strong>이 pane, 그리고 창문을 <strong>달았다 뗐다</strong> 하는 행위가
+        바로 detach/attach예요. 이 방을 통째로 관리하는 큰 시스템이
+        <strong>터미널 멀티플렉서(terminal multiplexer)</strong>이고, tmux는 그중에서도 가장 사랑받는 한 종류랍니다.
+      </p>
+    </div>
+
+    <!-- 역사 박스 -->
+    <aside class="note note--history reveal" data-delay="2" role="complementary" aria-label="옛날 이야기">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </span>
+      <span class="note__label">옛날 이야기</span>
+      <p>
+        옛날에는 <code>screen</code>이라는 도구가 먼저 있었어요. 1987년에 태어난 이 도구의 아이디어를
+        2007년에 Nicholas Marriott가 더 현대적으로 다듬어 태어난 게 바로 tmux(티뭉스, <em>tee-mux</em>)랍니다.
+        약 20년 가까이 쓰인 검증된 도구예요.
+      </p>
+    </aside>
+
+    <!-- 비유 박스 -->
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21h6M10 17l-2 4M14 17l2 4M4 13a8 8 0 1 1 16 0"/><path d="M12 5v8M9 9h6"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        terminal / shell / multiplexer가 헷갈린다면 — terminal은 <strong>'창문 틀'</strong>,
+        shell은 <strong>'창문 너머로 말을 거는 비서'</strong>,
+        multiplexer는 <strong>'창문 틀을 통째로 관리하는 건축가'</strong>라고 생각하면 쉬워요.
+      </p>
+    </aside>
+
+    <!-- 알아두면 좋은 -->
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        터미널은 글자만 보이는 검은/회색 화면이에요. 마우스를 잘 안 쓰고 키보드로 모든 걸 합니다.
+        처음엔 어색하지만, 익숙해지면 마우스보다 빠르고 편해져요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [2] WHY — 왜 쓰나?
+     ============================================================ -->
+<section id="why" aria-labelledby="why-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container">
+    <div class="reveal">
+      <span class="section-index">02 · 왜 쓰나?</span>
+      <h2 class="section-title" id="why-title">왜 다들 tmux를 좋아할까요?</h2>
+      <p class="section-subtitle">다섯 가지 상황만 보면, "아, 이래서 쓰는구나"가 한 번에 와닿아요.</p>
+    </div>
+
+    <div class="grid grid--5 reveal" data-delay="1">
+      <article class="scenario">
+        <span class="scenario__num">01</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18M5 12h7M19 3l-7 9 7 9"/></svg>
+        </div>
+        <h3 class="scenario__title">지속되는 작업</h3>
+        <p class="scenario__desc">방에 불을 켜둔 채로 밖에 나갈 수 있어요. 인터넷이 끊겨도 작업은 방 안에 살아 있어요.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">02</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>
+        </div>
+        <h3 class="scenario__title">화면 분할</h3>
+        <p class="scenario__desc">한 창에서 코드도 보고, 설명서도 보고, 채팅도 볼 수 있어요.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">03</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12a7 7 0 0 1 14 0M5 12a7 7 0 0 0 14 0M12 5v14"/></svg>
+        </div>
+        <h3 class="scenario__title">원격 작업 생존</h3>
+        <p class="scenario__desc">노트북을 덮어도 서버에선 작업이 계속돼요.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">04</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><circle cx="16" cy="8" r="3.5"/><path d="M3 20c1-3.5 3.5-5 6-5M10 20c1-3.5 3.5-5 6-5M14 20c1-3.5 3-5 5-5"/></svg>
+        </div>
+        <h3 class="scenario__title">페어 프로그래밍</h3>
+        <p class="scenario__desc">같은 화면을 두 사람이 같이 볼 수 있어요.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">05</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="6" rx="1"/></svg>
+        </div>
+        <h3 class="scenario__title">멀티태스킹</h3>
+        <p class="scenario__desc">여러 창을 번갈 보며 한 번에 여러 일을 해요.</p>
+      </article>
+    </div>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 6V4M16 6V4"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        옛날 컴퓨터는 화면이 하나뿐이었어요. 한 번에 하나만 할 수 있었죠. tmux는 그 하나의 화면을
+        여러 조각으로 쪼개 쓰는 아이디어에서 출발했어요.
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        개발자들이 tmux를 사랑하는 진짜 이유는 <strong>'맥락(context)을 잃지 않는 것'</strong>이에요.
+        무엇을 하고 있었는지, 어디까지 했는지 화면이 그대로 남아 있으니까요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [3] INSTALL
+     ============================================================ -->
+<section id="install" aria-labelledby="install-title">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">03 · 설치</span>
+      <h2 class="section-title" id="install-title">설치해 봐요 (3분 컷)</h2>
+      <p class="section-subtitle">운영체제에 맞춰 한 줄만 복사하면 돼요. 그 전에 'prefix 키'라는 핵심 개념도 짚고 갈게요.</p>
+    </div>
+
+    <div class="grid grid--3 reveal" data-delay="1">
+      <article class="platform">
+        <span class="platform__badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.04c-.02-2.3 1.88-3.4 1.96-3.45-1.07-1.56-2.73-1.77-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.75 2.27-1.6 2.78-.41 6.89 1.15 9.14.76 1.1 1.67 2.34 2.86 2.3 1.15-.05 1.58-.74 2.97-.74 1.39 0 1.78.74 3 .72 1.24-.02 2.02-1.12 2.78-2.22.88-1.28 1.24-2.52 1.26-2.58-.03-.01-2.42-.93-2.43-3.68zM14.6 5.6c.63-.77 1.06-1.83.94-2.9-.91.04-2.01.61-2.66 1.37-.58.68-1.09 1.76-.96 2.81 1.02.08 2.05-.52 2.68-1.28z"/></svg>
+          mac
+        </span>
+        <h3 class="platform__title">macOS</h3>
+        <p class="platform__sub">Homebrew라는 '앱스토어 같은 도구'로 한 줄 설치.</p>
+        <code class="platform__cmd">brew install tmux</code>
+      </article>
+
+      <article class="platform">
+        <span class="platform__badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C7 2 4 4 4 7v1c0 4 4 7 8 7s8-3 8-7V7c0-3-3-5-8-5zm-6 16c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2zm6 0c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2zm6 0c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/></svg>
+          Linux
+        </span>
+        <h3 class="platform__title">Ubuntu / Debian</h3>
+        <p class="platform__sub">리눅스의 앱스토어 명령어(<code>apt</code>)로 설치.</p>
+        <code class="platform__cmd">sudo apt install tmux</code>
+      </article>
+
+      <article class="platform">
+        <span class="platform__badge">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5l8-1v8H3V5zm0 14l8 1v-8H3v7zm9 1l9 1V11h-9v9zm0-17v9h9V2l-9 1z"/></svg>
+          Windows
+        </span>
+        <h3 class="platform__title">Windows (WSL)</h3>
+        <p class="platform__sub">윈도우 안에 작은 리눅스 방(WSL)을 하나 더 달아서 그 안에서 tmux를 써요. WSL 설치 후엔 리눅스와 동일.</p>
+        <code class="platform__cmd">sudo apt install tmux</code>
+      </article>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="reveal">
+      <h3 style="font-size:24px; font-weight:700; margin-bottom:10px;">핵심 개념: prefix 키 — tmux한테 말 거는 '종'</h3>
+      <p class="lead">
+        tmux한테 말을 걸려면 먼저 <strong>'종을 울려야'</strong> 해요. 그 종이 바로
+        <strong>prefix 키</strong>예요. 기본 종은 <span class="kbd-group"><kbd class="kbd">Ctrl</kbd><span class="plus">+</span><kbd class="kbd">b</kbd></span>
+        를 동시에 누르는 <span class="kbd kbd--accent">C-b</span> 랍니다.
+        종을 울린 뒤에야 <strong>"창을 만들어줘(<span class="kbd kbd--coral">c</span>)"</strong>처럼 명령을 내릴 수 있어요.
+      </p>
+    </div>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 0 0 4 0"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        종(prefix)을 먼저 울리고 → 그 다음 명령을 하나 내리는 2단계 구조예요.
+        "딸깍-딸깍" 두 번의 소리가 나면 그제야 tmux가 알아듣죠.
+      </p>
+    </aside>
+
+    <aside class="note note--warn reveal" role="complementary" aria-label="잠깐, 주의!">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2L12 3zM12 9v6M12 18v.5"/></svg>
+      </span>
+      <span class="note__label">잠깐, 주의!</span>
+      <p>
+        <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">c</kbd></span> 는
+        <strong>'Ctrl과 b를 누르고, 손을 뗀 뒤, c를 누른다'</strong>는 뜻이에요. <code>Ctrl</code>을 누른 채로 c까지 누르는 게 아니에요!
+        처음엔 다들 헷갈려요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [4] MENTAL MODEL
+     ============================================================ -->
+<section id="model" aria-labelledby="model-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">04 · 머릿속 그림</span>
+      <h2 class="section-title" id="model-title">tmux의 4층 구조, 비유로 한 번에 정리</h2>
+      <p class="section-subtitle">tmux 안에는 4개의 개념이 층층이 쌓여 있어요. 헷갈리지 않게, '건물'에 빗대어 볼게요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <div class="tbl-wrap">
+        <table class="tbl" aria-label="tmux 4계층 비유 표">
+          <thead>
+            <tr><th>tmux 용어</th><th>일상 비유</th><th>한 줄 설명</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="kbd kbd--accent">server</span></td><td>건물의 관리사무소</td><td class="col-meta">보이지 않는 곳에서 모든 걸 총괄. 전원이 꺼지지 않는 한 계속 돌아감.</td></tr>
+            <tr><td><span class="kbd kbd--accent">session</span></td><td>건물 안의 방 하나</td><td class="col-meta">독립된 작업 공간. 방 여러 개를 만들 수 있고, 방마다 다른 일을 함.</td></tr>
+            <tr><td><span class="kbd kbd--accent">window</span></td><td>방 안의 책상</td><td class="col-meta">한 방에 책상(탭)이 여러 장. 번호(0,1,2…)로 구분.</td></tr>
+            <tr><td><span class="kbd kbd--accent">pane</span></td><td>책상 위의 쪽지들</td><td class="col-meta">한 책상을 여러 조각으로 쪼갠 각 조각. 각 조각마다 다른 프로그램이 돌아감.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 애니메이션 계층 다이어그램 -->
+    <div class="hierarchy reveal" data-delay="2" id="hierarchy-diagram" role="img" aria-label="tmux 4계층 구조 다이어그램: server 안에 session, session 안에 window, window 안에 pane">
+      <div class="hierarchy__layer" data-layer="1">
+        <div class="hierarchy__head">
+          <span class="hierarchy__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A5B" stroke-width="2"><path d="M3 21V8l9-5 9 5v13M9 21V11M15 21V11M3 21h18"/></svg>
+          </span>
+          <span class="hierarchy__title">건물 전체<span class="mono">server</span></span>
+        </div>
+        <p class="hierarchy__desc">보이지 않는 관리사무소. 컴퓨터를 끄지 않는 한 항상 돌아가고 있어요.</p>
+        <div class="hierarchy__nest">
+          <span class="hierarchy__chip"><span class="dot" style="background:#FF8A5B"></span> tmux server</span>
+        </div>
+      </div>
+
+      <div class="hierarchy__layer" data-layer="2">
+        <div class="hierarchy__head">
+          <span class="hierarchy__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3D5FE0" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg>
+          </span>
+          <span class="hierarchy__title">방<span class="mono">session</span></span>
+        </div>
+        <p class="hierarchy__desc">건물 안의 독립된 방. 여러 개 만들 수 있고, 각자 다른 일을 해요.</p>
+        <div class="hierarchy__nest">
+          <span class="hierarchy__chip"><span class="dot" style="background:#3D5FE0"></span> session "work"</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#3D5FE0"></span> session "logs"</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#3D5FE0"></span> session "chat"</span>
+        </div>
+      </div>
+
+      <div class="hierarchy__layer" data-layer="3">
+        <div class="hierarchy__head">
+          <span class="hierarchy__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#26A69A" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="1"/><path d="M8 5v14M14 5v14"/></svg>
+          </span>
+          <span class="hierarchy__title">책상<span class="mono">window</span></span>
+        </div>
+        <p class="hierarchy__desc">방 안의 책상(탭). 번호(0,1,2…)로 구분돼요.</p>
+        <div class="hierarchy__nest">
+          <span class="hierarchy__chip"><span class="dot" style="background:#26A69A"></span> 0: editor</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#26A69A"></span> 1: shell</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#26A69A"></span> 2: logs</span>
+        </div>
+      </div>
+
+      <div class="hierarchy__layer" data-layer="4">
+        <div class="hierarchy__head">
+          <span class="hierarchy__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7C5DC4" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+          </span>
+          <span class="hierarchy__title">쪽지<span class="mono">pane</span></span>
+        </div>
+        <p class="hierarchy__desc">책상 위를 여러 조각으로 쪼갠 각 조각. 각 조각이 화면의 한 영역이에요.</p>
+        <div class="hierarchy__nest">
+          <span class="hierarchy__chip"><span class="dot" style="background:#7C5DC4"></span> pane 0: vim</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#7C5DC4"></span> pane 1: server</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#7C5DC4"></span> pane 2: tests</span>
+          <span class="hierarchy__chip"><span class="dot" style="background:#7C5DC4"></span> pane 3: git</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21h6M10 17l-2 4M14 17l2 4M4 13a8 8 0 1 1 16 0"/><path d="M12 5v8M9 9h6"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        session을 방, window를 책상이라 하면, <strong>detach는 '방에서 나와 현관문을 닫는 것'</strong>,
+        <strong>attach는 '다시 현관문을 열고 들어가는 것'</strong>이에요. 방 안의 물건(작업)은 그대로 남아 있어요.
+      </p>
+      <div class="note__pair-art" aria-hidden="true">
+        <div class="note__pair-cell" role="img" aria-label="사람이 방문을 열고 나가는데, 방 안의 불은 켜져 있는 일러스트 — detach 비유">
+          <svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="detachWallG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#FFE3CE"/>
+              </linearGradient>
+              <linearGradient id="detachFloorG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#E8D5BD"/><stop offset="1" stop-color="#D8C0A0"/>
+              </linearGradient>
+              <radialGradient id="detachLight" cx="0.5" cy="0.4" r="0.5">
+                <stop offset="0" stop-color="#FFE3A0" stop-opacity="0.7"/>
+                <stop offset="1" stop-color="#FFE3A0" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="detachSoft" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#2D2A26" flood-opacity="0.08"/>
+              </filter>
+            </defs>
+            <rect x="10" y="10" width="200" height="110" rx="10" fill="url(#detachWallG)"/>
+            <rect x="10" y="110" width="200" height="30" rx="0" fill="url(#detachFloorG)"/>
+            <rect x="10" y="40" width="120" height="80" rx="6" fill="#FFD9B0" opacity="0.5"/>
+            <ellipse cx="70" cy="80" rx="50" ry="32" fill="url(#detachLight)"/>
+            <rect x="44" y="52" width="52" height="38" rx="3" fill="#E2E8FB" stroke="#3D5FE0" stroke-width="2"/>
+            <text x="70" y="76" font-family="JetBrains Mono, monospace" font-size="8" fill="#3D5FE0" text-anchor="middle">$ work</text>
+            <circle cx="70" cy="48" r="3" fill="#FFB089"/>
+            <rect x="150" y="44" width="42" height="76" rx="4" fill="#C9956A" stroke="#2D2A26" stroke-width="2"/>
+            <rect x="154" y="48" width="34" height="68" rx="2" fill="#2D2A26" opacity="0.35"/>
+            <circle cx="171" cy="82" r="2.4" fill="#FFD0B8"/>
+            <path d="M168 50 Q171 46 174 50" stroke="#2D2A26" stroke-width="1.5" fill="none"/>
+            <g filter="url(#detachSoft)">
+              <circle cx="192" cy="98" r="10" fill="#FF8A5B"/>
+              <path d="M178 122 Q192 108 206 122 Z" fill="#FF8A5B"/>
+            </g>
+            <circle cx="186" cy="94" r="1.5" fill="#2D2A26"/>
+            <circle cx="190" cy="94" r="1.5" fill="#2D2A26"/>
+            <path d="M185 100 q3 2 6 0" stroke="#2D2A26" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M152 98 Q168 96 178 98" stroke="#2D2A26" stroke-width="1.6" fill="none" stroke-linecap="round" marker-end="url(#detachArrow)"/>
+            <defs>
+              <marker id="detachArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L10 5 L0 10 Z" fill="#2D2A26"/>
+              </marker>
+            </defs>
+            <text x="110" y="135" font-family="Pretendard, sans-serif" font-size="10" fill="#7A726B" text-anchor="middle">방의 불은 켜져 있어요</text>
+          </svg>
+        </div>
+        <div class="note__pair-cell" role="img" aria-label="사람이 다시 방문을 열고 들어가는 일러스트 — attach 비유">
+          <svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="attachWallG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#FFE3CE"/>
+              </linearGradient>
+              <linearGradient id="attachFloorG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#E8D5BD"/><stop offset="1" stop-color="#D8C0A0"/>
+              </linearGradient>
+              <radialGradient id="attachLight" cx="0.5" cy="0.4" r="0.5">
+                <stop offset="0" stop-color="#FFE3A0" stop-opacity="0.7"/>
+                <stop offset="1" stop-color="#FFE3A0" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="attachSoft" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#2D2A26" flood-opacity="0.08"/>
+              </filter>
+            </defs>
+            <rect x="10" y="10" width="200" height="110" rx="10" fill="url(#attachWallG)"/>
+            <rect x="10" y="110" width="200" height="30" rx="0" fill="url(#attachFloorG)"/>
+            <rect x="10" y="40" width="120" height="80" rx="6" fill="#FFD9B0" opacity="0.5"/>
+            <ellipse cx="70" cy="80" rx="50" ry="32" fill="url(#attachLight)"/>
+            <rect x="44" y="52" width="52" height="38" rx="3" fill="#E6F7F4" stroke="#26A69A" stroke-width="2"/>
+            <text x="70" y="76" font-family="JetBrains Mono, monospace" font-size="8" fill="#26A69A" text-anchor="middle">그대로</text>
+            <circle cx="70" cy="48" r="3" fill="#FFB089"/>
+            <rect x="150" y="44" width="42" height="76" rx="4" fill="#C9956A" stroke="#2D2A26" stroke-width="2"/>
+            <path d="M172 44 A 21 38 0 0 0 172 120 L 150 120 L 150 44 Z" fill="#A9764E" opacity="0.85"/>
+            <circle cx="171" cy="82" r="2.4" fill="#FFD0B8"/>
+            <g filter="url(#attachSoft)">
+              <circle cx="22" cy="98" r="10" fill="#3D5FE0"/>
+              <path d="M8 122 Q22 108 36 122 Z" fill="#3D5FE0"/>
+            </g>
+            <circle cx="16" cy="94" r="1.5" fill="#2D2A26"/>
+            <circle cx="20" cy="94" r="1.5" fill="#2D2A26"/>
+            <path d="M15 100 q3 2 6 0" stroke="#2D2A26" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M36 98 Q70 94 102 98" stroke="#2D2A26" stroke-width="1.6" fill="none" stroke-linecap="round" marker-end="url(#attachArrow)"/>
+            <defs>
+              <marker id="attachArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0 0 L10 5 L0 10 Z" fill="#2D2A26"/>
+              </marker>
+            </defs>
+            <text x="110" y="135" font-family="Pretendard, sans-serif" font-size="10" fill="#7A726B" text-anchor="middle">다시 들어가면 그 자리에</text>
+          </svg>
+        </div>
+      </div>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        방(session)에 불을 끄지 않는 한, 그 안에서 돌아가는 프로그램은 계속 돌아가요. 이게 tmux의 가장 강력한 점이에요.
+        <em>active pane</em> = 지금 손을 대고 있는 쪽지 / <em>current window</em> = 지금 앉아 있는 책상.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [5] CORE USAGE + FakeTerminal 데모
+     ============================================================ -->
+<section id="core" aria-labelledby="core-title">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">05 · 핵심 사용법</span>
+      <h2 class="section-title" id="core-title">이것만 알면 tmux 80%는 써요</h2>
+      <p class="section-subtitle">가장 자주 쓰는 흐름: 세션 만들기 → 분할 → 이동 → detach/attach. 아래 표로 보고, 그 아래 데모로 직접 눌러봐요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <div class="tbl-wrap">
+        <table class="tbl" aria-label="tmux 핵심 단축키 치트시트">
+          <thead>
+            <tr><th>하고 싶은 일</th><th>비유</th><th>단축키 / 명령어</th><th>결과</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="col-action">세션 시작</td><td>방 만들기</td><td class="col-key"><code>tmux</code> 또는 <code>tmux new -s 이름</code></td><td class="col-meta">방 하나가 열리고 안으로 들어감</td></tr>
+            <tr><td class="col-action">세션에서 나오기 (detach)</td><td>방문을 닫고 나오기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">d</span></td><td class="col-meta">방은 그대로, 나만 밖으로</td></tr>
+            <tr><td class="col-action">다시 들어가기 (attach)</td><td>다시 방문 열기</td><td class="col-key"><code>tmux attach</code> 또는 <code>tmux a</code></td><td class="col-meta">마지막 방으로 복귀</td></tr>
+            <tr><td class="col-action">방 목록 보기</td><td>건물 층 안내도</td><td class="col-key"><code>tmux ls</code></td><td class="col-meta">현재 열려 있는 방들 목록</td></tr>
+            <tr><td class="col-action">창(책상) 만들기</td><td>책상 한 장 더</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">c</span></td><td class="col-meta">새 책상(번호+1)이 열림</td></tr>
+            <tr><td class="col-action">창 이동</td><td>책상 옮겨 앉기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">0~9</span>, <span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">n</span>(다음), <span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">p</span>(이전)</td><td class="col-meta">해당 책상으로 이동</td></tr>
+            <tr><td class="col-action">창 분할 (좌우)</td><td>책상을 좌우로 자르기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">%</span></td><td class="col-meta">현재 조각이 좌우 두 개로</td></tr>
+            <tr><td class="col-action">창 분할 (상하)</td><td>책상을 위아래로 자르기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">"</span></td><td class="col-meta">현재 조각이 위아래 두 개로</td></tr>
+            <tr><td class="col-action">조각(pane) 이동</td><td>다른 쪽지로 손 옮기기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">←/→/↑/↓</span></td><td class="col-meta">화살표 방향의 쪽지로</td></tr>
+            <tr><td class="col-action">조각 크기 조절 (작게)</td><td>쪽지를 살짝 줄이기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">C-←/→/↑/↓</span></td><td class="col-meta">경계선이 살짝씩 밀림</td></tr>
+            <tr><td class="col-action">조각 크기 조절 (크게)</td><td>쪽지를 크게 밀기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">M-←/→/↑/↓</span></td><td class="col-meta">경계선이 크게 밀림</td></tr>
+            <tr><td class="col-action">쪽지 번호 보기</td><td>"몇 번 쪽지?" 확인</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">q</span></td><td class="col-meta">각 쪽지 위에 번호가 잠깐 뜸</td></tr>
+            <tr><td class="col-action">전체 확대/복귀 (zoom)</td><td>한 쪽지를 책상 전체로</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">z</span></td><td class="col-meta">다시 누르면 원래대로</td></tr>
+            <tr><td class="col-action">창 닫기</td><td>책상 치우기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">&amp;</span></td><td class="col-meta">닫기 전 확인 프롬프트</td></tr>
+            <tr><td class="col-action">쪽지 닫기</td><td>쪽지 찢기</td><td class="col-key"><span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">x</span></td><td class="col-meta">닫기 전 확인 프롬프트</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FakeTerminal 인터랙티브 데모 -->
+    <div class="demo-box reveal" data-delay="2">
+      <div class="demo-box__title">인터랙티브 데모 · 직접 눌러보기</div>
+      <p class="demo-box__hint">진짜 터미널 없이도, 버튼을 누르면 tmux가 어떻게 반응하는지 눈으로 체험할 수 있어요.</p>
+
+      <div class="term" id="demo-core" data-state="empty">
+        <div class="term__bar">
+          <div class="term__dots" aria-hidden="true">
+            <span class="term__dot term__dot--r"></span>
+            <span class="term__dot term__dot--y"></span>
+            <span class="term__dot term__dot--g"></span>
+          </div>
+          <span class="term__title">tmux — demo</span>
+        </div>
+        <div class="term__statusbar" id="demo-core-status">
+          <span>[work] 0:editor*</span>
+          <span>"my-machine" · 14:32</span>
+        </div>
+        <div class="term__body">
+          <div class="term__panes" id="demo-core-panes">
+            <div class="term__pane is-active" data-pane="0">
+              <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd">tmux</span></div>
+              <div class="term__line term__out">세션을 시작하려면 아래 <span class="term__hi">"세션 시작"</span> 버튼을 눌러주세요.</div>
+            </div>
+          </div>
+        </div>
+        <div class="term__controls">
+          <button class="term__btn" data-action="start">세션 시작</button>
+          <button class="term__btn" data-action="split-v" disabled>분할(좌우) <span style="opacity:.6">C-b %</span></button>
+          <button class="term__btn" data-action="split-h" disabled>분할(상하) <span style="opacity:.6">C-b "</span></button>
+          <button class="term__btn" data-action="move" disabled>pane 이동 <span style="opacity:.6">C-b ←/→</span></button>
+          <button class="term__btn" data-action="detach" disabled>detach <span style="opacity:.6">C-b d</span></button>
+          <button class="term__btn" data-action="attach" disabled>attach <span style="opacity:.6">tmux a</span></button>
+        </div>
+        <div class="term__hint">
+          팁: 실제로는 <span class="kbd">C-b</span> 가 prefix(종)이고, 그 다음 키가 명령이에요.
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--tip reveal" role="complementary" aria-label="꼭 알아두면 좋아요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c1 1 1 2 1 3h6c0-1 0-2 1-3a7 7 0 0 0-4-12z"/></svg>
+      </span>
+      <span class="note__label">꼭 알아두면 좋아요</span>
+      <p>
+        번호가 헷갈릴 땐 <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">q</kbd></span>!
+        각 쪽지 위에 큰 숫자가 잠깐 뜨면서, 그 숫자를 누르면 바로 그 쪽지로 이동해요.
+      </p>
+    </aside>
+
+    <aside class="note note--warn reveal" role="complementary" aria-label="잠깐, 주의!">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2L12 3zM12 9v6M12 18v.5"/></svg>
+      </span>
+      <span class="note__label">잠깐, 주의!</span>
+      <p>
+        <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">d</kbd></span> 로 나가도
+        방(session)은 절대 사라지지 않아요. '닫은 게 아니라 잠시 나온 것'이에요. 다시 <code>tmux a</code> 치면 그대로 있어요.
+      </p>
+    </aside>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M12 6v12"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        화면 분할은 책상을 자르는 것과 같아요. 같은 책상 위에 두 조각이 나란히 놓이는 거죠.
+        한 조각에서 글을 쓰면서 다른 조각의 자료를 볼 수 있어요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [6] KEYBINDINGS — 치트시트
+     ============================================================ -->
+<section id="keys" aria-labelledby="keys-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">06 · 단축키 카드</span>
+      <h2 class="section-title" id="keys-title">단축키 카드, 한눈에</h2>
+      <p class="section-subtitle">외울 필요 없어요. 자주 쓰는 것만 모아뒀고, 모르면 <span class="kbd kbd--accent">C-b</span> <span class="kbd kbd--coral">?</span> 로 전체 목록을 볼 수 있어요.</p>
+    </div>
+
+    <div class="cheat reveal" data-delay="1">
+      <div class="cheat__prefix-banner">
+        <div class="label">먼저 울리는 '종' (prefix)</div>
+        <kbd class="kbd">C-b</kbd>
+        <div class="desc">Ctrl과 b를 동시에 누르고 손을 뗀 뒤, 다음 키를 누른다</div>
+      </div>
+
+      <div class="cheat__grid">
+        <div class="cheat__item"><span class="desc">세션 나가기 (detach)</span><span class="keys"><kbd class="kbd kbd--coral">d</kbd></span></div>
+        <div class="cheat__item"><span class="desc">새 창 만들기</span><span class="keys"><kbd class="kbd kbd--coral">c</kbd></span></div>
+        <div class="cheat__item"><span class="desc">좌우 분할</span><span class="keys"><kbd class="kbd kbd--coral">%</kbd></span></div>
+        <div class="cheat__item"><span class="desc">상하 분할</span><span class="keys"><kbd class="kbd kbd--coral">"</kbd></span></div>
+        <div class="cheat__item"><span class="desc">쪽지 이동</span><span class="keys"><kbd class="kbd kbd--coral">← → ↑ ↓</kbd></span></div>
+        <div class="cheat__item"><span class="desc">쪽지 번호 표시</span><span class="keys"><kbd class="kbd kbd--coral">q</kbd></span></div>
+        <div class="cheat__item"><span class="desc">zoom (전체화면/복귀)</span><span class="keys"><kbd class="kbd kbd--coral">z</kbd></span></div>
+        <div class="cheat__item"><span class="desc">다음 창 / 이전 창</span><span class="keys"><kbd class="kbd kbd--coral">n</kbd> / <kbd class="kbd kbd--coral">p</kbd></span></div>
+        <div class="cheat__item"><span class="desc">번호 창으로 이동</span><span class="keys"><kbd class="kbd kbd--coral">0~9</kbd></span></div>
+        <div class="cheat__item"><span class="desc">크기 조절 (작게)</span><span class="keys"><kbd class="kbd kbd--coral">C-화살표</kbd></span></div>
+        <div class="cheat__item"><span class="desc">크기 조절 (크게)</span><span class="keys"><kbd class="kbd kbd--coral">M-화살표</kbd></span></div>
+        <div class="cheat__item"><span class="desc">복사 모드 진입</span><span class="keys"><kbd class="kbd kbd--coral">[</kbd></span></div>
+        <div class="cheat__item"><span class="desc">붙여넣기</span><span class="keys"><kbd class="kbd kbd--coral">]</kbd></span></div>
+        <div class="cheat__item"><span class="desc">단축키 전체 목록</span><span class="keys"><kbd class="kbd kbd--coral">?</kbd></span></div>
+        <div class="cheat__item"><span class="desc">명령 프롬프트</span><span class="keys"><kbd class="kbd kbd--coral">:</kbd></span></div>
+        <div class="cheat__item"><span class="desc">창 닫기 / 쪽지 닫기</span><span class="keys"><kbd class="kbd kbd--coral">&amp;</kbd> / <kbd class="kbd kbd--coral">x</kbd></span></div>
+      </div>
+    </div>
+
+    <aside class="note note--tip reveal" role="complementary" aria-label="꼭 알아두면 좋아요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c1 1 1 2 1 3h6c0-1 0-2 1-3a7 7 0 0 0-4-12z"/></svg>
+      </span>
+      <span class="note__label">꼭 알아두면 좋아요</span>
+      <p>
+        prefix 키를 <span class="kbd-group"><kbd class="kbd">C-a</kbd></span> 로 바꾸는 사람이 많아요. 손이 더 편하거든요.
+        바꾸는 법은 뒤에 Config에서!
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">?</kbd></span> 를 누르면
+        모든 단축키가 리스트로 떠요. 외울 필요 없이 그때그때 찾아보면 돼요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [7] COPY MODE
+     ============================================================ -->
+<section id="copy" aria-labelledby="copy-title">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">07 · 복사 모드</span>
+      <h2 class="section-title" id="copy-title">마우스 없이 글자를 복사하고, 위로 스크롤해요</h2>
+      <p class="section-subtitle">터미널에서 위로 스크롤하려고 마우스 휠을 굴려도 안 움직여서 당황한 적 있죠? tmux에서는 '복사 모드'라는 특별한 모드로 들어가야 해요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <ol class="steps">
+        <li class="step">
+          <div class="step__num">1</div>
+          <div class="step__body">
+            <strong>복사 모드 진입 — <span class="kbd-group"><kbd class="kbd kbd--accent">C-b</kbd><span class="plus">+</span><kbd class="kbd kbd--coral">[</kbd></span></strong>
+            <span class="meta">돋보기를 꺼내 드는 단계. 이제 화면이 "정지"해요.</span>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step__num">2</div>
+          <div class="step__body">
+            <strong>이동 — 화살표 / <span class="kbd">Page Up</span> / <span class="kbd">Page Down</span></strong>
+            <span class="meta">원하는 위치로 자유롭게 커서를 옮겨요.</span>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step__num">3</div>
+          <div class="step__body">
+            <strong>선택 &amp; 복사 — (emacs 모드) <span class="kbd">C-Space</span> 시작 → 이동 → <span class="kbd">C-w</span> 복사</strong>
+            <span class="meta">vi 모드라면 <span class="kbd">Space</span> 시작, <span class="kbd">Enter</span> 복사.</span>
+          </div>
+        </li>
+        <li class="step">
+          <div class="step__num">4</div>
+          <div class="step__body">
+            <strong>붙여넣기 — <span class="kbd-group"><kbd class="kbd kbd--accent">C-b</kbd><span class="plus">+</span><kbd class="kbd kbd--coral">]</kbd></span></strong>
+            <span class="meta">복사한 내용이 다시 터미널에 입력돼요.</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Copy mode fake terminal demo -->
+    <div class="demo-box reveal" data-delay="2">
+      <div class="demo-box__title">데모 · 복사 모드 한눈에 보기</div>
+      <p class="demo-box__hint">버튼을 누르면 복사 모드 진입 → 선택 → 복사 흐름이 재생돼요.</p>
+      <div class="term" id="demo-copy">
+        <div class="term__bar">
+          <div class="term__dots" aria-hidden="true">
+            <span class="term__dot term__dot--r"></span>
+            <span class="term__dot term__dot--y"></span>
+            <span class="term__dot term__dot--g"></span>
+          </div>
+          <span class="term__title">copy mode — demo</span>
+        </div>
+        <div class="term__body" style="position:relative;">
+          <div class="term__copymode" id="demo-copy-badge">COPY MODE</div>
+          <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd">npm run build</span></div>
+          <div class="term__line term__out">&gt; building...</div>
+          <div class="term__line term__out">&gt; <span id="demo-copy-target">src/index.ts · 12 modules</span></div>
+          <div class="term__line term__out">&gt; <span id="demo-copy-target2">assets/styles.css · ok</span></div>
+          <div class="term__line term__ok">✓ built in 1.4s</div>
+          <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd" id="demo-copy-after"></span><span class="term__cursor" aria-hidden="true"></span></div>
+          <div class="term__controls">
+            <button class="term__btn" data-action="enter">1. 복사 모드 진입 <span style="opacity:.6">C-b [</span></button>
+            <button class="term__btn" data-action="select" disabled>2. 선택 &amp; 복사 <span style="opacity:.6">C-Space…C-w</span></button>
+            <button class="term__btn" data-action="paste" disabled>3. 붙여넣기 <span style="opacity:.6">C-b ]</span></button>
+            <button class="term__btn" data-action="reset" disabled>다시</button>
+          </div>
+          <div class="term__hint" id="demo-copy-hint">"복사 모드는 잠시 화면을 정지시키고 돋보기로 살펴보는 시간이에요."</div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M16 16l4 4"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        복사 모드는 <strong>'잠시 화면을 정지시키고 돋보기로 살펴보는 시간'</strong>이에요.
+        보통 모드에서는 새 글자가 계속 올라오지만, 복사 모드에선 화면이 멈춰서 자유롭게 훑어볼 수 있어요.
+      </p>
+    </aside>
+
+    <aside class="note note--warn reveal" role="complementary" aria-label="잠깐, 주의!">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2L12 3zM12 9v6M12 18v.5"/></svg>
+      </span>
+      <span class="note__label">잠깐, 주의!</span>
+      <p>
+        복사 모드를 끝내려면 <span class="kbd">q</span>! 빠져나오는 법을 잊으면 당황하기 쉬워요.
+      </p>
+    </aside>
+
+    <aside class="note note--tip reveal" role="complementary" aria-label="꼭 알아두면 좋아요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c1 1 1 2 1 3h6c0-1 0-2 1-3a7 7 0 0 0-4-12z"/></svg>
+      </span>
+      <span class="note__label">꼭 알아두면 좋아요</span>
+      <p>
+        마우스를 쓰고 싶다면 <code>.tmux.conf</code>에 <code>set -g mouse on</code>을 한 줄 추가하면
+        휠 스크롤과 드래그 복사가 가능해져요.
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        복사한 글자는 tmux만의 '버퍼'에 보관돼요. 최대 50개까지 저장되고,
+        <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">=</kbd></span> 로 과거 버퍼 목록을 볼 수 있어요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [8] CONFIG
+     ============================================================ -->
+<section id="config" aria-labelledby="config-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">08 · 설정</span>
+      <h2 class="section-title" id="config-title">나만의 tmux로 꾸미기</h2>
+      <p class="section-subtitle">tmux는 집처럼 꾸밀 수 있어요. 집의 설계도 역할을 하는 파일이 바로 홈 폴더의 <code>~/.tmux.conf</code>예요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <p class="lead">
+        가장 자주 바꾸는 4가지: <strong>(1) prefix 키</strong>, <strong>(2) 마우스 켜기</strong>,
+        <strong>(3) 상태표시줄 색/내용</strong>, <strong>(4) 창 번호를 1부터</strong>.
+        아래 코드는 주석을 달아뒀어요. 한 줄씩 읽어보면 "아 이걸 바꾸는 거구나"가 보여요.
+      </p>
+
+      <div class="code" aria-label="tmux.conf 기본 예시">
+        <span class="ln"><span class="comment"># 1. prefix를 C-a로 바꾸기 (손이 더 편함)</span></span>
+        <span class="ln"><span class="key">unbind</span> C-b</span>
+        <span class="ln"><span class="key">set</span> -g prefix C-a</span>
+        <span class="ln"><span class="key">bind</span> C-a send-prefix</span>
+        <span class="ln"></span>
+        <span class="ln"><span class="comment"># 2. 마우스 켜기 (휠 스크롤 + 드래그 복사)</span></span>
+        <span class="ln"><span class="key">set</span> -g mouse <span class="val">on</span></span>
+        <span class="ln"></span>
+        <span class="ln"><span class="comment"># 3. 창 번호를 1부터 시작 (0은 너무 멀어요)</span></span>
+        <span class="ln"><span class="key">set</span> -g base-index <span class="val">1</span></span>
+        <span class="ln"><span class="key">set</span> -g pane-base-index <span class="val">1</span></span>
+        <span class="ln"></span>
+        <span class="ln"><span class="comment"># 4. 상태표시줄 꾸미기</span></span>
+        <span class="ln"><span class="key">set</span> -g status-style <span class="str">"bg=#2D2A26, fg=#FFB089"</span></span>
+        <span class="ln"><span class="key">set</span> -g status-left <span class="str">"#[fg=#FF8A5B,bold] #S "</span></span>
+        <span class="ln"><span class="key">set</span> -g status-right <span class="str">"#(whoami) · %H:%M"</span></span>
+      </div>
+    </div>
+
+    <!-- Before/After 상태표시줄 비교 -->
+    <div class="reveal" data-delay="2">
+      <h3 style="font-size:22px; font-weight:700; margin: 28px 0 6px;">상태표시줄(status line), 비교해 보기</h3>
+      <p style="color:var(--text-secondary); margin-bottom: 18px;">
+        화면 맨 아래 줄이 바로 상태표시줄이에요. 왼쪽엔 방 이름, 가운데엔 책상 목록, 오른쪽엔 시간이 떠요.
+        이것도 전부 내 마음대로 바꿀 수 있어요. 탭으로 둘 중 하나를 골라보세요.
+      </p>
+
+      <div class="ba" id="config-ba">
+        <div class="ba__tabs" role="tablist" aria-label="상태표시줄 비교">
+          <button class="ba__tab ba__tab--before is-active" role="tab" aria-selected="true" data-ba="before">기본 (초록줄)</button>
+          <button class="ba__tab ba__tab--after" role="tab" aria-selected="false" data-ba="after">커스텀 (따뜻한 톤)</button>
+        </div>
+        <div class="ba__panels">
+          <div class="ba__panel is-active" data-panel="before">
+            <div class="ba__caption ba__caption--before">기본 — tmux를 처음 켰을 때</div>
+            <div class="statusline-demo">
+              <div class="statusline-demo__term">
+                <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd">vim app.js</span></div>
+                <div class="term__line term__out">작업 중...</div>
+              </div>
+              <div class="statusline-demo__bar statusline-demo__bar--default">
+                <span>[0] 0:bash* &nbsp; "my-machine"</span>
+                <span>14:32</span>
+              </div>
+            </div>
+            <p style="margin-top:12px; font-size:13.5px; color:var(--text-secondary);">
+              익숙한 tmux 기본 초록줄. 정보는 있지만, "내 것" 같은 느낌은 아직 없어요.
+            </p>
+          </div>
+          <div class="ba__panel" data-panel="after">
+            <div class="ba__caption ba__caption--after">커스텀 — .tmux.conf를 고친 후</div>
+            <div class="statusline-demo">
+              <div class="statusline-demo__term">
+                <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd">vim app.js</span></div>
+                <div class="term__line term__out">작업 중...</div>
+              </div>
+              <div class="statusline-demo__bar statusline-demo__bar--custom">
+                <span>🟧 <strong style="color:#FF8A5B;">work</strong> · 1:editor* 2:shell 3:logs</span>
+                <span class="right">jw · 14:32</span>
+              </div>
+            </div>
+            <p style="margin-top:12px; font-size:13.5px; color:var(--text-secondary);">
+              방 이름(<code>work</code>)이 크게 보이고, 색이 집 전체 톤과 어울려요. "내 방" 느낌이 살아요.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--tip reveal" role="complementary" aria-label="꼭 알아두면 좋아요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c1 1 1 2 1 3h6c0-1 0-2 1-3a7 7 0 0 0-4-12z"/></svg>
+      </span>
+      <span class="note__label">꼭 알아두면 좋아요</span>
+      <p>
+        설정 파일을 고치고 나서 바로 적용하려면 tmux 안에서 <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">:</kbd></span> 로
+        명령 프롬프트를 열고 <code>source ~/.tmux.conf</code>를 입력하면 돼요. tmux를 다시 켤 필요 없어요.
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        tmux 설정은 4가지 종류(server/session/window/pane)가 있어요. 보통은 전체에 적용되는 global 설정(<code>-g</code>)만 만져도 충분해요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [9] PLUGINS & TPM
+     ============================================================ -->
+<section id="plugins" aria-labelledby="plugins-title">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">09 · 플러그인</span>
+      <h2 class="section-title" id="plugins-title">tmux에 '앱'을 더해요: 플러그인과 tpm</h2>
+      <p class="section-subtitle">스마트폰에 앱을 설치하듯, tmux에도 플러그인을 추가할 수 있어요. 이걸 관리해 주는 앱스토어 역할이 <strong>tpm(tmux plugin manager)</strong>이에요.</p>
+    </div>
+
+    <div class="reveal" data-delay="1">
+      <div class="flow" role="img" aria-label="tpm 설치 흐름: tpm 설치 → .tmux.conf에 플러그인 나열 → prefix+I로 설치 → 완료">
+        <div class="flow__step">
+          <div class="flow__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+          </div>
+          <div class="flow__title">1. tpm 설치</div>
+          <div class="flow__sub">git clone 한 줄</div>
+        </div>
+        <div class="flow__arrow" aria-hidden="true">→</div>
+        <div class="flow__step">
+          <div class="flow__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v4h4M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-6-4z"/><path d="M8 13h8M8 17h5"/></svg>
+          </div>
+          <div class="flow__title">2. .tmux.conf<br>플러그인 나열</div>
+          <div class="flow__sub">원하는 걸 이름만</div>
+        </div>
+        <div class="flow__arrow" aria-hidden="true">→</div>
+        <div class="flow__step">
+          <div class="flow__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v14M6 11l6 6 6-6M5 21h14"/></svg>
+          </div>
+          <div class="flow__title">3. <span class="kbd" style="font-size:11px">prefix</span> + <kbd style="font-size:11px" class="kbd kbd--coral">I</kbd></div>
+          <div class="flow__sub">I = Install</div>
+        </div>
+        <div class="flow__arrow" aria-hidden="true">→</div>
+        <div class="flow__step">
+          <div class="flow__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="flow__title">4. 완료</div>
+          <div class="flow__sub">바로 사용!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid--3 reveal" data-delay="2">
+      <article class="plugin">
+        <span class="plugin__tag">스킨</span>
+        <div class="plugin__name">tmux-themepack<br>/ catppuccin/tmux</div>
+        <p class="plugin__desc">상태표시줄과 색을 예쁘게 바꿔주는 <strong>테마 플러그인</strong>. 마치 집 페인트칠 같아요.</p>
+      </article>
+      <article class="plugin">
+        <span class="plugin__tag">저장</span>
+        <div class="plugin__name">tmux-resurrect</div>
+        <p class="plugin__desc">방 안의 책상 배치까지 기억했다가, 컴퓨터를 껐다 켜도 그대로 복원해 주는 <strong>'저장'</strong> 기능이에요.</p>
+      </article>
+      <article class="plugin">
+        <span class="plugin__tag">자동</span>
+        <div class="plugin__name">tmux-continuum</div>
+        <p class="plugin__desc">resurrect가 저장한 걸 주기적으로 자동 저장해 주는 <strong>비서</strong>. 컴퓨터가 꺼져도 마지막 상태가 살아 있어요.</p>
+      </article>
+    </div>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        <strong>resurrect와 continuum을 같이 쓰면</strong>, "내 노트북이 꺼져도 서버 작업은 살아있다"는 약속이
+        진짜로 현실이 돼요. tmux의 궁극의 무기예요.
+      </p>
+    </aside>
+
+    <aside class="note note--warn reveal" role="complementary" aria-label="잠깐, 주의!">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2L12 3zM12 9v6M12 18v.5"/></svg>
+      </span>
+      <span class="note__label">잠깐, 주의!</span>
+      <p>
+        플러그인이 너무 많으면 tmux가 느려질 수 있어요. 정말 필요한 것부터 하나씩!
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [10] APPLICATIONS
+     ============================================================ -->
+<section id="apps" aria-labelledby="apps-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">10 · 실생활 응용</span>
+      <h2 class="section-title" id="apps-title">실제로 어떻게 쓰이나요? 다섯 가지 이야기</h2>
+      <p class="section-subtitle">지금까지 배운 개념들이 "아하"로 이어지는 클라이맥스 구간이에요.</p>
+    </div>
+
+    <div class="grid grid--5 reveal" data-delay="1">
+      <article class="scenario">
+        <span class="scenario__num">01</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12a7 7 0 0 1 14 0M5 12a7 7 0 0 0 14 0"/><path d="M8 16h8M12 8v8"/></svg>
+        </div>
+        <h3 class="scenario__title">SSH 원격 세션 지속</h3>
+        <p class="scenario__desc">회사 서버에 접속해 작업하다 와이파이가 끊겨도, 다시 접속해서 <code>tmux a</code> 한 줄이면 그 자리로 복귀.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">02</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><circle cx="16" cy="8" r="3.5"/><path d="M3 20c1-3.5 3.5-5 6-5M10 20c1-3.5 3.5-5 6-5M14 20c1-3.5 3-5 5-5"/></svg>
+        </div>
+        <h3 class="scenario__title">페어 프로그래밍</h3>
+        <p class="scenario__desc">두 사람이 같은 tmux session에 붙어서 한 화면을 같이 보며 코딩.</p>
+        <div class="scenario__art" role="img" aria-label="두 사람이 같은 방을 바라보는 일러스트">
+          <svg viewBox="0 0 240 140" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pairWallG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFF1E2"/><stop offset="1" stop-color="#FFE3CE"/>
+              </linearGradient>
+              <linearGradient id="pairFloorG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#E8D5BD"/><stop offset="1" stop-color="#D8C0A0"/>
+              </linearGradient>
+              <filter id="pairSoft" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#2D2A26" flood-opacity="0.08"/>
+              </filter>
+            </defs>
+            <rect x="10" y="10" width="220" height="100" rx="12" fill="url(#pairWallG)"/>
+            <rect x="10" y="100" width="220" height="30" rx="0" fill="url(#pairFloorG)"/>
+            <g filter="url(#pairSoft)">
+              <rect x="80" y="24" width="80" height="56" rx="6" fill="#E6F7F4" stroke="#26A69A" stroke-width="2.5"/>
+              <rect x="88" y="32" width="64" height="40" rx="3" fill="#F4FBFA"/>
+              <text x="120" y="52" font-family="JetBrains Mono, monospace" font-size="8" fill="#26A69A" text-anchor="middle">$ vim</text>
+              <text x="120" y="64" font-family="JetBrains Mono, monospace" font-size="8" fill="#26A69A" text-anchor="middle">pair.go</text>
+            </g>
+            <ellipse cx="120" cy="110" rx="70" ry="8" fill="#2D2A26" opacity="0.07"/>
+            <g filter="url(#pairSoft)">
+              <circle cx="64" cy="100" r="11" fill="#FF8A5B"/>
+              <path d="M50 124 Q64 110 78 124 Z" fill="#FF8A5B"/>
+            </g>
+            <g filter="url(#pairSoft)">
+              <circle cx="176" cy="100" r="11" fill="#3D5FE0"/>
+              <path d="M162 124 Q176 110 190 124 Z" fill="#3D5FE0"/>
+            </g>
+            <circle cx="54" cy="96" r="1.6" fill="#2D2A26"/>
+            <circle cx="60" cy="96" r="1.6" fill="#2D2A26"/>
+            <path d="M56 101 q3 2.5 6 0" stroke="#2D2A26" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <circle cx="170" cy="96" r="1.6" fill="#2D2A26"/>
+            <circle cx="176" cy="96" r="1.6" fill="#2D2A26"/>
+            <path d="M170 101 q3 2.5 6 0" stroke="#2D2A26" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <path d="M74 92 Q96 78 106 82" stroke="#FF8A5B" stroke-width="1.8" fill="none" stroke-dasharray="3 3" stroke-linecap="round"/>
+            <path d="M166 92 Q144 78 134 82" stroke="#3D5FE0" stroke-width="1.8" fill="none" stroke-dasharray="3 3" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">03</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="6" rx="1"/></svg>
+        </div>
+        <h3 class="scenario__title">로그 모니터링</h3>
+        <p class="scenario__desc">한 화면에 서버 로그/에러/현재 작업을 동시에 띄워두고 한눈에 감시.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">04</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18"/></svg>
+        </div>
+        <h3 class="scenario__title">멀티 모니터 대체</h3>
+        <p class="scenario__desc">모니터가 하나여도 tmux 분할로 여러 창을 동시에.</p>
+      </article>
+      <article class="scenario">
+        <span class="scenario__num">05</span>
+        <div class="scenario__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9"/><path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 9-9"/><path d="M8 12l3 3 5-6"/></svg>
+        </div>
+        <h3 class="scenario__title">노트북 꺼져도 OK</h3>
+        <p class="scenario__desc">클라이맥스. 노트북을 덮고 퇴근해도, 서버의 tmux session은 계속 돌아가고 있어요.</p>
+      </article>
+    </div>
+
+    <!-- Before/After SSH 비교 -->
+    <div class="reveal" data-delay="2">
+      <h3 style="font-size:22px; font-weight:700; margin: 40px 0 6px;">"와이파이가 끊겼을 때" — 일반 터미널 vs tmux</h3>
+      <p style="color:var(--text-secondary); margin-bottom: 16px;">
+        같은 상황인데 결과가 완전히 달라요. 한 번 보면 잊을 수가 없어요.
+      </p>
+
+      <div class="ssh-compare">
+        <div class="ssh-card ssh-card--bad">
+          <div class="ssh-card__head">✗ tmux 없이 일반 터미널</div>
+          <div class="ssh-card__body">
+            <div>$ ssh server</div>
+            <div>$ npm run build</div>
+            <div>&gt; building...</div>
+            <div style="opacity:.6">[연결 끊김]</div>
+            <div><span class="lost">↳ 프로세스 사라짐. 처음부터 다시.</span></div>
+          </div>
+        </div>
+        <div class="ssh-card ssh-card--good">
+          <div class="ssh-card__head">✓ tmux로 감싼 경우</div>
+          <div class="ssh-card__body">
+            <div>$ ssh server</div>
+            <div>$ tmux</div>
+            <div>$ npm run build</div>
+            <div style="opacity:.6">[연결 끊김 → 다시 접속]</div>
+            <div>$ tmux a</div>
+            <div><span class="kept">↳ 그 자리 그대로. 빌드 계속됨.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--metaphor reveal" role="complementary" aria-label="이렇게 생각해보세요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92V21a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5"/><path d="M15 3h6v6M10 14L21 3"/></svg>
+      </span>
+      <span class="note__label">이렇게 생각해보세요</span>
+      <p>
+        tmux 없이 SSH를 쓰면, 인터넷이 끊기는 순간 서버에서 하던 일도 같이 사라져요.
+        마치 전화를 끊으면 통화 내용이 증발하는 것처럼요. tmux는 <strong>'통화 내용이 녹음되어 남는 전화'</strong>를
+        만들어 주는 도구예요.
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은 — 보안">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은 — 보안</span>
+      <p>
+        공유 session은 강력하지만 주의가 필요해요. 같은 session에 붙은 사람은 <strong>내가 치는 모든 걸 볼 수 있어요</strong>.
+        믿을 수 있는 사람과만!
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [11] TROUBLESHOOTING — FAQ
+     ============================================================ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">11 · 문제 해결</span>
+      <h2 class="section-title" id="faq-title">당황하지 마세요, 다 해결책이 있어요</h2>
+      <p class="section-subtitle">초보자가 가장 많이 겪는 6가지 상황. 그리고 가장 흔한 공포를 직접 풀어보는 인터랙션까지.</p>
+    </div>
+
+    <div class="accordion reveal" data-delay="1" id="faq-accordion">
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q1</span>스크롤이 안 돼요!</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책</span>
+            <p>
+              기본 상태예요. tmux는 휠 스크롤을 가로챈 거예요. <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">[</kbd></span> 로
+              <strong>복사 모드</strong>에 진입한 뒤 스크롤하세요. 또는 <code>.tmux.conf</code>에
+              <code>set -g mouse on</code>을 추가하면 휠 스크롤이 바로 됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q2</span>마우스로 클릭/드래그가 안 돼요.</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책</span>
+            <p>
+              mouse 옵션이 꺼져 있어서 그래요. <code>.tmux.conf</code>에 <code>set -g mouse on</code> 한 줄이면
+              휠 스크롤, 클릭으로 pane 이동, 드래그 복사까지 다 됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q3</span>색이 이상하게 나와요.</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책</span>
+            <p>
+              터미널이 256색을 쓴다고 못 알아들은 거예요. <code>.tmux.conf</code>에
+              <code>set -s default-terminal 'tmux-256color'</code> 추가, 그리고 필요하면
+              <code>set -ga terminal-overrides ',*:Tc'</code>로 트루컬러까지 켜주세요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item" id="detach-fear">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q4</span>detach해 버렸어요, 작업 날아갔나요?!</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책 — 그리고 직접 체험해 보세요</span>
+            <p style="margin-bottom:12px;">
+              <strong>아니요!</strong> 방(session)은 그대로예요. <code>tmux a</code>를 치면 그 자리로 돌아갑니다.
+              가장 흔한 초보 공포 — "detach 해버렸다" — 를 아래서 직접 겪어보고 풀어보세요.
+            </p>
+
+            <div class="term" id="demo-fear" data-state="attached">
+              <div class="term__bar">
+                <div class="term__dots" aria-hidden="true">
+                  <span class="term__dot term__dot--r"></span>
+                  <span class="term__dot term__dot--y"></span>
+                  <span class="term__dot term__dot--g"></span>
+                </div>
+                <span class="term__title">detach 공포 — 안심 인터랙션</span>
+              </div>
+              <div class="term__body" id="demo-fear-body">
+                <div class="term__line"><span class="term__prompt">$</span> <span class="term__cmd">vim memo.txt</span></div>
+                <div class="term__line term__out">오늘 할 일: ...</div>
+                <div class="term__line term__out">1. tmux 세션 만들기 ✓</div>
+                <div class="term__line term__out">2. detach 해보기</div>
+                <div class="term__controls">
+                  <button class="term__btn" data-action="detach">detach 해보기 <span style="opacity:.6">C-b d</span></button>
+                  <button class="term__btn" data-action="attach" disabled>다시 들어가기 <span style="opacity:.6">tmux a</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="reassure" id="reassure" hidden>
+              <span class="reassure__emoji" aria-hidden="true">😌</span>
+              <div class="reassure__msg">별거 아니었죠? 작업은 그 자리에 그대로였어요.</div>
+              <div class="reassure__sub">이게 바로 tmux의 약속이에요. detach는 '나가기'가 아니라 '잠시 밖에 나가기'일 뿐.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q5</span>세션을 잃어버렸어요.</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책</span>
+            <p>
+              먼저 <code>tmux ls</code>로 현재 열린 방 목록을 확인하세요. 이름을 알면
+              <code>tmux a -t 이름</code>으로 그 방으로 정확히 재진입할 수 있어요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span><span class="q-tag">Q6</span>tmux 자체를 완전히 끄고 싶어요.</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <span class="answer-label">해결책</span>
+            <p>
+              <code>tmux kill-server</code>를 치면 건물(서버) 전체가 종료돼요. 단, <strong>모든 세션과 작업이 즉시 사라지니</strong>
+              정말 다 필요 없을 때만!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--warn reveal" role="complementary" aria-label="잠깐, 주의!">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2L12 3zM12 9v6M12 18v.5"/></svg>
+      </span>
+      <span class="note__label">잠깐, 주의!</span>
+      <p>
+        <code>kill-server</code>는 건물(서버) 자체를 허무는 거예요. 모든 방과 작업이 즉시 사라져요.
+        정말 다 필요 없을 때만!
+      </p>
+    </aside>
+
+    <aside class="note note--tip reveal" role="complementary" aria-label="꼭 알아두면 좋아요">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12c1 1 1 2 1 3h6c0-1 0-2 1-3a7 7 0 0 0-4-12z"/></svg>
+      </span>
+      <span class="note__label">꼭 알아두면 좋아요</span>
+      <p>
+        tmux 안에서 뭔가 이상하면 <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">?</kbd></span>(단축키 목록),
+        <span class="kbd-group"><kbd class="kbd">C-b</kbd><span class="plus">+</span><kbd class="kbd">:</kbd></span>(명령 프롬프트)로
+        항상 도움을 받을 수 있어요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+<!-- ============================================================
+     [12] DEEP DIVE
+     ============================================================ -->
+<section id="deep" aria-labelledby="deep-title" style="background: linear-gradient(180deg, transparent 0%, var(--bg-soft) 50%, transparent 100%);">
+  <div class="container container--wide">
+    <div class="reveal">
+      <span class="section-index">12 · 더 깊이 (보너스)</span>
+      <h2 class="section-title" id="deep-title">더 깊이 알고 싶은 분을 위해</h2>
+      <p class="section-subtitle">곁가지 주제를 한 곳에 모았어요. 안 읽어도 tmux는 잘 쓸 수 있지만, 읽으면 더 재미있어요.</p>
+    </div>
+
+    <div class="accordion reveal" data-delay="1" id="deep-accordion">
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span>터미널 멀티플렉서의 역사 — screen에서 tmux까지</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <p style="margin-bottom:10px;">
+              tmux는 2007년 OpenBSD 운영체제 개발 과정에서 태어났어요. "화면 관리 도구가 더 필요하다"는 요구에서 시작됐죠.
+              그 전에는 <code>screen</code>(1987년 탄생)이 표준이었어요.
+            </p>
+            <p>
+              tmux는 screen의 핵심 아이디어(세션 지속, 분할)를 계승하면서도 설정 파일, 스크립트 기반 자동화,
+              플러그인 생태계를 더 현대적으로 다듬었어요. 그 결과 지금은 tmux가 사실상 표준.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span>왜 개발자들이 tmux에 집착할까 — '맥락 보존' 철학</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <p style="margin-bottom:10px;">
+              개발은 한 번에 수십 개의 "맥락"을 동시에 다뤄요 — 서버 로그, 에디터, 터미널, 문서.
+              이걸 매번 켜고 끄면, "아까 뭘 보고 있었더라?"로 에너지가 새어나가요.
+            </p>
+            <p>
+              tmux는 그 맥락 전체를 '방'에 보존해요. 다음 날 아침에 <code>tmux a</code> 한 번이면 어제의
+              머릿속이 그대로 복원돼요. 이게 "맥락 보존(context preservation)" 철학이고, tmux 사랑의 진짜 이유예요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span>tmux vs screen vs zellij vs iTerm2 탭 — 비교</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <div class="tbl-wrap" style="margin:8px 0 0;">
+              <table class="tbl cmp-tbl" aria-label="tmux screen zellij iTerm2 비교">
+                <thead>
+                  <tr><th>기능</th><th>tmux</th><th>screen</th><th>zellij</th><th>iTerm2 탭</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td class="col-feature">세션 지속 (detach/attach)</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">×</span></td></tr>
+                  <tr><td class="col-feature">화면 분할 (pane)</td><td><span class="y">✓</span></td><td><span class="partial">△</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                  <tr><td class="col-feature">원격 SSH 환경에서 사용</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="n">×</span></td></tr>
+                  <tr><td class="col-feature">플러그인 생태계</td><td><span class="y">풍부 (tpm)</span></td><td><span class="n">거의 없음</span></td><td><span class="partial">성장 중</span></td><td><span class="partial">앱 한정</span></td></tr>
+                  <tr><td class="col-feature">운영체제</td><td class="col-meta">모든 Unix</td><td class="col-meta">모든 Unix</td><td class="col-meta">모든 Unix</td><td class="col-meta">mac 전용</td></tr>
+                  <tr><td class="col-feature">역사 / 검증</td><td class="col-meta">2007, 사실상 표준</td><td class="col-meta">1987, 레거시</td><td class="col-meta">2021, 차세대</td><td class="col-meta">mac 앱</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p style="margin-top:12px; font-size:14px;">
+              요약: 서버에서 쓸 거면 <strong>tmux</strong>. 차세대 감성이 좋다면 <strong>zellij</strong>.
+              로컬 mac에서만 쓴다면 iTerm2 탭도 훌륭해요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span>공유 세션 보안 노트</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <p>
+              두 사람이 같은 session에 붙으면(페어 프로그래밍), <strong>서로가 치는 모든 키와 화면을 공유</strong>해요.
+              강력하지만 그만큼 위험해요 — 비밀번호, 토큰, 개인정보도 다 보여요.
+              믿을 수 있는 팀원과만 공유하고, 민감 작업은 별도 session으로 빼는 걸 추천해요.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-trigger" aria-expanded="false">
+          <span>생산성 철학 — "화면을 분할하기 전에"</span>
+          <span class="acc-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-content">
+          <div class="acc-content__inner">
+            <p>
+              도구는 강력하지만, 도구 그 자체로 생산적이지는 않아요.
+              "화면을 분할하기 전에, 내가 지금 무엇에 집중하고 있는지"를 먼저 묻는 습관이 tmux를 더 빛나게 해요.
+              도구는 생각의 확장일 뿐, 대체재가 아니에요.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="note note--history reveal" role="complementary" aria-label="옛날 이야기">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </span>
+      <span class="note__label">옛날 이야기</span>
+      <p>
+        tmux는 2007년 OpenBSD 운영체제 개발 과정에서 태어났어요.
+        '화면 관리 도구가 더 필요하다'는 요구에서 시작됐죠.
+      </p>
+    </aside>
+
+    <aside class="note note--extra reveal" role="complementary" aria-label="알아두면 좋은">
+      <span class="note__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 17l9 5 9-5"/></svg>
+      </span>
+      <span class="note__label">알아두면 좋은</span>
+      <p>
+        요즘은 <strong>zellij</strong>라는 '차세대 tmux'를 만들려는 시도도 있어요.
+        하지만 tmux는 20년 가까운 검증과 엄청난 커뮤니티 자료를 가진, 여전히 사실상 표준이에요.
+      </p>
+    </aside>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     [13] FOOTER
+     ============================================================ -->
+<footer class="footer" id="footer">
+  <div class="footer__inner">
+    <div class="footer__col">
+      <h3>다음 단계를 제안해 드려요</h3>
+      <p style="margin-bottom:16px;">
+        읽는 것도 좋지만, 결국 손이 기억하는 게 최고예요. 지금 터미널을 열고 <code style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">tmux</code>를 쳐보세요.
+        처음엔 어색해도 10분이면 "아, 이거였구나"가 와요.
+      </p>
+      <p>그리고 모르는 건 <span class="kbd" style="background:rgba(255,255,255,0.1); color:#FFB089; border-color:rgba(255,255,255,0.2); box-shadow:none;">C-b ?</span> 로 항상 물어보면 돼요.</p>
+    </div>
+
+    <div class="footer__col">
+      <h3>공식 문서</h3>
+      <div class="footer__links">
+        <a class="footer__link" href="https://github.com/tmux/tmux/wiki" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12c0 4.4 2.9 8.2 6.8 9.5.5.1.7-.2.7-.5v-1.7C6.7 19.9 6.1 18 6.1 18c-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7 0-.3-.4-1.3.2-2.7 0 0 .8-.3 2.7 1 .8-.2 1.7-.3 2.5-.3.9 0 1.7.1 2.5.3 1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.8v2.7c0 .3.2.6.7.5C19.1 20.2 22 16.4 22 12c0-5.5-4.5-10-10-10z"/></svg>
+          tmux GitHub Wiki
+        </a>
+        <a class="footer__link" href="https://man.openbsd.org/tmux" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z M4 8h16 M8 4v16"/></svg>
+          tmux man 페이지
+        </a>
+        <a class="footer__link" href="https://github.com/tmux-plugins/tpm" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12c0 4.4 2.9 8.2 6.8 9.5.5.1.7-.2.7-.5v-1.7C6.7 19.9 6.1 18 6.1 18c-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7 0-.3-.4-1.3.2-2.7 0 0 .8-.3 2.7 1 .8-.2 1.7-.3 2.5-.3.9 0 1.7.1 2.5.3 1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.8v2.7c0 .3.2.6.7.5C19.1 20.2 22 16.4 22 12c0-5.5-4.5-10-10-10z"/></svg>
+          tpm (플러그인 매니저)
+        </a>
+      </div>
+    </div>
+
+    <div class="footer__col">
+      <h3>추천 플러그인 모음</h3>
+      <div class="footer__links">
+        <a class="footer__link" href="https://github.com/tmux-plugins/tmux-resurrect" target="_blank" rel="noopener noreferrer">tmux-resurrect — 세션 저장</a>
+        <a class="footer__link" href="https://github.com/tmux-plugins/tmux-continuum" target="_blank" rel="noopener noreferrer">tmux-continuum — 자동 저장</a>
+        <a class="footer__link" href="https://github.com/catppuccin/tmux" target="_blank" rel="noopener noreferrer">catppuccin/tmux — 테마</a>
+        <a class="footer__link" href="https://github.com/tmux-plugins/tmux-sensible" target="_blank" rel="noopener noreferrer">tmux-sensible — 기본값 개선</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <span>SPEC-TMUX-GUIDE-001 · 비개발자를 위한 따뜻한 튜토리얼</span>
+    <span>모든 단축키는 tmux 공식 위키 기반</span>
+  </div>
+</footer>
+
+<!-- ============================================================
+     플로팅 치트시트 토글 (FAB)
+     ============================================================ -->
+<button class="cheat-fab" id="cheat-fab" aria-label="단축키 카드 열기/닫기" aria-expanded="false" aria-controls="cheat-sheet">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M7 6V4M17 6V4M3 11h18M8 16h2M14 16h2"/></svg>
+</button>
+
+<aside class="cheat-sheet" id="cheat-sheet" role="complementary" aria-label="단축키 요약 카드" aria-hidden="true">
+  <div class="cheat-sheet__title">
+    단축키 요약
+    <button class="btn btn--ghost btn--sm" id="cheat-close" aria-label="닫기" style="padding:4px 10px; font-size:11px;">닫기</button>
+  </div>
+  <div class="cheat-sheet__sub">prefix <kbd class="kbd kbd--accent">C-b</kbd> 먼저, 그 다음 키</div>
+  <div class="cheat-sheet__list">
+    <div class="cheat-sheet__row"><span class="desc">세션 나가기</span><kbd class="kbd kbd--coral">d</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">새 창</span><kbd class="kbd kbd--coral">c</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">좌우 분할</span><kbd class="kbd kbd--coral">%</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">상하 분할</span><kbd class="kbd kbd--coral">"</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">pane 이동</span><kbd class="kbd kbd--coral">←→↑↓</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">번호 표시</span><kbd class="kbd kbd--coral">q</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">zoom</span><kbd class="kbd kbd--coral">z</kbd></div>
+    <div class="cheat-sheet__row"><span class="desc">창 닫기 / pane 닫기</span><span><kbd class="kbd kbd--coral">&amp;</kbd>/<kbd class="kbd kbd--coral">x</kbd></span></div>
+    <div class="cheat-sheet__row"><span class="desc">복사 모드 / 붙여넣기</span><span><kbd class="kbd kbd--coral">[</kbd>/<kbd class="kbd kbd--coral">]</kbd></span></div>
+    <div class="cheat-sheet__row"><span class="desc">도움말 / 명령창</span><span><kbd class="kbd kbd--coral">?</kbd>/<kbd class="kbd kbd--coral">:</kbd></span></div>
+    <div class="cheat-sheet__row"><span class="desc">크기 (작게/크게)</span><span><kbd class="kbd kbd--coral">C-↔</kbd>/<kbd class="kbd kbd--coral">M-↔</kbd></span></div>
+  </div>
+</aside>
+
+<script src="js/main.js" defer></script>
+</body>
+</html>

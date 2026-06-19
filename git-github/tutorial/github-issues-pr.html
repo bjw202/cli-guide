@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T16 대화로 코드를 만드는 법 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitHub에서 대화하는 두 가지 방법. Issue(문제 제기)와 Pull Request(변경 제안). merge 전략 squash/rebase/merge-commit까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T16 · GitHub 협업</p>
+  <h1 class="page-header__title">대화로 코드를 만드는 법: Issue와 PR</h1>
+  <p class="page-header__subhead">GitHub는 단순한 창고가 아니라 대화 공간이에요. '이거 문제 있어요'라고 말하는 Issue와 '제가 고쳤어요'라고 제안하는 Pull Request, 두 가지 대화 방식을 배워요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T16 → T1-13 교사 과제 PR, T2-05 오픈소스 기여) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>교사도 학생 과제를 Pull Request로 받아요. 오픈소스에 기여할 때도 같은 흐름이 쓰여요. Issue로 문제를 알리고, PR로 해결을 제안하는 — GitHub가 만든 '대화하며 만드는' 방식이죠.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-13">교사 과제 PR 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-05">오픈소스 기여 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="two-ways" data-reveal>
+      <h2 class="tut-section__title">대화하는 두 가지 방법</h2>
+      <div class="tut-section__body">
+        <p>마을(GitHub)에서 사람들은 두 가지 카드로 대화해요. 하나는 <strong>Issue(이슈)</strong>, '이거 문제 있어요', '이런 기능 있으면 좋겠어요'라고 말하는 카드예요. 다른 하나는 <span data-term="pull-request"><strong>Pull Request(PR, 풀 리퀘스트)</strong></span>, '제가 코드를 고쳤는데 같이 볼래요?'라고 제안하는 카드예요.</p>
+        <p>Issue는 '무엇이 문제인가'를 말하고, PR은 '어떻게 고쳤는가'를 보여줘요. 보통 Issue로 문제를 먼저 알리고, 그걸 해결하는 PR을 나중에 올리는 흐름이에요. 질문→대답의 관계랄까요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Issue는 마을 게시판에 붙이는 '건의 메모'예요. "이 길에 웅덩이가 있어요"라고 적어 올리는 거죠. PR은 그 웅덩이를 직접 고친 뒤 "제가 고쳤으니 검토해 주세요" 하고 내어놓는 제안서예요. PR이 더 능동적이고, 코드까지 딸려 있죠.</p>
+    </div>
+
+    <section class="tut-section" id="issue" data-reveal>
+      <h2 class="tut-section__title">Issue: 문제를 말하는 카드</h2>
+      <div class="tut-section__body">
+        <p>Issue는 "이거 버그 있어요", "이런 기능 있으면 좋겠어요" 같은 문제 제기 카드예요. 제목, 설명, 댓글이 달리고, 하나의 이슈는 하나의 대화 주제로 묶여요. 누구나 달아도 되고, 해결되면 'close'로 닫아요.</p>
+        <p>Issue를 체계적으로 관리하는 도구 세 가지를 알아둬요.</p>
+        <ul>
+          <li><strong>Issue templates</strong> — 버그 리포트, 기능 요청 등 '양식'을 미리 만들어두는 기능. 새 이슈를 만들 때 양식이 자동으로 채워져서, 빠뜨리는 정보가 줄어들어요.</li>
+          <li><strong>labels</strong> — <code>bug</code>, <code>feature</code>, <code>help wanted</code> 같은 색깔 라벨. 이슈를 종류별로 한눈에 분류해요.</li>
+          <li><strong>milestones</strong> — "v1.0까지 이 이슈들 끝내자"처럼 여러 이슈를 묶어 목표로 삼는 기능. 마감일과 진척도를 한 번에 봐요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="tut-section" id="pr" data-reveal>
+      <h2 class="tut-section__title">Pull Request: 변경을 제안하는 카드</h2>
+      <div class="tut-section__body">
+        <p>PR은 '내가 고친 코드를 같이 볼래요?'라는 제안 카드예요. T15에서 배운 fork(또는 브랜치)에서 코드를 고치고 push하면, 그 변경을 원본 저장소로 '제안'하는 게 PR이에요. PR 안에서는 코드가 한 줄씩 보이고, 리뷰어가 코멘트를 달 수 있어요.</p>
+        <p>PR의 흐름은 대체로 이래요: <strong>fork → branch → commit → push → PR → review → merge</strong>. 오픈소스 기여의 표준 동선이기도 해요.</p>
+        <p>PR의 상태는 크게 세 가지로 바뀌어요. 리뷰어가 보낼 수 있는 응답이에요.</p>
+        <ul>
+          <li><strong>comment</strong> — "이렇게 바꾸면 좋겠어요" 의견만.</li>
+          <li><strong>approve</strong> — "좋습니다, 병합해도 돼요" 승인.</li>
+          <li><strong>request changes</strong> — "이 부분 고쳐 주셔야 병합 가능해요" 수정 요청.</li>
+        </ul>
+        <p>또 <strong>draft PR</strong>이라는 것도 있어요. "아직 작성 중인데 미리 보여드려요"라며 피드백만 먼저 구하는 반쯤 완성된 PR이에요. 병합 버튼이 비활성화돼 있어서 실수로 들어갈 일은 없어요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>PR을 열 때 '이 PR이 무엇을 바꾸는지'를 한두 줄로 적어 두면 리뷰어가 훨씬 편해요. 코드만 보여주는 PR보다, '왜 고쳤는지'를 설명하는 PR이 훨씬 빨리 병합된답니다.</p>
+    </div>
+
+    <section class="tut-section" id="conflicts" data-reveal>
+      <h2 class="tut-section__title">충돌이 일어나면: resolve conflicts</h2>
+      <div class="tut-section__body">
+        <p>PR을 올렸는데, 그사이 다른 사람이 같은 부분을 고쳤다면 <strong>충돌(conflict)</strong>이 생겨요. T07에서 배운 병합 충돌과 같은 현상이에요. GitHub는 웹 화면에서 간단한 충돌은 바로 고칠 수 있게 해 줘요(<strong>resolve conflicts</strong> 버튼).</p>
+        <p>복잡한 충돌은 웹에서 해결이 어려워서, 내 컴퓨터로 가져와서 직접 해결하고 다시 push해야 해요. 충돌 해결은 '두 사람이 같은 줄을 동시에 고쳤을 때 어느 쪽을 택할지 정하는' 작업이에요. T07을 다시 보면 도움이 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="merge-strategies" data-reveal>
+      <h2 class="tut-section__title">병합(merge)하는 세 가지 방법</h2>
+      <div class="tut-section__body">
+        <p>리뷰가 끝나고 승인되면, PR을 <strong>merge(병합)</strong>해요. 이때 GitHub는 세 가지 방식을 제안해요. 설정에서 허용한 방식만 골라 쓸 수 있어요.</p>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th scope="col">방식</th>
+              <th scope="col">무슨 일이 일어나나</th>
+              <th scope="col">언제 어울리나</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">squash merge</th>
+              <td>브랜치의 모든 커밋을 <strong>하나로 합쳐서</strong> 병합. 중간 과정이 사라지고 한 줄로 깔끔하게.</td>
+              <td>작은 기능, '고치다 만 흔적'을 남기고 싶지 않을 때. 역사를 깔끔하게.</td>
+            </tr>
+            <tr>
+              <th scope="row">rebase merge</th>
+              <td>커밋들을 <strong>그대로 이어 붙이되</strong>, main 줄기 위에 차례로 올림. 병합 커밋이 안 생김.</td>
+              <td>커밋 하나하나의 의미를 보존하고 싶을 때. 선형 역사 선호.</td>
+            </tr>
+            <tr>
+              <th scope="row">merge commit</th>
+              <td><strong>병합 전용 커밋을 하나 만들어서</strong> 합치기. 기본값. 두 줄기가 만났다는 흔적이 남음.</td>
+              <td>팀 표준, '여기서 합쳤다'는 지점을 기록하고 싶을 때.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>팀마다 취향이 달라요. "우리 팀은 squash로 깔끔하게", "우리는 merge commit으로 합친 지점을 남겨"처럼 정해서 써요. 중요한 건 한 가지로 통일하면 역사가 일관된다는 거예요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>저장소에 <strong>Discussions</strong>(질답 게시판), <strong>Wiki</strong>(문서 모음), <strong>Projects(v2)</strong>(칸반 보드) 같은 기능도 있어요. Issue는 '문제', Discussions는 '질문', Projects는 '일정 관리'에 어울려요. 같이 쓰면 팀 워크가 체계화된답니다.</p>
+    </div>
+
+    <!-- SPEC-IMPL-006 자산: PRFlowDiagram -->
+    <section class="asset" data-asset="pr-flow" data-reveal aria-label="PR 워크플로우 다이어그램">
+      <h2 class="asset__title">📨 PR 흐름 — fork → merge</h2>
+      <p class="asset__hint">재생 버튼으로 7단계가 순서대로 켜지는 걸 보거나, 각 단계를 눌러 설명을 보세요.</p>
+      <div class="asset__controls">
+        <button class="asset__btn asset__btn--play" type="button" data-pr-play>▶ 흐름 재생</button>
+      </div>
+      <div class="pr-flow__track" data-pr-track></div>
+      <div class="pr-flow__detail" data-pr-detail></div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T16 한 장 요약</h2>
+      <p class="cheat-card__sub">Issue와 Pull Request</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Issue</span><span class="cheat-card__desc">'문제 있어요' '기능 원해요' 카드. templates/labels/milestones으로 정리.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Pull Request (PR)</span><span class="cheat-card__desc">'코드 고쳤어요, 같이 볼래요?' 변경 제안 카드.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">draft PR</span><span class="cheat-card__desc">아직 작성 중이라 피드백만 먼저 구하는 PR.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">리뷰 응답</span><span class="cheat-card__desc">comment / approve / request changes 세 가지.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">resolve conflicts</span><span class="cheat-card__desc">같은 줄을 동시에 고쳤을 때 충돌 해결. 웹 또는 로컬.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">merge 3종</span><span class="cheat-card__desc">squash(하나로 합침) / rebase(이어붙임) / merge commit(병합 커밋).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">곁들임</span><span class="cheat-card__desc">Discussions(질문) · Wiki(문서) · Projects(v2, 일정) — side-note.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T15, 다음=T17) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-repo.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T15 나의 첫 저장소</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-review.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T17 코드 리뷰, 서로 키워주는 시간</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#two-ways">대화 두 가지</a>
+      <a class="sidebar-toc__link" href="#issue">Issue</a>
+      <a class="sidebar-toc__link" href="#pr">Pull Request</a>
+      <a class="sidebar-toc__link" href="#conflicts">충돌 해결</a>
+      <a class="sidebar-toc__link" href="#merge-strategies">merge 3종</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → 자산 -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/pr-flow.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

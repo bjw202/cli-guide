@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R01 명령어 사전 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Git/GitHub 명령어 사전. 주요 git 명령어와 GitHub 기능을 한 줄 설명 + 주제/난이도 필터로 빠르게 찾기. 각 항목은 튜토리얼로 역링크." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (REQ-008: P1 셸 상속) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">참조 허브 · R01</p>
+  <h1 class="page-header__title">명령어 사전</h1>
+  <p class="page-header__subhead">"git reset 차이가 뭐였지?" 필요한 순간에 점프. 주제·난이도로 거르고, 각 명령은 튜토리얼로 바로 이어져요. URL fragment(<code>#git-reset</code>)로 직접 링크도 가능합니다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-ref">
+
+    <!-- 필터 바 (REQ-009: 키보드 접근성) -->
+    <div class="ref-filter-bar" role="region" aria-label="명령어 필터">
+      <div class="ref-filter__group">
+        <span class="ref-filter__label">주제</span>
+        <button type="button" class="ref-filter__chip is-active" data-group="topic" data-value="all">전체</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="basic">기본</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="branch">브랜치</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="remote">원격</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="recovery">복구</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="advanced">고급</button>
+        <button type="button" class="ref-filter__chip" data-group="topic" data-value="github">github</button>
+      </div>
+      <div class="ref-filter__group">
+        <span class="ref-filter__label">난이도</span>
+        <button type="button" class="ref-filter__chip is-active" data-group="level" data-value="all">전체</button>
+        <button type="button" class="ref-filter__chip" data-group="level" data-value="easy">초급</button>
+        <button type="button" class="ref-filter__chip" data-group="level" data-value="mid">중급</button>
+        <button type="button" class="ref-filter__chip" data-group="level" data-value="hard">고급</button>
+      </div>
+      <label class="ref-search">
+        <span aria-hidden="true">🔍</span>
+        <input type="search" placeholder="명령어나 설명 검색" aria-label="명령어 검색" />
+      </label>
+    </div>
+
+    <!-- 명령어 카드 목록 -->
+    <div class="cmd-dict js-ref-list">
+
+      <article class="cmd-dict__item js-ref-item" id="git-init" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git init</span></div>
+        <p class="cmd-dict__desc">빈 사진첩(저장소)을 새로 만드는 첫 명령. 현재 폴더를 Git이 추적하기 시작해요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-setup.html">→ T02 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-clone" data-topic="basic remote" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git clone &lt;url&gt;</span></div>
+        <p class="cmd-dict__desc">원격 저장소 전체를 내 컴퓨터로 복사해 오기. 역사까지 전부 가져와요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본 · 원격</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-remote.html">→ T09 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-config" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git config</span></div>
+        <p class="cmd-dict__desc">Git 설정(이름·이메일 등)을 읽고 고치기. 사진첩에 도장 찍을 주인 정보를 정해요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-config-files.html">→ T13 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-status" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git status</span></div>
+        <p class="cmd-dict__desc">지금 뭐가 바뀌었고, 사진첩에 안 붙인 게 뭔지 보여줘요. 막막하면 일단 status.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-basics.html">→ T03 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-add" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git add &lt;file&gt;</span></div>
+        <p class="cmd-dict__desc">바뀐 파일을 '다음 사진에 넣겠다'고 표시(대기방으로 올리기). <code>.</code>으로 전부 추가.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-staging.html">→ T04 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-commit" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git commit -m "msg"</span></div>
+        <p class="cmd-dict__desc">대기방의 묶음에 도장 찍어 사진첩에 한 장으로 영구히 붙이기. <code>--amend</code>로 직전 사진 수정.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-basics.html">→ T03 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-log" data-topic="basic" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git log</span></div>
+        <p class="cmd-dict__desc">사진첩의 목차. <code>--oneline</code>(한 줄 요약) · <code>--graph --all</code>(그림) · <code>-p</code>(diff 포함).</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-history.html">→ T05 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-show" data-topic="basic" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git show &lt;커밋&gt;</span></div>
+        <p class="cmd-dict__desc">사진 한 장을 확대해 보기. 무엇이 바뀌었는지(diff)까지 자세히 보여줘요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-history.html">→ T05 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-diff" data-topic="basic" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git diff</span></div>
+        <p class="cmd-dict__desc">작업방·대기방·사진첩 사이의 차이를 비교. <code>--stat</code>(요약) · 브랜치 간 비교도 가능.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-staging.html">→ T04 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-blame" data-topic="advanced" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git blame &lt;file&gt;</span></div>
+        <p class="cmd-dict__desc">이 줄을 누가, 언제, 어떤 사진에서 남겼는지 한 줄씩 추적. 코드 흔적 수사.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-history.html">→ T05 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-reflog" data-topic="recovery advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git reflog</span></div>
+        <p class="cmd-dict__desc">HEAD가 지나간 모든 흔적(숨은 발자취). <code>reset --hard</code>로 잃어버린 커밋을 찾아 되돌릴 때 구명조끼.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">복구 · 고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-undo.html">→ T11 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-branch" data-topic="branch" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git branch</span></div>
+        <p class="cmd-dict__desc">평행 우주(브랜치) 목록 보기 · 새로 만들기 · 지우기. <code>git branch &lt;이름&gt;</code>로 생성.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">브랜치</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-branch.html">→ T06 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-switch" data-topic="branch" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git switch &lt;브랜치&gt;</span></div>
+        <p class="cmd-dict__desc">다른 평행 우주로 이동. <code>-c</code>로 새 브랜치 만들면서 이동. <code>checkout</code>의 후속 명령.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">브랜치</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-branch.html">→ T06 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-merge" data-topic="branch" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git merge &lt;브랜치&gt;</span></div>
+        <p class="cmd-dict__desc">두 평행 우주를 하나로 합치기. 빠른길(fast-forward)과 3-way 병합이 있고, 충돌이 날 수 있어요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">브랜치</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-merge.html">→ T07 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-rebase" data-topic="branch advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git rebase &lt;브랜치&gt;</span></div>
+        <p class="cmd-dict__desc">내 사진들을 다른 우주 끝으로 '옮겨 다시 붙이기'. 역사를 한 줄로 깔끔하게 정리. <code>-i</code>로 대화형.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">브랜치 · 고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-rebase.html">→ T08 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-remote" data-topic="remote" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git remote</span></div>
+        <p class="cmd-dict__desc">원격 저장소 연결 관리. <code>git remote add origin &lt;url&gt;</code>로 GitHub와 이어줘요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">원격</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-remote.html">→ T09 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-fetch" data-topic="remote" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git fetch</span></div>
+        <p class="cmd-dict__desc">원격의 새 소식을 '받아만' 오기. 내 작업방은 건드리지 않아 안전하게 미리 보기.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">원격</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-remote.html">→ T09 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-pull" data-topic="remote" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git pull</span></div>
+        <p class="cmd-dict__desc"><code>fetch</code> + <code>merge</code> 한 번에. 원격 변경을 받아와 바로 합치기. <code>--rebase</code> 옵션도.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">원격</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-remote.html">→ T09 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-push" data-topic="remote" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git push</span></div>
+        <p class="cmd-dict__desc">내 사진첩을 원격으로 올리기. <code>-u</code>로 처음 연결. 공개된 사진은 함부로 고치면 위험(참고: <code>--force-with-lease</code>).</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">원격</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-remote.html">→ T09 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-tag" data-topic="branch advanced" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git tag</span></div>
+        <p class="cmd-dict__desc">특정 사진에 이름표(버전) 붙이기. lightweight와 annotated(서명 포함) 두 종류.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">브랜치 · 고급</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-tag.html">→ T10 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-reset" data-topic="recovery" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git reset</span></div>
+        <p class="cmd-dict__desc">과제 되돌리기. <code>--soft</code>(HEAD만) · <code>--mixed</code>(대기방까지, 기본값) · <code>--hard</code>(작업방까지 버림).</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">복구</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-undo.html">→ T11 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-revert" data-topic="recovery" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git revert &lt;커밋&gt;</span></div>
+        <p class="cmd-dict__desc">과거 사진을 '부정'하는 새 사진을 추가. 역사를 안전하게 되돌리며, 이미 push한 공개 내역에 안전해요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">복구</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-undo.html">→ T11 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-restore" data-topic="recovery basic" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git restore &lt;file&gt;</span></div>
+        <p class="cmd-dict__desc">파일을 이전 상태로 되돌려 놓기. 대기방 올린 것 취소(<code>--staged</code>)도 가능. <code>checkout &lt;file&gt;</code> 후속.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">복구 · 기본</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-undo.html">→ T11 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-clean" data-topic="recovery" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git clean</span></div>
+        <p class="cmd-dict__desc">추적 안 된(새로 만든) 파일을 작업방에서 쓸어내기. <code>-fd</code>로 폴더까지. 복구 불가니 주의.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">복구</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-undo.html">→ T11 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-cherry-pick" data-topic="advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git cherry-pick &lt;커밋&gt;</span></div>
+        <p class="cmd-dict__desc">다른 우주의 특정 사진 한 장만 골라 내 우주로 가져오기. 전체 병합 없이 한 개만.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-stash" data-topic="advanced" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git stash</span></div>
+        <p class="cmd-dict__desc">작업중인 변경을 잠시 서랍에 넣어두기. 급히 브랜치 바꿔야 할 때 유용. <code>pop</code>으로 꺼내기.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-bisect" data-topic="advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git bisect</span></div>
+        <p class="cmd-dict__desc">이진 탐색으로 버그가 생긴 사진을 찾기. 좋은/나쁜 사진 표시하면 Git이 반씩 좁혀 범인을 찾아요.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-submodule" data-topic="advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git submodule</span></div>
+        <p class="cmd-dict__desc">저장소 안에 다른 저장소를 '하위 모듈'로 끼워 넣기. 공통 라이브러리를 가져다 쓸 때.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-worktree" data-topic="advanced" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git worktree</span></div>
+        <p class="cmd-dict__desc">한 저장소를 여러 폴더에서 동시에(각각 다른 브랜치로) 작업. 브랜치 전환 없이 병렬 개발.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="git-filter-repo" data-topic="advanced recovery" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">git filter-repo</span></div>
+        <p class="cmd-dict__desc">역사 전체에서 민감 정보(비밀번호, 큰 파일)를 통째로 씻어내기. 실수로 push한 비밀 제거용.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">고급 · 복구</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-advanced.html">→ T12 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="gitignore" data-topic="basic" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">.gitignore</span></div>
+        <p class="cmd-dict__desc">추적하지 않을 파일 목록 파일. 빌드 결과·비밀(.env)을 사진첩에서 영원히 배제.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">기본</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/git-config-files.html">→ T13 자세히</a>
+        </div>
+      </article>
+
+      <hr class="cmd-dict__sep" aria-hidden="true" style="border:none;border-top:2px dashed rgba(45,42,38,.1);margin:8px 0;" />
+
+      <p class="side-note__label" style="margin:8px 0;">GitHub 기능</p>
+
+      <article class="cmd-dict__item js-ref-item" id="gh-fork" data-topic="github" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">Fork</span></div>
+        <p class="cmd-dict__desc">남의 저장소를 내 계정로 통째로 복사. 마음대로 실험한 뒤 원작자에게 PR로 제안.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">github</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/github-repo.html">→ T15 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="gh-issue" data-topic="github" data-level="easy">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">Issue</span></div>
+        <p class="cmd-dict__desc">대화방에 남기는 '할 일·버그·질문' 카드. 라벨·마일스톤으로 정리. <code>gh issue</code>로 터미널에서도.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">github</span>
+          <span class="tag tag--diff-easy">초급</span>
+          <a class="cmd-dict__link" href="../tutorial/github-issues-pr.html">→ T16 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="gh-pr" data-topic="github" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">Pull Request (PR)</span></div>
+        <p class="cmd-dict__desc">"내 변경을 받아주세요" 하는 제안 카드. 리뷰→승인→병합(squash/rebase/merge) 흐름. <code>gh pr</code>.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">github</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/github-issues-pr.html">→ T16 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="gh-actions" data-topic="github" data-level="hard">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">Actions (workflow.yml)</span></div>
+        <p class="cmd-dict__desc">push 등 이벤트에 자동으로 돌아가는 로봇. job/step/runner/matrix/secret으로 CI·CD 자동화.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">github</span>
+          <span class="tag tag--diff-hard">고급</span>
+          <a class="cmd-dict__link" href="../tutorial/github-actions.html">→ T18 자세히</a>
+        </div>
+      </article>
+
+      <article class="cmd-dict__item js-ref-item" id="gh-cli" data-topic="github" data-level="mid">
+        <div class="cmd-dict__head"><span class="cmd-dict__cmd js-search-text">gh (GitHub CLI)</span></div>
+        <p class="cmd-dict__desc">터미널에서 GitHub를 다루는 공식 도구. <code>gh repo</code> · <code>gh pr</code> · <code>gh issue</code>로 브라우저 없이 협업.</p>
+        <div class="cmd-dict__tags">
+          <span class="tag tag--topic">github</span>
+          <span class="tag tag--diff-mid">중급</span>
+          <a class="cmd-dict__link" href="../tutorial/github-actions.html">→ T18 자세히</a>
+        </div>
+      </article>
+
+      <p class="ref-empty">조건에 맞는 명령어가 없어요. 필터나 검색어를 바꿔보세요.</p>
+    </div>
+
+    <!-- Related -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">함께 보기</span>
+      <p>한눈에 인쇄하려면 <a href="cheatsheet.html">R04 치트시트</a>, 단어 뜻이 궁금하면 <a href="glossary.html">R02 용어집</a>, 막힌 상황은 <a href="faq.html">R03 FAQ</a>로.</p>
+    </div>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">필터</p>
+    <div class="sidebar-toc__list">
+      <span class="sidebar-toc__link" style="color:var(--text-tertiary)">주제 · 난이도 · 검색으로 거르세요. <code>#git-reset</code> 같은 앵커로 직접 링크됩니다.</span>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → ref-filter -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/ref-filter.js" defer></script>
+</body>
+</html>

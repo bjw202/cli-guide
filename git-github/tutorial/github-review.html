@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T17 코드 리뷰, 서로 키워주는 시간 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="코드 리뷰는 '틀린 걸 잡는' 자리가 아니라 '서로 더 나은 코드로 키우는' 자리. review comments, suggestions, CODEOWNERS, branch protection까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T17 · GitHub 협업</p>
+  <h1 class="page-header__title">코드 리뷰, 서로 키워주는 시간</h1>
+  <p class="page-header__subhead">좋은 리뷰는 칭찬이자 훈련이에요. '틀린 걸 잡는' 자리가 아니라 '서로 더 나은 코드로 키우는' 자리 — GitHub의 리뷰 도구를 차근차근 만나봐요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T17 → T1-13 교사 피드백, T2-05 오픈소스 리뷰) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>교사가 학생 과제에 달아주는 피드백도 코드 리뷰와 같아요. 오픈소스에서도 전 세계 낯선 사람끼리 이 방식으로 리뷰해요. 리뷰는 전문가만의 게임이 아니라, '서로 키워주는' 보편적인 대화 방식이랍니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-13">교사 피드백 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-05">오픈소스 리뷰 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="mindset" data-reveal>
+      <h2 class="tut-section__title">리뷰는 '잡는' 게 아니라 '키우는' 시간</h2>
+      <div class="tut-section__body">
+        <p>코드 리뷰(code review)는 다른 사람이 쓴 코드를 읽고 의견을 나누는 시간이에요. 흔히 '틀린 걸 찾아내는' 자리로 생각하지만, 진짜 목적은 달라요. <strong>서로 더 나은 코드로 키우는</strong> 자리예요. 질문 하나, 제안 하나가 코드의 미래를 바꿔요.</p>
+        <p>좋은 리뷰 문화에서는 초보자의 PR도 환영받고, 사소한 실수도 부드럽게 알려줘요. '틀렸다'고 지적하는 게 아니라 '이러면 더 좋을 것 같아요'라고 제안하는 거예. 말투가 달라지면 같은 코드도 다르게 자라요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>리뷰는 동네 북클럽과 같아요. 누군가 쓴 글(코드)을 모여서 읽고, '이 부분 좋더라', '여긴 이렇게 바꾸면 더 읽기 쉬울 것 같아'라고 이야기하는 거예요. 작가를 깎아내리는 게 아니라, 다음 글을 더 잘 쓰도록 돕는 자리랍니다.</p>
+    </div>
+
+    <section class="tut-section" id="comments-suggestions" data-reveal>
+      <h2 class="tut-section__title">리뷰 도구: comments와 suggestions</h2>
+      <div class="tut-section__body">
+        <p>GitHub의 PR 화면에서 코드는 한 줄씩 보여요. 리뷰어는 <strong>review comments(리뷰 코멘트)</strong>로 코드 특정 줄에 코멘트를 달아요. "이 변수 이름이 헷갈려요"처럼요. 줄 단위로 달기 때문에 어느 부분에 대한 말인지 명확해요.</p>
+        <p>더 강력한 도구가 <strong>suggestions(제안)</strong>이에요. 리뷰어가 "이렇게 바꾸면 어떨까요?" 하고 코드를 직접 제안하면, 작성자는 <strong>클릭 한 번</strong>으로 그 제안을 적용할 수 있어요. 복사-붙여넣기 없이, 제안 그대로 커밋에 반영돼요. 수정이 부드럽게 이어지는 비결이에요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="codeowners" data-reveal>
+      <h2 class="tut-section__title">CODEOWNERS: 이 구역은 내 담당</h2>
+      <div class="tut-section__body">
+        <p>저장소가 커지면 "이 폴더는 A팀, 저 폴더는 B팀"처럼 담당을 나누게 돼요. 이걸 자동으로 처리하는 게 <strong>CODEOWNERS</strong>예요. 저장소 루트의 <code>.github/CODEOWNERS</code> 파일에 '이 경로는 이 사람이 리뷰한다'를 적어두면, 해당 경로가 바뀌는 PR은 자동으로 그 사람을 리뷰어로 지정해요.</p>
+        <p>예를 들어 이렇게 적을 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- 코드 블록: CODEOWNERS 예시 -->
+    <pre class="code-block"><code># .github/CODEOWNERS 예시
+# 문서 폴더는 문서팀이
+/docs/           @docs-team
+# 데이터베이스 관련 코드는 DBA가
+/src/db/         @dba-alice @dba-bob
+# package.json은 프론트 리드가
+package.json     @frontend-lead</code></pre>
+
+    <section class="tut-section" id="branch-protection" data-reveal>
+      <h2 class="tut-section__title">branch protection: 중요 줄기 잠그기</h2>
+      <div class="tut-section__body">
+        <p>혼자 쓸 땐 아무나 main 브랜치에 push해도 돼요. 하지만 팀이나 오픈소스라면, <strong>main 브랜치를 함부로 못 건드리게 잠가야 해요</strong>. 이게 <strong>branch protection rules(브랜치 보호 규칙)</strong>이에요. 설정에서 'main 브랜치 보호'를 켜면 이런 규칙을 정할 수 있어요.</p>
+        <p>자주 쓰는 보호 규칙 세 가지를 알아둬요.</p>
+        <ul>
+          <li><strong>required reviews(필수 리뷰)</strong> — 병합하려면 최소 N명의 승인(approve)이 있어야 함. 한 명도 안 보고 병합하는 일을 막아요.</li>
+          <li><strong>status checks(상태 검사)</strong> — CI(자동 테스트, T18에서 배워요)를 통과해야만 병합 가능. 빨간 불이면 병합 버튼이 안 눌러요.</li>
+          <li><strong>직접 push 금지</strong> — main에 곧바로 commit을 올릴 수 없음. 반드시 PR을 거쳐야 함.</li>
+        </ul>
+        <p>이 규칙을 '설정' 같은 곳에 적어 두는 게 아니라, GitHub가 강제로 지키게 해 줘요. 한 번 켜두면 아무도 슬쩍 빠져나갈 수 없죠.</p>
+      </div>
+    </section>
+
+    <!-- 코드 블록: branch protection 설정 JSON 예시 -->
+    <pre class="code-block"><code>// branch protection rule — GitHub 설정의 핵심 항목
+{
+  "required_status_checks": {
+    "strict": true,              // 최신 main 기준으로 검사
+    "contexts": ["ci/tests"]     // 통과해야 할 CI 작업
+  },
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1  // 최소 1명 승인 필수
+  },
+  "enforce_admins": true,        // 관리자도 규칙 예외 없음
+  "restrict_pushes": true        // main 직접 push 금지
+}</code></pre>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>리뷰 코멘트는 '사람'이 아니라 '코드'에 남겨요. "이 부분은 X한 이유로 Y하면 좋겠어요"가 "이거 왜 이래?"보다 백 번 낫습니다. 질문 형태("여기 이렇게 한 이유가 궁금해요")는 방어적이지 않게 대화를 여는 가장 부드러운 방법이에요.</p>
+    </div>
+
+    <section class="tut-section" id="flow" data-reveal>
+      <h2 class="tut-section__title">리뷰 흐름: comment → resolve → approve → merge</h2>
+      <div class="tut-section__body">
+        <p>리뷰는 대부분 이런 흐름으로 흘러가요.</p>
+        <ol>
+          <li><strong>comment</strong> — 리뷰어가 코드에 코멘트나 제안을 달아요.</li>
+          <li><strong>resolve</strong> — 작성자가 코멘트를 반영하거나 답변하고, 'Resolved' 체크로 해결 표시를 해요.</li>
+          <li><strong>approve</strong> — 리뷰어가 '좋습니다' 승인을 보내요.</li>
+          <li><strong>merge</strong> — 작성자(또는 관리자)가 PR을 병합해요.</li>
+        </ol>
+        <p>모든 코멘트가 resolve되고 승인이 떨어지면, 그제서로 병합 버튼이 눌러요. branch protection이 켜져 있다면 이 흐름을 건너뛸 수 없죠. 그래서 코드가 안전하게 자라는 거예요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>리뷰에도 에티켓이 있어요. 큰 PR보다 작은 PR이 리뷰하기 편하고, 제목과 설명이 명확하면 리뷰어 시간이 아껴져요. 칭찬도 잊지 말기 — "이 부분 깔끔하네요" 한마디가 리뷰 문화를 따뜻하게 만들어요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T17 한 장 요약</h2>
+      <p class="cheat-card__sub">코드 리뷰 도구와 보호 규칙</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">review comments</span><span class="cheat-card__desc">PR 코드 특정 줄에 다는 코멘트. 어느 부분에 대한 말인지 명확.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">suggestions</span><span class="cheat-card__desc">"이렇게 바꾸면?" 코드 제안. 클릭 한 번으로 적용.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">CODEOWNERS</span><span class="cheat-card__desc">.github/CODEOWNERS 파일로 경로별 담당 리뷰어 자동 지정.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">branch protection</span><span class="cheat-card__desc">main 브랜치를 함부로 못 건드리게 잠그는 규칙.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">required reviews</span><span class="cheat-card__desc">병합하려면 최소 N명 승인 필수.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">status checks</span><span class="cheat-card__desc">CI 통과해야만 병합 가능 (T18과 연결).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">리뷰 흐름</span><span class="cheat-card__desc">comment → resolve → approve → merge.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T16, 다음=T18) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-issues-pr.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T16 대화로 코드를 만드는 법</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-actions.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T18 로봇 비서를 고용하세요: GitHub Actions</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#mindset">리뷰는 키우는 시간</a>
+      <a class="sidebar-toc__link" href="#comments-suggestions">comments/suggestions</a>
+      <a class="sidebar-toc__link" href="#codeowners">CODEOWNERS</a>
+      <a class="sidebar-toc__link" href="#branch-protection">branch protection</a>
+      <a class="sidebar-toc__link" href="#flow">리뷰 흐름</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

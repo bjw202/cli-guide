@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>터미널 친구들 — 비개발자를 위한 따뜻한 튜토리얼 시리즈</title>
+<meta name="description" content="코딩을 몰라도 터미널 도구를 한 번에 이해하는 따뜻한 튜토리얼 시리즈. tmux, Git/GitHub." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+/* 디자인 토큰 — tmux 가이드와 공유 (시리즈 일체감) */
+:root{
+  --bg-base:#FFFBF5; --bg-surface:#FFFFFF; --bg-soft:#FFF6EC;
+  --primary:#FF8A5B; --primary-dark:#E66E3F; --primary-soft:#FFE3D4;
+  --accent:#3D5FE0; --mint:#26A69A; --git:#2E7D52;
+  --text-primary:#2D2A26; --text-secondary:#7A726B; --text-tertiary:#A39A92;
+  --font-sans:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-sans);
+  color:var(--text-primary);
+  line-height:1.7;
+  min-height:100vh;
+  word-break:keep-all;
+  background-color:var(--bg-base);
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(255,138,91,.10), transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(61,95,224,.08), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(38,166,154,.05), transparent 50%);
+}
+.shell{max-width:920px;margin:0 auto;padding:0 24px}
+
+/* HERO */
+.hero{text-align:center;padding:96px 0 40px}
+.hero__eyebrow{
+  display:inline-block;padding:6px 14px;border-radius:999px;
+  background:var(--primary-soft);color:var(--primary-dark);
+  font-size:14px;font-weight:600;letter-spacing:-.01em;margin-bottom:24px;
+}
+.hero__title{
+  font-size:clamp(34px,5.4vw,52px);font-weight:800;letter-spacing:-.03em;
+  line-height:1.2;color:var(--text-primary);margin-bottom:20px;
+}
+.hero__title .accent{color:var(--primary)}
+.hero__subtitle{
+  font-size:clamp(17px,2vw,20px);color:var(--text-secondary);
+  max-width:620px;margin:0 auto;font-weight:400;
+}
+.hero__hint{font-size:14px;color:var(--text-tertiary);margin-top:10px}
+.hero__art{margin:40px auto 0;max-width:300px}
+
+/* 카드 그리드 */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:24px;padding:32px 0 80px;
+}
+.card{
+  position:relative;display:block;text-decoration:none;
+  background:var(--bg-surface);border-radius:24px;padding:36px 32px;
+  box-shadow:0 1px 2px rgba(45,42,38,.04),0 12px 32px rgba(45,42,38,.06);
+  border:1px solid rgba(45,42,38,.05);
+  transition:transform .25s ease,box-shadow .25s ease;
+  overflow:hidden;
+}
+.card:hover{transform:translateY(-6px);box-shadow:0 4px 8px rgba(45,42,38,.06),0 20px 44px rgba(45,42,38,.10)}
+.card:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+.card--coming{cursor:default}
+.card--coming:hover{transform:none;box-shadow:0 1px 2px rgba(45,42,38,.04),0 12px 32px rgba(45,42,38,.06)}
+.card__icon{
+  width:56px;height:56px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+}
+.card__icon--tmux{background:var(--primary-soft)}
+.card__icon--git{background:#E0F0E8}
+.card__badge{
+  position:absolute;top:24px;right:24px;
+  font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;
+}
+.badge--done{background:#E0F0E8;color:var(--git)}
+.badge--soon{background:var(--bg-soft);color:var(--text-secondary)}
+.card__title{font-size:24px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px;color:var(--text-primary)}
+.card__desc{font-size:15.5px;color:var(--text-secondary);margin-bottom:18px}
+.card__meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tag{font-size:12px;font-weight:500;padding:4px 10px;border-radius:8px;background:var(--bg-soft);color:var(--text-secondary)}
+.card__cta{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:var(--primary)}
+.card--coming .card__cta{color:var(--text-tertiary)}
+.card__arrow{transition:transform .2s ease}
+.card:hover .card__arrow{transform:translateX(4px)}
+
+/* 푸터 */
+.foot{padding:48px 0 64px;text-align:center;border-top:1px solid rgba(45,42,38,.06);margin-top:24px}
+.foot__txt{font-size:14px;color:var(--text-tertiary)}
+.foot__txt strong{color:var(--text-secondary)}
+
+@media(prefers-reduced-motion:reduce){
+  .card,.card__arrow{transition:none}
+  .card:hover{transform:none}
+}
+@media(max-width:600px){
+  .hero{padding:64px 0 32px}
+  .cards{grid-template-columns:1fr;padding:24px 0 56px}
+  .card{padding:28px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- HERO -->
+  <header class="hero">
+    <span class="hero__eyebrow">비개발자를 위한 튜토리얼 시리즈</span>
+    <h1 class="hero__title">터미널 친구들,<br><span class="accent">따뜻하게 소개합니다</span></h1>
+    <p class="hero__subtitle">개발자들이 매일 쓰는 도구들을, 코딩을 모르는 분도 한 번에 이해하도록 풀어내는 시리즈예요.</p>
+    <p class="hero__hint">모든 어려운 말 앞에는 일상 비유가 먼저 찾아옵니다.</p>
+
+    <div class="hero__art" aria-hidden="true">
+      <svg viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="0" width="300" height="170" rx="20" fill="#FFF6EC"/>
+        <!-- 창문 1 (코랄) -->
+        <rect x="28" y="30" width="74" height="58" rx="8" fill="#FFE3D4" stroke="#FF8A5B" stroke-width="2.5"/>
+        <line x1="65" y1="30" x2="65" y2="88" stroke="#FF8A5B" stroke-width="2.5"/>
+        <line x1="28" y1="59" x2="102" y2="59" stroke="#FF8A5B" stroke-width="2.5"/>
+        <!-- 창문 2 (인디고) -->
+        <rect x="116" y="20" width="64" height="52" rx="8" fill="#E2E8FB" stroke="#3D5FE0" stroke-width="2.5"/>
+        <line x1="148" y1="20" x2="148" y2="72" stroke="#3D5FE0" stroke-width="2.5"/>
+        <!-- 창문 3 (민트) -->
+        <rect x="194" y="34" width="70" height="50" rx="8" fill="#C9EBE6" stroke="#26A69A" stroke-width="2.5"/>
+        <line x1="229" y1="34" x2="229" y2="84" stroke="#26A69A" stroke-width="2.5"/>
+        <line x1="194" y1="59" x2="264" y2="59" stroke="#26A69A" stroke-width="2.5"/>
+        <!-- 책상 -->
+        <rect x="44" y="118" width="212" height="12" rx="4" fill="#2D2A26"/>
+        <!-- 포스트잇 -->
+        <rect x="64" y="98" width="26" height="24" rx="2" fill="#FFD0B8" transform="rotate(-6 77 110)"/>
+        <rect x="138" y="96" width="26" height="24" rx="2" fill="#FFF7E6" transform="rotate(4 151 108)"/>
+        <rect x="206" y="99" width="26" height="24" rx="2" fill="#E2E8FB" transform="rotate(-3 219 111)"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- 카드 그리드 -->
+  <main class="cards">
+
+    <!-- tmux (완성) -->
+    <a class="card" href="tmux/index.html">
+      <span class="card__badge badge--done">완성</span>
+      <div class="card__icon card__icon--tmux" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+          <rect x="3" y="3" width="11" height="11" rx="2.5" fill="#FF8A5B"/>
+          <rect x="18" y="3" width="11" height="11" rx="2.5" fill="#3D5FE0"/>
+          <rect x="3" y="18" width="11" height="11" rx="2.5" fill="#26A69A"/>
+          <rect x="18" y="18" width="11" height="11" rx="2.5" fill="#FFD0B8" stroke="#FF8A5B" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h2 class="card__title">tmux 한 장 정리</h2>
+      <p class="card__desc">터미널 하나로 방 하나를 통째로 쓰는 법. 컴퓨터를 꺼도, 인터넷이 끊겨도 작업은 그 자리에 살아 있어요.</p>
+      <div class="card__meta">
+        <span class="tag">단일 페이지</span>
+        <span class="tag">14개 섹션</span>
+        <span class="tag">인터랙티브 데모</span>
+      </div>
+      <span class="card__cta">읽어보기 <span class="card__arrow" aria-hidden="true">→</span></span>
+    </a>
+
+    <!-- git/github (준비 중) -->
+    <div class="card card--coming" aria-disabled="true">
+      <span class="card__badge badge--soon">준비 중</span>
+      <div class="card__icon card__icon--git" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="13" fill="#2E7D52"/>
+          <path d="M16 9v14M11 13.5a3 3 0 1 0 0 5M21 13.5a3 3 0 1 1 0 5M11 19l10-5.5" stroke="#FFFBF5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="card__title">Git &amp; GitHub 안내서</h2>
+      <p class="card__desc">버전 관리부터 협업·자동화까지. 원고 버전관리부터 리눅스 커널까지, "이렇게도 쓸 수 있구나" 사례가 가득해요.</p>
+      <div class="card__meta">
+        <span class="tag">멀티 페이지</span>
+        <span class="tag">27페이지 예정</span>
+        <span class="tag">사례 갤러리</span>
+      </div>
+      <span class="card__cta">곧 만나요 <span class="card__arrow" aria-hidden="true">→</span></span>
+    </div>
+
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="foot">
+    <p class="foot__txt"><strong>터미널 친구들</strong> · 따뜻한 튜토리얼 시리즈</p>
+    <p class="foot__txt" style="margin-top:6px">비유 먼저, 단어 나중 · 코딩 없이 이해하기</p>
+  </footer>
+
+</div>
+
+</body>
+</html>

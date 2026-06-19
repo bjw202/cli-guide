@@ -1,0 +1,84 @@
+/* =================================================================
+   SPEC-GIT-GITHUB-IMPL-001 — reset + 한국어 본문 타이포
+   tmux style.css 88~160행 참조. 변수명/값 동일 톤.
+   ================================================================= */
+
+/* Pretendard Variable CDN (index.html <link> 병행 권장) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+/* ---------- reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  background-image:
+    radial-gradient(circle at 15% 8%, rgba(255, 138, 91, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 85% 60%, rgba(61, 90, 254, 0.04) 0%, transparent 38%);
+  background-attachment: fixed;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg { max-width: 100%; height: auto; display: block; }
+
+/* ---------- 링크 ---------- */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+a:hover { border-bottom-color: var(--accent); }
+
+ul, ol { list-style: none; }
+
+/* ---------- 코드/명령어 ---------- */
+code, pre {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+}
+
+/* ---------- 포커스 (접근성) ---------- */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- 스크린 리더 전용 ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- 기본 타이포그래피 ---------- */
+h1, h2, h3, h4 {
+  line-height: 1.25;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+p { color: var(--text-primary); }
+
+ul, ol { color: var(--text-primary); }

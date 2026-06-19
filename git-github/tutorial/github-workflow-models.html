@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T20 어떻게 일할 것인가: 워크플로우 모델 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitFlow, GitHub Flow, Trunk-based, Forking, Release Flow 다섯 가지 워크플로우를 '주방 철학' 비유로 비교해요. 팀마다 다른 Git 사용법, 어떤 것을 고를까요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T20 · GitHub 자동화·보안·워크플로우</p>
+  <h1 class="page-header__title">팀마다 다른 Git 사용법, 다섯 가지 철학</h1>
+  <p class="page-header__subhead">Git은 그냥 '도구'예요. 도구를 '어떻게 쓸지'는 팀마다 다 달라요. 똑같은 칼을 두고도, 정교한 식당 주방과 빠른 길거리 노점은 쓰는 법이 다르듯이요. 유명한 다섯 가지 워크플로우를 비교해 볼게요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T20 → T2-02 trunk, T2-03 GitFlow, T2-04 모노레포) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>Google·Meta 같은 거대 기업은 'Trunk-based'로 수천 명이 한 줄에서 일하고, 명확한 출시 주기가 있는 제품팀은 'GitFlow'로 버전을 관리하고, 한 저장소에 여러 프로젝트를 묶는 모노레포는 또 다른 규칙을 써요. 팀 크기·제품 종류에 따라 어울리는 철학이 달라요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-02">Trunk-based 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-03">GitFlow 원조 사례 보기 →</a></span>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-04">모노레포 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">먼저, 주방으로 비유할게요</h2>
+      <div class="tut-section__body">
+        <p>같은 '요리'라도, 어디서 하느냐에 따라 방식이 달라요. 정교한 식당 주방은 역할 분담이 세밀하고(셰프·소스 셰프·디저트 담당…), 작은 카페는 한두 명이 빠르게 오가며, 길거리 노점은 한 사람이 모든 걸 빠르게 처리해요. 어느 쪽이 '맞다'가 아니라 상황에 맞는 거예요.</p>
+        <p>Git 워크플로우도 같아요. 누가 어떤 브랜치에서 일하고, 언제 합치는지에 대한 규칙이 곧 그 팀의 '요리 방식'이에요. 다섯 가지 유명한 방식을 소개할게요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>요약하면: <strong>GitFlow</strong>는 정교한 식당 주방(역할 분담), <strong>GitHub Flow</strong>는 스몰카페(빠르고 단순), <strong>Trunk-based</strong>는 바쁜 길거리 노점(빠른 회전). <strong>Forking</strong>은 각자 제 주방에서 요리해 와서 진열대에 올리는 재래시장, <strong>Release Flow</strong>는 식당과 카페를 합친 퓨전 주방이에요.</p>
+    </div>
+
+    <section class="tut-section" id="five-models" data-reveal>
+      <h2 class="tut-section__title">다섯 가지 워크플로우, 한 표로</h2>
+      <div class="tut-section__body">
+        <p>말이 길면 헷갈려요. 먼저 한 표로 비교하고, 그 다음 하나씩 풀어 설명할게요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">워크플로우</th>
+            <th scope="col">핵심</th>
+            <th scope="col">언제 어울리나</th>
+            <th scope="col">출처</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">GitFlow</th>
+            <td>main / develop / feature / release / hotfix 다계층</td>
+            <td>릴리즈 주기가 명확한 제품 (예: 설치형 앱)</td>
+            <td>Vincent Driessen, 2010</td>
+          </tr>
+          <tr>
+            <th scope="row">GitHub Flow</th>
+            <td>main + feature 브랜치, 단순</td>
+            <td>웹 서비스, 잦은 배포</td>
+            <td>GitHub</td>
+          </tr>
+          <tr>
+            <th scope="row">Trunk-based</th>
+            <td>모두가 main에 직접, 짧은 브랜치</td>
+            <td>대규모, 빠른 통합 (Google·Meta)</td>
+            <td>대형팀 관행</td>
+          </tr>
+          <tr>
+            <th scope="row">Forking</th>
+            <td>fork → PR, 원본 저장소 보호</td>
+            <td>오픈소스</td>
+            <td>일반적 관행</td>
+          </tr>
+          <tr>
+            <th scope="row">Release Flow</th>
+            <td>GitFlow + trunk 혼합 (MS)</td>
+            <td>제품 + 서비스 혼합</td>
+            <td>Microsoft</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="tut-section" id="gitflow" data-reveal>
+      <h2 class="tut-section__title">GitFlow — 정교한 식당 주방</h2>
+      <div class="tut-section__body">
+        <p><strong>GitFlow</strong>는 브랜치가 여러 층으로 나뉘어요. <code>main</code>(출시용), <code>develop</code>(개발용), <code>feature/*</code>(각 기능), <code>release/*</code>(출시 준비), <code>hotfix/*</code>(긴급 수정). 역할마다 전용 브랜치가 있어서, "지금 이 줄은 무슨 용도인가?"가 명확해요.</p>
+        <p>장점은 출시 주기가 명확한 제품(예: "1년에 두 번 큰 버전 발표"하는 설치형 소프트웨어)에 잘 맞는다는 거예요. 단점은 배우기 어렵고, 잦은 배포가 필요한 웹 서비스에는 너무 무거워요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="github-flow" data-reveal>
+      <h2 class="tut-section__title">GitHub Flow — 스몰카페</h2>
+      <div class="tut-section__body">
+        <p><strong>GitHub Flow</strong>는 단순해요. <code>main</code> 하나와, 거기서 갈라나온 <code>feature</code> 브랜치만 있어요. 작업이 끝나면 PR로 main에 병합하고 바로 배포. GitFlow의 복잡한 계층은 다 빼고, 'main은 항상 배포 가능해야 한다'는 규칙 하나만 지켜요.</p>
+        <p>이 방식이 요즘 웹 분야에서 사실상 표준이에요. 작은 팀, 자주 배포하는 웹 서비스, 이 안내서 같은 문서 사이트에 두루 어울려요. 복잡도가 낮아서 처음 도입하기도 좋아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="trunk-based" data-reveal>
+      <h2 class="tut-section__title">Trunk-based — 빠른 길거리 노점</h2>
+      <div class="tut-section__body">
+        <p><strong>Trunk-based</strong>는 'main(trunk)에 모두가 직접 붓는다'는 철학이에요. 브랜치를 아예 안 쓰거나, 쓰더라도 하루 이내로 아주 짧게 써요. Google·Meta 같은 거대 조직이 이 방식으로 수천 명의 작업을 한 줄로 통합해요. 속도가 생명이에요.</p>
+        <p>단, 이 방식은 '아주 강력한 자동 테스트'가 필수예요. main이 항상 안전한지 CI가 매 순간 검사하지 않으면, 한 사람의 실수가 모두에게 영향을 줘요. 대규모 조직이 아니면 굳이 안 써도 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="forking" data-reveal>
+      <h2 class="tut-section__title">Forking — 재래시장</h2>
+      <div class="tut-section__body">
+        <p><strong>Forking</strong>은 원본 저장소를 'fork'(복사)해서 내 계정으로 가져온 뒤, 거기서 작업하고 원본에 PR을 보내는 방식이에요. 원본 저장소의 쓰기 권한을 함부로 주지 않아도 돼서, 오픈소스에서 가장 흔해요. 모르는 사람의 기여도 이렇게 받아요. T15·T16에서 잠깐 봤던 패턴이에요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="release-flow" data-reveal>
+      <h2 class="tut-section__title">Release Flow — 퓨전 주방</h2>
+      <div class="tut-section__body">
+        <p><strong>Release Flow</strong>는 Microsoft가 정리한 방식으로, GitFlow와 Trunk-based의 좋은 점을 섞었어요. main에서 작은 단위로 자주 통합하는 건 Trunk-based처럼, 하지만 출시 시점마다 별도 <code>release/*</code> 브랜치를 만들어 안정화하는 건 GitFlow처럼. '제품(출시 주기 있음) + 서비스(수시 배포)'가 섞인 환경에 어울려요.</p>
+      </div>
+    </section>
+
+    <!-- 역사 박스 -->
+    <div class="side-note side-note--history" data-reveal>
+      <span class="side-note__label">옛날 이야기</span>
+      <p>Vincent Driessen가 2010년 블로그에 올린 <em>"A successful Git branching model"</em>이 GitFlow의 원조예요. 10년 넘게 널리 쓰였지만, 2020년 본인이 "웹 서비스엔 안 맞을 수 있다"고 글을 업데이트했어요. 도구의 창시자조차 상황이 바뀌면 다시 생각한다는 좋은 본보기예요.</p>
+    </div>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>요즘 웹 분야에서는 <strong>GitHub Flow가 사실상 표준</strong>이에요. GitFlow는 출시 주기가 명확한 제품에, Trunk-based는 대규모 조직에 어울려요. 혼자 사이드 프로젝트를 한다면 GitHub Flow로 충분해요. 처음엔 가장 단순한 것부터 시작하고, 팀이 커지면 그때 고민해도 늦지 않아요.</p>
+    </div>
+
+    <section class="tut-section" id="choosing" data-reveal>
+      <h2 class="tut-section__title">그럼 우리는 뭘 골라야 할까요?</h2>
+      <div class="tut-section__body">
+        <p>네, 답은 '상황에 따라 다르다'예요. 하지만 출발점은 명확해요. 작은 팀·웹 서비스·잦은 배포라면 <strong>GitHub Flow</strong>로 시작하세요. 출시 주기가 분명한 제품이라면 <strong>GitFlow</strong> 또는 <strong>Release Flow</strong>. 수백 명이 한 저장소에서 일한다면 <strong>Trunk-based</strong>. 오픈소스라면 <strong>Forking</strong>이 자연스러워요.</p>
+        <p>어떤 것을 고르든 핵심은 '우리 팀이 이 규칙을 모두 이해하고 있는가'예요. 화려한 워크플로우를 도입해도 절반만 따르면 혼란만 커져요. 작게 시작해서 모두가 같은 언어로 소통하는 게 훨씬 중요해요.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T20 한 장 요약</h2>
+      <p class="cheat-card__sub">다섯 가지 워크플로우 — 팀마다 다른 Git 철학</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">GitFlow</span><span class="cheat-card__desc">main/develop/feature/release/hotfix 다계층. 출시 주기 명확한 제품. (Vincent Driessen, 2010)</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">GitHub Flow</span><span class="cheat-card__desc">main + feature만. 웹 서비스 표준. 단순하고 잦은 배포에 최적.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Trunk-based</span><span class="cheat-card__desc">모두 main에 직접, 짧은 브랜치. 대규모(Google·Meta). 강력한 CI 필수.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Forking</span><span class="cheat-card__desc">fork → PR. 원본 보호. 오픈소스 표준.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Release Flow</span><span class="cheat-card__desc">GitFlow + trunk 혼합 (Microsoft). 제품 + 서비스 혼합 환경.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">출발점</span><span class="cheat-card__desc">작은 팀·웹 → GitHub Flow. 명확한 출시 주기 → GitFlow. 오픈소스 → Forking.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">주방 비유</span><span class="cheat-card__desc">GitFlow=정교한 식당, GitHub Flow=스몰카페, Trunk=길거리 노점, Forking=재래시장.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">가장 중요한 것</span><span class="cheat-card__desc">모두가 같은 규칙을 이해하고 있는 것. 화려함보다 합의.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T19, 다음=T21) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-security.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T19 안전한 협업의 기술: 보안</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-extras.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T21 GitHub, 더 넓은 세계</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">주방으로 비유</a>
+      <a class="sidebar-toc__link" href="#five-models">다섯 가지 한 표로</a>
+      <a class="sidebar-toc__link" href="#gitflow">GitFlow</a>
+      <a class="sidebar-toc__link" href="#github-flow">GitHub Flow</a>
+      <a class="sidebar-toc__link" href="#trunk-based">Trunk-based</a>
+      <a class="sidebar-toc__link" href="#forking">Forking</a>
+      <a class="sidebar-toc__link" href="#release-flow">Release Flow</a>
+      <a class="sidebar-toc__link" href="#choosing">뭘 고를까</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

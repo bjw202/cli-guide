@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T21 GitHub, 더 넓은 세계 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitHub의 Releases, Packages, Container registry, Codespaces, Copilot, Gists, profile README, organizations/teams를 가볍게 둘러봐요. 저장소·PR 너머의 생태계 투어." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T21 · GitHub 자동화·보안·워크플로우</p>
+  <h1 class="page-header__title">GitHub, 알면 알수록 넓어지는 생태계</h1>
+  <p class="page-header__subhead">여기까지 오시느라 수고 많았어요. 마지막 페이지에서는 '저장소·PR' 너머에 GitHub가 또 어떤 것들을 갖고 있는지 가볍게 둘러볼게요. 다 외울 필요 없어요. "아, 이런 것도 있구나"만 남기면 돼요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T21 → T1-11 이력서, T2-11 프로필, T2-12 Copilot) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>GitHub 프로필을 이력서처럼 꾸미고, 블로그를 Pages로 운영하고, Copilot으로 코딩을 도움받는 사람들이 늘어나요. 저장소 하나만 팠던 시절과 달리, 이제 GitHub는 '개발자의 명함'이자 '작업실'이에요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-11">이력서·포트폴리오 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-11">profile README 사례 보기 →</a></span>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t2-12">Copilot 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">GitHub는 작은 마을이에요</h2>
+      <div class="tut-section__body">
+        <p>처음엔 GitHub가 그냥 '코드 창고'인 줄 알았죠. 하지만 파고들수록 더 많은 게 나와요. 출시 노트를 붙이는 게시판, 패키지를 올리는 우체국, 브라우저만 켜면 바로 작업할 수 있는 작업실, 코드를 짜주는 AI 조수까지. 한 마디로 '개발자를 위한 작은 마을'이에요.</p>
+        <p>이번 페이지에서는 그 마을 골목을 가볍게 돌아보는 시간을 가질게요. 깊이 파고들진 않을게요. "다음에 필요하면 이런 게 있었지" 하고 기억만 해 두면 충분해요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>Codespaces</strong>는 '클라우드 작업실'이에요. 컴퓨터에 아무것도 깔 필요 없이, 브라우저만 켜면 즉시 코드를 고칠 수 있는 방이 열려요. 남의 컴퓨터에서 내 작업 환경 그대로 쓰는 느낌이에요.</p>
+    </div>
+
+    <section class="tut-section" id="releases" data-reveal>
+      <h2 class="tut-section__title">출시 노트를 붙이세요 (Releases)</h2>
+      <div class="tut-section__body">
+        <p>T10에서 '태그'를 배웠어요. <strong>Releases</strong>는 그 태그에 '이야기'를 붙이는 기능이에요. "v1.0 — 드디어 출시! 새 기능: A, B. 고친 버그: C" 같은 출시 노트를 적어두면, 사용자가 '무슨 버전에서 뭐가 달라졌는지'를 한눈에 알 수 있어요. 저장소 페이지 오른쪽의 'Releases'에서 만들어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="packages" data-reveal>
+      <h2 class="tut-section__title">남이 쓰게 올려요 (Packages, Container registry)</h2>
+      <div class="tut-section__body">
+        <p>남이 만든 도구를 쓰듯(npm, pip, Docker Hub…), 내가 만든 도구도 비슷한 방식으로 올릴 수 있어요. <strong>Packages</strong>는 npm 패키지, 라이브러리 같은 것들을 호스팅하고, <strong>Container registry</strong>는 Docker 이미지를 호스팅해요. 별도 서비스에 올릴 필요 없이 GitHub 한 곳에서 코드와 패키지를 같이 관리할 수 있어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="codespaces" data-reveal>
+      <h2 class="tut-section__title">브라우저만 켜면 바로 작업 (Codespaces)</h2>
+      <div class="tut-section__body">
+        <p>내 컴퓨터에 개발 환경을 세팅하는 건 귀찮은 일이에요. <strong>Codespaces</strong>는 그걸 클라우드에서 해결해요. 저장소에서 'Code' 버튼 → 'Codespaces'를 누르면, 브라우저 안에 완전한 개발 환경이 열려요. 다른 컴퓨터에서도, 태블릿에서도 같은 환경을 그대로 쓸 수 있어요. '클라우드 작업실'이라고 생각하면 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="copilot" data-reveal>
+      <h2 class="tut-section__title">AI가 옆에서 같이 코드 짜요 (Copilot)</h2>
+      <div class="tut-section__body">
+        <p><strong>Copilot</strong>은 GitHub가 만든 AI '페어 프로그래머'예요. 주석을 적으면 그에 맞는 코드를 제안하고, 반복되는 패턴을 알아서 채워 넣고, 함수 설명을 달아줘요. 옆자리에 앉은 동료가 "이 부분 이렇게 하면 어때요?"라고 말해주는 느낌이에요. 물론 최종 확인은 사람이 해야 해요. AI도 틀릴 수 있으니까요.</p>
+      </div>
+    </section>
+
+    <!-- 역사 박스 -->
+    <div class="side-note side-note--history" data-reveal>
+      <span class="side-note__label">옛날 이야기</span>
+      <p>Copilot은 2021년 출시됐어요. "AI가 코드를 짜주는 시대"가 드디어 현실이 된 순간이죠. 몇 년 새 IDE 안에 AI 추천이 거의 기본이 됐고, 자연어로 명령을 내리는 'Copilot Chat'까지 등장했어요. 앞으로 또 얼마나 달라질지 기대되는 부분이에요.</p>
+    </div>
+
+    <section class="tut-section" id="gists" data-reveal>
+      <h2 class="tut-section__title">코드 조각 메모 (Gists)</h2>
+      <div class="tut-section__body">
+        <p>저장소를 만들기엔 작은 코드 조각이 있을 때가 있어요. 설정 파일, 유용한 스크립트 한 조각 같은 것들. <strong>Gists</strong>는 그런 '코드 메모'를 올리는 곳이에요. 블로그 글에 코드 블록을 붙이듯, 공개/비공개로 코드 조각을 보관하고 공유할 수 있어요. <code>gist.github.com</code>에서 바로 쓸 수 있어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="profile-readme" data-reveal>
+      <h2 class="tut-section__title">내 프로필을 자기소개서로 (profile README)</h2>
+      <div class="tut-section__body">
+        <p>GitHub 프로필 페이지(<code>github.com/내아이디</code>)를 방문하면 README가 보이는 걸 본 적 있을 거예요. 내 아이디와 같은 이름의 저장소(예: <code>byungju/byungju</code>)를 만들고 거기에 <code>README.md</code>를 넣으면, 그게 프로필 페이지에 그대로 보여요. 자기소개, 관심사, 링크를 적어 '개발자 명함'을 꾸미는 거예요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>profile README는 마크다운 한 장이면 돼요. 사진·배지(사용하는 언어·기술)·블로그 링크·최근 프로젝트를 넣어두면, GitHub 프로필이 곧 이력서가 돼요. 채용 담당자도 많이 본답니다. 한 번쯤 꾸며보면 재미있어요.</p>
+    </div>
+
+    <section class="tut-section" id="orgs-teams" data-reveal>
+      <h2 class="tut-section__title">여러 저장소·사람을 한 곳에 (organizations, teams)</h2>
+      <div class="tut-section__body">
+        <p>개인 계정 말고 <strong>organization</strong>을 만들면, 여러 저장소와 사람을 한 조직 아래 묶을 수 있어요. 회사, 오픈소스 커뮤니티, 스터디 모임이 흔히 써요. 그 안에서 <strong>teams</strong>로 사람들을 묶고, 팀별로 저장소 권한을 줄 수 있어요. '보안 팀은 이 폴더만', '신규 입사자는 이 저장소만' 같은 통제가 한결 쉬워져요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="whats-next" data-reveal>
+      <h2 class="tut-section__title">시리즈를 마치며 — 이제 직접 만져보세요</h2>
+      <div class="tut-section__body">
+        <p>T01에서 '버전 관리가 뭔가요?'로 시작해, 여기까지 왔어요. 사진첩에서 시작해 브랜치·병합·원격·PR·리뷰·Actions·보안·워크플로우·생태계까지. 한 번에 다 기억할 필요 없어요. 필요할 때마다 이 안내서로 돌아오면 돼요.</p>
+        <p>가장 좋은 복습은 '직접 무언가를 만들어 보는' 거예요. 작은 저장소 하나를 만들고, README를 쓰고, 변경을 commit하고, 브랜치를 따고, PR을 보내 보세요. 이 안내서의 모든 비유가 그 작은 실습 속에서 살아날 거예요.</p>
+        <p>이제 명령어가 헷갈릴 때는 <a href="../ref/command-dictionary.html">명령어 사전</a>을, 용어가 기억 안 날 때는 <a href="../ref/glossary.html">용어집</a>을 찾아보세요. 사례가 궁금하면 <a href="../cases/index.html">사례 갤러리</a>가 있어요. 계속 옆에 두고 쓸 수 있는 참조 허브이기도 해요.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T21 한 장 요약</h2>
+      <p class="cheat-card__sub">GitHub 생태계 — 저장소·PR 너머의 넓은 세계</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Releases</span><span class="cheat-card__desc">태그에 출시 노트(변경 내역)를 붙이는 게시판.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Packages</span><span class="cheat-card__desc">npm 패키지·라이브러리 호스팅.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Container registry</span><span class="cheat-card__desc">Docker 이미지 호스팅. 별도 서비스 불필요.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Codespaces</span><span class="cheat-card__desc">클라우드 작업실. 브라우저만 켜면 개발 환경 즉시 열림.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Copilot</span><span class="cheat-card__desc">AI 페어 프로그래머. 코드 제안·자동 완성·설명. (2021 출시)</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Gists</span><span class="cheat-card__desc">코드 조각 메모. 공개/비공개 보관·공유.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">profile README</span><span class="cheat-card__desc">내 아이디와 같은 이름의 저장소의 README가 프로필에 표시.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">organizations</span><span class="cheat-card__desc">여러 저장소·사람을 한 조직으로 묶기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">teams</span><span class="cheat-card__desc">조직 안에서 사람들을 묶고 저장소 권한을 팀별로 통제.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">다음 단계</span><span class="cheat-card__desc">직접 작은 저장소를 만들어 실습. 참조 허브는 곁에 두기.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T20, 다음=참조 허브 — 시리즈 완주 안내) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-workflow-models.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T20 어떻게 일할 것인가: 워크플로우 모델</span>
+      </a>
+      <a class="pager__card pager__card--next" href="../ref/command-dictionary.html">
+        <span class="pager__label">참조 허브로 →</span>
+        <span class="pager__title">시리즈 완주! 명령어 사전에서 계속</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">GitHub는 작은 마을</a>
+      <a class="sidebar-toc__link" href="#releases">Releases</a>
+      <a class="sidebar-toc__link" href="#packages">Packages / Container registry</a>
+      <a class="sidebar-toc__link" href="#codespaces">Codespaces</a>
+      <a class="sidebar-toc__link" href="#copilot">Copilot</a>
+      <a class="sidebar-toc__link" href="#gists">Gists</a>
+      <a class="sidebar-toc__link" href="#profile-readme">profile README</a>
+      <a class="sidebar-toc__link" href="#orgs-teams">organizations / teams</a>
+      <a class="sidebar-toc__link" href="#whats-next">시리즈를 마치며</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

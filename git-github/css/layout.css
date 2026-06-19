@@ -1,0 +1,248 @@
+/* =================================================================
+   SPEC-GIT-GITHUB-IMPL-001 — 페이지 레이아웃 뼈대
+   ReadingProgressBar / GlobalHeader / Breadcrumb / 2단 그리드 /
+   GlobalFooter / 모바일 드로어 / 반응형
+   ================================================================= */
+
+/* ---------- ReadingProgressBar ---------- */
+.reading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--primary);
+  width: 0;
+  z-index: 1000;
+  transition: width 0.1s linear;
+}
+
+/* ---------- GlobalHeader ---------- */
+.global-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-h);
+  background: rgba(255, 251, 245, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(45, 42, 38, 0.08);
+  z-index: 900;
+}
+
+.global-header__inner {
+  max-width: var(--content-xwide);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* 로고 */
+.gh-logo {
+  font-weight: 700;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  border-bottom: none;
+  white-space: nowrap;
+}
+.gh-logo:hover { border-bottom-color: transparent; color: var(--primary); }
+
+/* 네비 (데스크톱) */
+.gh-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gh-nav__item {
+  position: relative;
+}
+
+.gh-nav__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-bottom: none;
+  border-radius: var(--r-sm);
+  transition: color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.gh-nav__trigger:hover { color: var(--text-primary); background: var(--bg-soft); }
+
+.gh-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(45, 42, 38, 0.1);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-md);
+  padding: 8px;
+  margin-top: 6px;
+}
+.gh-nav__item--open .gh-dropdown,
+.gh-nav__item:focus-within .gh-dropdown,
+.gh-nav__item:hover .gh-dropdown {
+  display: block;
+}
+
+.gh-dropdown__link {
+  display: block;
+  padding: 8px 12px;
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  border-bottom: none;
+  border-radius: var(--r-sm);
+}
+.gh-dropdown__link:hover { background: var(--bg-soft); color: var(--accent); }
+
+/* 시리즈 링크 */
+.gh-series-link {
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-bottom: none;
+}
+.gh-series-link:hover { color: var(--primary); }
+
+/* 햄버거 (768px 이하에서만 표시) */
+.gh-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid rgba(45, 42, 38, 0.12);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+/* ---------- Breadcrumb ---------- */
+.breadcrumb {
+  padding-top: calc(var(--header-h) + 24px);
+  max-width: var(--content-wide);
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-small);
+  color: var(--text-tertiary);
+}
+
+.breadcrumb__item { display: inline-flex; align-items: center; gap: 8px; }
+.breadcrumb__sep { color: var(--text-tertiary); }
+.breadcrumb__link {
+  color: var(--text-secondary);
+  border-bottom: none;
+}
+.breadcrumb__link:hover { color: var(--accent); }
+.breadcrumb__current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ---------- 2단 그리드 ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 48px;
+  max-width: var(--content-wide);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.layout__main { min-width: 0; }
+
+/* ---------- GlobalFooter ---------- */
+.global-footer {
+  border-top: 1px solid rgba(45, 42, 38, 0.08);
+  margin-top: var(--space-section);
+  padding: var(--space-component) 24px;
+  background: var(--bg-soft);
+}
+.global-footer__inner {
+  max-width: var(--content-xwide);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: var(--fs-small);
+  color: var(--text-secondary);
+}
+
+/* ---------- 모바일 드로어 ---------- */
+.mobile-drawer {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 42, 38, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dur) var(--ease-out);
+  z-index: 950;
+}
+body.drawer-open .mobile-drawer {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-drawer__panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(80vw, 320px);
+  height: 100%;
+  background: var(--bg-surface);
+  padding: calc(var(--header-h) + 16px) 24px 24px;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform var(--dur) var(--ease-out);
+}
+body.drawer-open .mobile-drawer__panel {
+  transform: translateX(0);
+}
+
+.mobile-drawer__section { margin-bottom: 24px; }
+.mobile-drawer__title {
+  font-size: var(--fs-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.mobile-drawer__link {
+  display: block;
+  padding: 8px 0;
+  font-size: var(--fs-body-sm);
+  color: var(--text-secondary);
+  border-bottom: none;
+}
+.mobile-drawer__link:hover { color: var(--accent); }
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar-toc { display: none; }
+  .gh-nav { display: none; }
+  .gh-hamburger { display: flex; }
+}

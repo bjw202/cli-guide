@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T15 나의 첫 저장소 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitHub에 나의 첫 사진첩(저장소)을 만드는 방법. create, clone, fork, template, import까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T15 · GitHub 협업</p>
+  <h1 class="page-header__title">GitHub에 나의 첫 사진첩 만들기</h1>
+  <p class="page-header__subhead">마을(GitHub)에 도착했으니, 이제 내 집을 지을 차례예요. 그 집의 이름이 바로 저장소(repository)랍니다.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T15 → T2-05 오픈소스 fork, T1-12 일기 private repo) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>오픈소스에 기여할 땐 남의 저장소를 fork해서, 내 일기를 기록할 땐 private 저장소로 만들어요. 같은 저장소라도 공개·비공개, 원본·사본에 따라 쓰임새가 달라진답니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-05">오픈소스 fork 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t1-12">일기 private repo 사례 보기 →</a></span>
+    </div>
+
+    <section class="tut-section" id="repository" data-reveal>
+      <h2 class="tut-section__title">저장소 = 마을에 지은 내 집</h2>
+      <div class="tut-section__body">
+        <p>GitHub에 올리는 사진첩 하나를 <strong>저장소(repository)</strong>라고 불러요. 줄여서 'repo(레포)'라고도 해요. T01에서 배운 저장소와 같은 말이지만, 이번엔 그 저장소가 인터넷 마을 위에 올라와 있다는 게 차이예요.</p>
+        <p>집을 짓는 방법은 여러 가지예요. 빈 땅에 새로 지을 수도 있고(create), 남이 지은 집 도면을 가져와 내 컴퓨터에 똑같이 지을 수도 있고(clone), 남의 집을 통째로 내 이름으로 복사할 수도 있어요(fork). 하나씩 만나봐요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>저장소는 마을에 지은 '집'. create는 빈 땅에 새 집 짓기, clone은 남의 집 도면을 내 작업장에 옮겨오기, fork는 남의 집을 통째로 내 마당에 베껴 짓기예요. 원본 집에 손대지 않고 내 마당에서 마음대로 고칠 수 있죠.</p>
+    </div>
+
+    <section class="tut-section" id="create" data-reveal>
+      <h2 class="tut-section__title">create: 빈 집 짓기</h2>
+      <div class="tut-section__body">
+        <p>가장 기본. GitHub 웹사이트 우측 위 '+' 버튼 → <strong>New repository</strong>. 이름, 설명, 공개 여부(public/private)를 정하고 'Create repository'를 누르면 끝이에요. 30초면 돼요.</p>
+        <p>명령줄을 좋아한다면 <strong>GitHub CLI</strong>의 <code>gh repo create</code> 한 줄로도 만들 수 있어요. 터미널에서 곧바로 마을에 집을 지을 수 있죠.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="clone" data-reveal>
+      <h2 class="tut-section__title">clone: 남의 집 도면을 내 작업장으로</h2>
+      <div class="tut-section__body">
+        <p>이미 GitHub에 있는 저장소를 내 컴퓨터로 복사해 오는 명령이 <strong>clone</strong>이에요. <code>git clone &lt;주소&gt;</code> 한 줄이면 끝나요. 복사본은 원본과 같은 역사(사진첩)를 통째로 갖고 있어요.</p>
+        <p>팀 프로젝트라면 보통 이렇게 해요. 한 사람이 만든 저장소를 팀원 모두가 clone해서 각자 컴퓨터에서 작업하고, 나중에 변경을 다시 마을로 올리는(push) 거죠.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="fork" data-reveal>
+      <h2 class="tut-section__title">fork: 남의 집을 내 마당으로 통째로</h2>
+      <div class="tut-section__body">
+        <p><span data-term="fork"><strong>fork</strong></span>는 clone과 헷갈리기 쉬워요. 둘 다 '복사'지만, 복사해 오는 곳이 달라요. clone은 남의 저장소를 '내 컴퓨터로' 복사하는 거고, fork는 남의 저장소를 '내 GitHub 계정으로' 복사하는 거예요.</p>
+        <p>비유하자면, fork는 "남의 레시피북을 통째로 내 책장으로 베껴오기"예요. 원본에 영향을 주지 않고 마음대로 고쳐볼 수 있어요. 고친 걸 원작자에게 제안하고 싶으면 그때 <strong>pull request(T16)</strong>를 보내는 거예요. 오픈소스 기여의 첫 단계가 바로 fork랍니다.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>clone과 fork의 차이를 한 줄로: clone은 '내 컴퓨터로', fork는 '내 GitHub 계정으로'. 오픈소스에 기여하려면 먼저 fork하고, 그 fork를 내 컴퓨터로 clone하는 순서예요.</p>
+    </div>
+
+    <section class="tut-section" id="template" data-reveal>
+      <h2 class="tut-section__title">template: 도면을 재사용하기</h2>
+      <div class="tut-section__body">
+        <p>비슷한 저장소를 반복해서 만들 일이 있을 때 쓰는 기능이 <strong>template repository</strong>예요. 자주 쓰는 폴더 구조, 설정 파일, README 틀을 저장소 하나에 템플릿으로 만들어두면, 그걸 시작점 삼아 새 저장소를 찍어낼 수 있어요.</p>
+        <p>예를 들어 매주 새로 만드는 과제 저장소, 강의 자료 저장소 같은 게 있다면 템플릿 하나 만들어두면 편해요. 'Use this template' 버튼 한 번이면 새 저장소가 템플릿 모양 그대로 태어난답니다.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="import" data-reveal>
+      <h2 class="tut-section__title">import: 다른 마을에서 이사 오기</h2>
+      <div class="tut-section__body">
+        <p>이미 다른 마을(GitLab, Bitbucket)에 집이 있다면, 그걸 GitHub로 그대로 가져올 수 있어요. 이걸 <strong>import</strong>라고 해요. GitHub의 'Import repository' 메뉴에서 기존 저장소 주소만 넣으면, 역사(사진첩)까지 통째로 이사와 줘요.</p>
+        <p>이사하면 Git의 사진첩 내용은 그대로지만, 마을의 기능(Issue, PR, Actions)은 GitHub 버전으로 새로 시작해요. 다른 마을에서 깃털 하나 안 떨어지고 이사할 수 있는 셈이죠.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>public 저장소는 누구나 볼 수 있고, private 저장소는 내가 초대한 사람만 볼 수 있어요. 비밀 일기, 회사 코드는 private로. 포트폴리오, 오픈소스는 public로. 나중에 마음 바뀌면 설정에서 공개 여부를 바꿀 수도 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="summary-five" data-reveal>
+      <h2 class="tut-section__title">다섯 가지 방법, 정리</h2>
+      <div class="tut-section__body">
+        <p>저장소를 만드는 다섯 길을 한눈에요.</p>
+        <ul>
+          <li><strong>create</strong> — 빈 땅에 새 집 짓기 (GitHub New 또는 <code>gh repo create</code>)</li>
+          <li><strong>clone</strong> — 남의 저장소를 내 컴퓨터로 복사 (<code>git clone</code>)</li>
+          <li><strong>fork</strong> — 남의 저장소를 내 GitHub 계정으로 통째로 복사</li>
+          <li><strong>template</strong> — 템플릿 저장소에서 새 저장소 찍어내기</li>
+          <li><strong>import</strong> — 다른 마을의 저장소를 GitHub로 이사</li>
+        </ul>
+        <p>집을 지었으니, 이제 마을 사람들과 대화할 차례예요. T16에서 Issue와 Pull Request라는 '대화 도구'를 배워요.</p>
+      </div>
+    </section>
+
+    <!-- SPEC-IMPL-006 자산: PRFlowDiagram -->
+    <section class="asset" data-asset="pr-flow" data-reveal aria-label="PR 워크플로우 다이어그램">
+      <h2 class="asset__title">📨 PR 흐름 — fork → merge</h2>
+      <p class="asset__hint">재생 버튼으로 7단계가 순서대로 켜지는 걸 보거나, 각 단계를 눌러 설명을 보세요.</p>
+      <div class="asset__controls">
+        <button class="asset__btn asset__btn--play" type="button" data-pr-play>▶ 흐름 재생</button>
+      </div>
+      <div class="pr-flow__track" data-pr-track></div>
+      <div class="pr-flow__detail" data-pr-detail></div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T15 한 장 요약</h2>
+      <p class="cheat-card__sub">저장소를 만드는 다섯 가지 방법</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">repository</span><span class="cheat-card__desc">GitHub에 올라온 사진첩 하나. 줄여서 'repo'.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">create</span><span class="cheat-card__desc">빈 저장소 새로 만들기. New repository 또는 gh repo create.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">clone</span><span class="cheat-card__desc">남의 저장소를 내 컴퓨터로 복사. git clone &lt;주소&gt;.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">fork</span><span class="cheat-card__desc">남의 저장소를 내 GitHub 계정으로 통째로 복사. 오픈소스 기여의 첫걸음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">template</span><span class="cheat-card__desc">템플릿 저장소에서 새 저장소 찍어내기. 반복 작업에 유리.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">import</span><span class="cheat-card__desc">GitLab/Bitbucket 등 다른 마을의 저장소를 GitHub로 이사.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T14, 다음=T16) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-concept.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T14 Git은 도구, GitHub는 마을</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-issues-pr.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T16 대화로 코드를 만드는 법</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#repository">저장소란</a>
+      <a class="sidebar-toc__link" href="#create">create</a>
+      <a class="sidebar-toc__link" href="#clone">clone</a>
+      <a class="sidebar-toc__link" href="#fork">fork</a>
+      <a class="sidebar-toc__link" href="#template">template</a>
+      <a class="sidebar-toc__link" href="#import">import</a>
+      <a class="sidebar-toc__link" href="#summary-five">다섯 가지 정리</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS (REQ-008): nav → progress → reveal → 자산 -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/pr-flow.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

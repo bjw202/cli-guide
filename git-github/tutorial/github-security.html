@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T19 안전한 협업의 기술: 보안 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitHub 보안 기능을 '여러 겹 안전망'이라는 비유로 설명해요. Dependabot(alerts vs security updates), secret scanning, code scanning, branch protection, 2FA, commit signing(SSH/GPG), Secrets vs Variables." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T19 · GitHub 자동화·보안·워크플로우</p>
+  <h1 class="page-header__title">안전하게 함께 일하는 법 — GitHub 보안</h1>
+  <p class="page-header__subhead">여럿이 일하면 좋은 점도 많지만, 실수가 미치는 영향도 커져요. GitHub는 한 번의 실수로 모든 게 무너지지 않도록, 여러 겹의 안전망을 제공해요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: cross-map T19 → T2-06 정부 보안) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>공공 기관·정부 부처도 GitHub로 협업할 때, 바로 이런 안전망들에 의존해요. 감사 추적, 권한 통제, 취약점 자동 알림까지 한 번에 갖추는 셈이에요. 혼자 쓰는 사이드 프로젝트에도 그대로 적용된답니다.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-06">정부 공공 보안 사례 보기 →</a>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">여러 겹의 안전망을 상상해 보세요</h2>
+      <div class="tut-section__body">
+        <p>한 겹의 두꺼운 벽보다, 여러 겹의 얇은 안전망이 더 안전할 때가 있어요. 한 겹이 뚫려도 다음 겹이 막아주니까요. GitHub 보안은 크게 <strong>네 겹</strong>으로 볼 수 있어요.</p>
+        <ul>
+          <li><strong>계정 겹</strong>: 비밀번호, 2FA로 내 계정 자체를 보호.</li>
+          <li><strong>저장소 겹</strong>: branch protection, 권한 설정으로 '누가 뭘 할 수 있는지' 통제.</li>
+          <li><strong>코드 겹</strong>: Dependabot, code scanning이 코드와 의존성의 취약점을 검사.</li>
+          <li><strong>커밋 겹</strong>: commit signing으로 "이 커밋은 정말 내가 한 거예요" 증명.</li>
+        </ul>
+        <p>이 네 겹이 서로 보완해서, 한 가지 실수 하나로는 큰 사고가 안 나도록 해요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>Dependabot</strong>은 밤새 도서관을 돌아다니며 '이 책엔 오타가 있어요'라며 알려주는 <em>성실한 경비원</em>이에요. 내가 직접 찾아다니지 않아도, 의존성 패키지에 취약점이 발견되면 알아서 알려줘요.</p>
+    </div>
+
+    <section class="tut-section" id="dependabot" data-reveal>
+      <h2 class="tut-section__title">경비원 Dependabot — 알림과 자동 수정은 달라요</h2>
+      <div class="tut-section__body">
+        <p>내 코드는 직접 짰지만, 활용하는 패키지(남이 만든 도구)는 수십~수백 개예요. 그중 하나에 취약점이 발견되면? <strong>Dependabot</strong>이 알아서 알려줘요. 다만, 알림과 자동 수정은 서로 다른 기능이에요. 헷갈리기 쉬운 부분이니 잘 구분해 두세요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">구분</th>
+            <th scope="col">Dependabot alerts</th>
+            <th scope="col">Dependabot security updates</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">하는 일</th>
+            <td>취약점을 <strong>알려주기만</strong> 함</td>
+            <td>고치는 PR을 <strong>자동으로 만들어 줌</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">내 역할</th>
+            <td>알림을 보고 직접 결정</td>
+            <td>열린 PR 검토 후 병합만 하면 끝</td>
+          </tr>
+          <tr>
+            <th scope="row">형태</th>
+            <td>Security 탭의 경고 목록</td>
+            <td>자동 생성된 Pull Request</td>
+          </tr>
+          <tr>
+            <th scope="row">별도 설정</th>
+            <td>기본 알림만 켜짐</td>
+            <td>설정에서 따로 켜야 함</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px">"알아서 알려줘"까지만 원할 수도 있고, "고쳐주는 PR까지 만들어 줘"까지 원할 수도 있어요. 저장소 Settings → Security에서 원하는 수준을 고르면 돼요.</p>
+    </section>
+
+    <section class="tut-section" id="scanning" data-reveal>
+      <h2 class="tut-section__title">비밀을 코드에 적었다면 — secret scanning</h2>
+      <div class="tut-section__body">
+        <p>토큰이나 API 키를 코드에 그대로 적고 push해버렸다면? GitHub의 <strong>secret scanning</strong>이 그 모양을 알아보고 즉시 알려줘요. 공개 저장소라면 누구나 그걸 볼 수 있으니 정말 위험해요. 알림을 받는 즉시 비밀번호를 바꾸고 역사에서 지워야 해요.</p>
+        <p>비슷하지만 다른 기능으로 <strong>code scanning</strong>이 있어요. secret scanning이 '비밀번호가 새어나갔는지'를 찾는다면, code scanning은 CodeQL 같은 도구로 '코드 자체에 취약한 패턴이 있는지'를 검사해요. SQL 주입, 버퍼 오버플로 같은 흔한 취약점을 찾아줘요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스 (핵심) -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">주의 — 정말 중요해요</span>
+      <p>한 번 공개 저장소에 push한 비밀번호는 '지웠다'고 안전하지 않아요. Git 불변성 때문에 역사에 남아요 (T01 참고). 즉시 그 비밀번호/토큰을 폐기하고 새로 발급받아야 해요. 그 다음 <code>git filter-repo</code>로 역사에서 제거하는 작업이 필요해요. GitHub에 '비밀 노출' 경고가 뜬다면 절대 무시하지 마세요.</p>
+    </div>
+
+    <section class="tut-section" id="branch-protection" data-reveal>
+      <h2 class="tut-section__title">main 브랜치는 함부로 만지지 마세요 (branch protection)</h2>
+      <div class="tut-section__body">
+        <p><code>main</code> 브랜치는 보통 '지금 실제로 쓰이는 코드'예요. 여기에 아무나 직접 push하면 실수 하나로 서비스가 멈출 수 있어요. <strong>branch protection</strong>은 이런 일을 막아줘요. 대표적인 규칙들:</p>
+        <ul>
+          <li><strong>직접 push 금지</strong>: 무조건 PR을 거쳐야만 병합 가능.</li>
+          <li><strong>리뷰 필수 (required reviews)</strong>: 최소 1명 이상의 승인이 있어야 병합.</li>
+          <li><strong>상태 검사 필수 (status checks)</strong>: CI 테스트가 통과해야 병합 (T18과 연결).</li>
+          <li><strong>브랜치 최신화</strong>: 병합 전 main의 최신 변경을 가져와야 허용.</li>
+        </ul>
+        <p>Settings → Branches에서 'Add branch protection rule'로 설정해요. 조직 단위로 정책을 일괄 적용할 수도 있어요.</p>
+      </div>
+      <pre class="code-block"><code>// branch protection rule — GitHub 설정의 핵심 항목
+// Settings → Branches → Add rule
+Require a pull request before merging: ON
+  Required approving reviews: 1 이상
+Require status checks to pass: ON
+  CI(test, lint) 통과 필수
+Require branches to be up to date: ON
+Do not allow bypassing the above settings: ON</code></pre>
+    </section>
+
+    <section class="tut-section" id="codeowners" data-reveal>
+      <h2 class="tut-section__title">이 파일은 이 사람이 검토해요 (CODEOWNERS)</h2>
+      <div class="tut-section__body">
+        <p>branch protection의 '리뷰 필수'와 짝을 이루는 게 <strong>CODEOWNERS</strong>예요. "이 폴더의 코드는 이 사람이 꼭 검토해야 해"라는 규칙을 적어두면, 해당 파일이 바뀌는 PR엔 자동으로 그 사람이 리뷰어로 지정돼요. 보안이 중요한 폴더(예: 결제 로직)에 딱이에요.</p>
+      </div>
+      <pre class="code-block"><code># .github/CODEOWNERS 예시
+# 각 줄은 "파일 경로 패턴   담당자"
+*.md                    @docs-team                # 문서는 docs 팀
+/src/security/          @security-team            # 보안 코드는 보안 팀
+/package.json           @tech-leads               # 의존성 변경은 팀장</code></pre>
+    </section>
+
+    <section class="tut-section" id="2fa" data-reveal>
+      <h2 class="tut-section__title">계정의 기본 안전장치 — 2FA</h2>
+      <div class="tut-section__body">
+        <p><strong>2FA (2단계 인증)</strong>은 비밀번호 외에 두 번째 확인(전화 앱의 코드, 지문 등)을 요구하는 거예요. 비밀번호가 유출돼도 공격자는 두 번째 단계를 넘지 못해요. GitHub는 모든 계정에 2FA 켜기를 강력히 권장하고, 일부 작업(패키지 게시 등)에는 필수로 요구해요. 보안의 가장 기본이면서 가장 효과적인 단계예요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="commit-signing" data-reveal>
+      <h2 class="tut-section__title">"이 커밋, 정말 내가 한 거예요" (commit signing)</h2>
+      <div class="tut-section__body">
+        <p>누군가 내 이름으로 가짜 커밋을 올린다면? Git 자체는 작성자 이름을 그냥 믿어요. 이걸 막는 게 <strong>commit signing</strong>이에요. 커밋에 '서명'을 붙여서 진짜 내가 만든 거라 증명하는 거예요. GitHub는 서명된 커밋에 'Verified' 배지를 달아줘요. 서명 방법은 크게 두 가지예요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">구분</th>
+            <th scope="col">SSH 서명</th>
+            <th scope="col">GPG 서명</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">기술</th>
+            <td>SSH 키 (이미 push에 쓰던 것과 같은 기술)</td>
+            <td>GPG 키 (전통적인 서명 전용 도구)</td>
+          </tr>
+          <tr>
+            <th scope="row">설정 난이도</th>
+            <td>비교적 간단 (SSH 키가 이미 있으면 더 쉬움)</td>
+            <td>조금 더 복잡 (키 생성·등록 절차)</td>
+          </tr>
+          <tr>
+            <th scope="row">추천</th>
+            <td>요즘 GitHub가 권장하는 방식</td>
+            <td>오래된 방식이지만 여전히 지원</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px">두 방식 모두 결과는 같아요: 커밋이 'Verified' 표시를 받고, 누군가 내 이름을 도용해도 서명까지 위조하긴 매우 어려워요.</p>
+    </section>
+
+    <section class="tut-section" id="secrets-vs-variables" data-reveal>
+      <h2 class="tut-section__title">Secrets과 Variables — 또 한 번 정리</h2>
+      <div class="tut-section__body">
+        <p>T18에서 잠깐 다뤘던 두 단어를 보안 관점에서 다시 볼게요. 이 둘의 차이는 '암호화 여부'예요. 이 차이를 모르면 큰 사고로 이어질 수 있어요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">구분</th>
+            <th scope="col">Secrets</th>
+            <th scope="col">Variables</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">저장 형태</th>
+            <td>암호화 저장</td>
+            <td>평문(일반 글) 저장</td>
+          </tr>
+          <tr>
+            <th scope="row">로그 노출</th>
+            <td>절대 찍히지 않음 (자동 마스킹)</td>
+            <td>로그에 그대로 보임</td>
+          </tr>
+          <tr>
+            <th scope="row">언제 쓰나</th>
+            <td>토큰·비밀번호·API 키</td>
+            <td>URL·포트 번호·환경 이름</td>
+          </tr>
+          <tr>
+            <th scope="row">참조</th>
+            <td><code>${{ secrets.이름 }}</code></td>
+            <td><code>${{ vars.이름 }}</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px">"비밀번호인데 Variables에 넣어도 되나?" → 절대 안 돼요. 비밀은 무조건 Secrets에. 이 한 가지만 기억하셔도 사고를 절반은 막을 수 있어요.</p>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>GitHub의 <strong>Security 탭</strong>에 가면 한 저장소의 보안 상태가 한눈에 들어와요. Dependabot 경고, secret scanning 결과, code scanning 결과가 다 모여 있어요. 매일 볼 필요는 없지만, 일주일에 한 번쯤 들여다보면 '빚'이 쌓이지 않아요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T19 한 장 요약</h2>
+      <p class="cheat-card__sub">GitHub 보안 — 여러 겹의 안전망</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">네 겹 안전망</span><span class="cheat-card__desc">계정 / 저장소 / 코드 / 커밋 — 한 겹 뚫려도 다음 겹이 막음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Dependabot alerts</span><span class="cheat-card__desc">의존성 취약점을 알림만 해 줌.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Dependabot security updates</span><span class="cheat-card__desc">고치는 PR까지 자동으로 만들어 줌. alerts와 다름.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">secret scanning</span><span class="cheat-card__desc">코드에 노출된 비밀번호/토큰 즉시 발견.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">code scanning</span><span class="cheat-card__desc">CodeQL로 코드 자체의 취약한 패턴 검사.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">branch protection</span><span class="cheat-card__desc">main 직접 push 금지, 리뷰·CI 필수.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">CODEOWNERS</span><span class="cheat-card__desc">폴더별 담당자 자동 지정 — PR에 자동 리뷰어.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">2FA</span><span class="cheat-card__desc">2단계 인증 — 계정 보안의 가장 기본.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">commit signing</span><span class="cheat-card__desc">SSH 또는 GPG — 'Verified' 배지로 진짜 내 커밋 증명.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Secrets vs Variables</span><span class="cheat-card__desc">Secrets=암호화/로그 안 찍힘, Variables=평문. 비밀은 무조건 Secrets.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">핵심 주의</span><span class="cheat-card__desc">공개 저장소에 노출된 비밀은 역사에 남음 — 즉시 폐기하고 filter-repo로 제거.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (REQ-005: 이전=T18, 다음=T20) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-actions.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T18 로봇 비서 GitHub Actions</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-workflow-models.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T20 어떻게 일할 것인가: 워크플로우 모델</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">네 겹 안전망</a>
+      <a class="sidebar-toc__link" href="#dependabot">Dependabot alerts vs updates</a>
+      <a class="sidebar-toc__link" href="#scanning">secret / code scanning</a>
+      <a class="sidebar-toc__link" href="#branch-protection">branch protection</a>
+      <a class="sidebar-toc__link" href="#codeowners">CODEOWNERS</a>
+      <a class="sidebar-toc__link" href="#2fa">2FA</a>
+      <a class="sidebar-toc__link" href="#commit-signing">commit signing (SSH/GPG)</a>
+      <a class="sidebar-toc__link" href="#secrets-vs-variables">Secrets vs Variables</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

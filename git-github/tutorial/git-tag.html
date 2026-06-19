@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T10 버전, 딱 붙이기: 태그 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="'이 사진이 v1.0이야'라는 표시를 붙이는 태그를 책갈피 비유로 시작해 lightweight vs annotated 태그, semantic versioning, 태그 공유까지 차근차근." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T10 · 태그</p>
+  <h1 class="page-header__title">'이 사진이 v1.0이야' — 표시 붙이기</h1>
+  <p class="page-header__subhead">사진첩의 수많은 사진 중 '바로 이 장!'을 한눈에 찾을 수 있게 이름표를 붙이는 방법을 배워요. 그 이름표가 바로 태그랍니다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 (REQ-006: T10 → T1-06, T1-03) -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>음악가는 데모곡을 v1, v2로 나눠 두고, 연구자는 논문 제출 버전을 'submit-v1'으로 딱 찍어둬요. 나중에 '그때 낸 버전'을 정확히 찾아야 할 때 태그가 빛을 발하죠.</p>
+      <a class="case-callout-link" href="../cases/index.html#t1-06">음악가 데모 v1 사례 보기 →</a>
+      <span style="display:block;margin-top:4px"><a class="case-callout-link" href="../cases/index.html#t1-03">논문 제출 버전 사례 보기 →</a></span>
+    </div>
+
+    <!-- 비유 박스 (REQ-002) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>태그는 사진첩의 한 페이지에 <strong>'책갈피 + 제목'</strong>을 붙이는 거예요. '아, v1.0이 어디 있더라?' 할 때 40글자 지문을 뒤질 필요 없이 이름만 부르면 그 페이지로 바로 가요.</p>
+    </div>
+
+    <section class="tut-section" id="what-is-tag" data-reveal>
+      <h2 class="tut-section__title">태그(tag)가 뭔가요?</h2>
+      <div class="tut-section__body">
+        <p>사진 한 장(커밋)에 <strong>'이건 1.0 배포판이야'</strong>라고 이름표를 붙이는 걸 <strong>태그(tag)</strong>라고 해요. 브랜치가 '점점 앞으로 가는 화살표'라면, 태그는 '특정 사진에 영구히 박힐 못'이에요. 움직이지 않고 그 사진을 평생 가리켜요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="two-kinds" data-reveal>
+      <h2 class="tut-section__title">태그 두 종류: 가벼운 이름표 vs 정식 이름표</h2>
+      <div class="tut-section__body">
+        <p><strong>lightweight 태그</strong>는 그냥 이름표만 붙이는 거예요. <span class="cmd-pill">git tag v1.0</span>. 빠르고 가벼워서 '아 여기 기억해둬' 정도로 쓸 때 좋아요. 대신 만든 사람이나 날짜 같은 정보가 안 들어가요.</p>
+        <p><strong>annotated 태그</strong>는 메시지, 만든 사람, 날짜까지 포함된 '정식 이름표'예요. <span class="cmd-pill">git tag -a v1.0 -m "첫 정식 출시"</span>. 공식 배포 버전에는 annotated를 쓰는 게 좋아요. 나중에 '이 버전 누가 언제 만들었지?'를 확인할 수 있거든요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은: SemVer -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><strong>Semantic Versioning(SemVer)</strong>: <code>v1.2.3</code>처럼 <strong>주.부.수</strong> 세 숫자로 의미를 나타내는 약속이에요. <strong>주(major)</strong>는 호환이 깨지는 큰 변화, <strong>부(minor)</strong>는 호환되는 새 기능, <strong>수(patch)</strong>는 버그 수정. 숫자만 봐도 '업데이트해도 안전할까?'를 알 수 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="share" data-reveal>
+      <h2 class="tut-section__title">태그도 구름으로 올려요</h2>
+      <div class="tut-section__body">
+        <p>태그를 붙였다고 원격에 자동으로 안 올라가요. 따로 올려줘야 해요. 하나만 올릴 땐 <span class="cmd-pill">git push origin v1.0</span>, 한꺼번에 다 올릴 땐 <span class="cmd-pill">git push --tags</span>예요. GitHub에 올라간 태그는 'Releases' 페이지에서 보기 좋게 정리돼요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p><span class="cmd-pill">git tag</span>만 치면 붙인 태그 목록이, <span class="cmd-pill">git show v1.0</span>을 치면 그 태그가 가리키는 사진의 내용과 메시지가 나와요. 이전 태그를 지우고 싶으면 <span class="cmd-pill">git tag -d v1.0</span>.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T10 한 장 요약</h2>
+      <p class="cheat-card__sub">태그 핵심 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git tag v1.0</span><span class="cheat-card__desc">lightweight 태그. 가벼운 이름표만.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git tag -a v1.0 -m "메시지"</span><span class="cheat-card__desc">annotated 태그. 메시지·작성자·날짜 포함.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git tag</span><span class="cheat-card__desc">태그 목록 보기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git show v1.0</span><span class="cheat-card__desc">해당 태그가 가리키는 사진 내용 보기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git push origin v1.0</span><span class="cheat-card__desc">태그 하나 원격으로 올리기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git push --tags</span><span class="cheat-card__desc">모든 태그 한꺼번에 원격으로 올리기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git tag -d v1.0</span><span class="cheat-card__desc">로컬에서 태그 삭제.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (T09 ← T10 → T11) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-remote.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T09 세상과 연결되기: 원격 저장소</span>
+      </a>
+      <a class="pager__card pager__card--next" href="git-undo.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T11 실수했어요? 되돌리기</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#what-is-tag">태그란</a>
+      <a class="sidebar-toc__link" href="#two-kinds">태그 두 종류</a>
+      <a class="sidebar-toc__link" href="#share">태그 공유</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>
