@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T22 한 권을 여러 책상에: git worktree — Git &amp; GitHub 안내서</title>
+<meta name="description" content="git worktree를 '같은 사진첩을 여러 책상에 펼쳐놓기'라는 비유로. 브랜치 여러 개를 동시에 작업하고, AI 에이전트와 병렬로 기능을 나눠 개발하는 법까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리란</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">심화 · T22 · 같은 사진첩, 여러 책상</p>
+  <h1 class="page-header__title">한 권의 책을 여러 책상에 펼쳐놓기 — git worktree</h1>
+  <p class="page-header__subhead">T12에서 잠깐 소개한 worktree를 더 깊이 파요. 브랜치를 여러 개 동시에 작업하고 싶을 때, 파일을 전환하는 대신 <strong>폴더를 전환</strong>하는 방법이에요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>한 저장소를 여러 책상에 펼쳐 각각 다른 브랜치를 동시에 작업하는 건, 거대 오픈소스 팀이 여러 기능을 병렬로 개발할 때 흔히 쓰는 방식이에요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-04">모노레포 대규모 관리 사례 보기 →</a>
+    </div>
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>보통은 책(<strong>저장소</strong>)을 한 책상에서만 펼쳐봐요. 다른 장(브랜치)을 보려면 페이지를 넘기죠(<span class="cmd-pill">git switch</span>). <strong>worktree</strong>는 같은 책을 <strong>여러 책상에 동시에 펼쳐놓는</strong> 거예요. 각 책상은 각자 다른 장을 펼쳐놓고, 한눈에 전부 볼 수 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="what" data-reveal>
+      <h2 class="tut-section__title">worktree가 뭔가요?</h2>
+      <div class="tut-section__body">
+        <p><span data-term="worktree"><strong>git worktree</strong></span>는 <strong>하나의 저장소를 여러 폴더에서 동시에 열어</strong>주는 기능이에요. 각 폴더는 각자 다른 브랜치를 체크아웃해요. 핵심은 — 이 폴더들은 <strong>같은 사진첩(.git)을 공유</strong>한다는 거예요. 그래서 사진첩을 두 번 복사하지 않고도, 여러 브랜치를 폴더처럼 나란히 둘 수 있어요.</p>
+        <p>보통 브랜치를 바꿀 땐 <span class="cmd-pill">git switch</span>로 작업 폴더가 통째로 덮어씌워져요. 한 브랜치에서 빌드 중인데 다른 브랜치를 봐야 하면 곤란하죠. worktree는 그때 <strong>"다른 책상에 앉아서 다른 장을 본다"</strong>는 해결책이에요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="why" data-reveal>
+      <h2 class="tut-section__title">언제 쓰나요?</h2>
+      <div class="tut-section__body">
+        <ul>
+          <li><strong>긴 작업을 두고 긴급 수정이 들어올 때</strong> — 메인 책상은 그대로 둔 채, 옆 책상에서 <code>hotfix</code> 브랜치를 열어 고치고 합친 뒤 닫아요. 진행 중이던 작업을 엎지 않아도 돼요.</li>
+          <li><strong>두 브랜치를 비교하며 작업할 때</strong> — 예전 버전과 지금 버전을 나란히 띄워놓고 코드를 비교할 수 있어요.</li>
+          <li><strong>오래 걸리는 빌드/인덱스를 유지하고 싶을 때</strong> — 브랜치를 바꾸면 에디터가 파일을 다시 읽고 인덱스를 다시 만들어요. worktree는 폴더마다 인덱스가 독립이라, "이 책상은 계속 켜둔 채로"가 가능해요.</li>
+          <li><strong>여러 기능을 동시에(병렬로) 개발할 때</strong> — 특히 AI 에이전트나 동료와 각자 worktree에서 다른 브랜치를 동시에 코딩하는 패턴에 잘 맞아요(아래 '에이전틱 코딩' 절 참고).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="tut-section" id="commands" data-reveal>
+      <h2 class="tut-section__title">실전 명령어 — 책상 하나 더 꺼내기</h2>
+      <div class="tut-section__body">
+        <p>메인 폴더(예: <code>cli-guide/</code>)에서 시작한다고 해요. 거기가 첫 번째 worktree(main 브랜치)예요.</p>
+        <pre class="code-block"><code># ① 새 책상(worktree) 추가 — 새 브랜치로
+git worktree add ../cli-guide-feature  feature/login
+
+# ② 그 책상으로 가서 작업
+cd ../cli-guide-feature
+#   ...여기선 feature/login 브랜치가 열려 있어요.
+#   메인 책상(cli-guide/)은 여전히 main 브랜치 그대로!
+
+# ③ 작업 끝나면 메인으로 돌아와 합치기
+cd ../cli-guide
+git merge feature/login
+
+# ④ 다 쓴 책상 치우기
+git worktree remove ../cli-guide-feature
+git branch -d feature/login   # 브랜치도 정리</code></pre>
+        <p>다른 책상에서 한 작업은 <strong>같은 사진첩에 바로 기록</strong>돼요. 별도로 push하거나 복사할 필요 없어요 — worktree는 같은 <code>.git</code>를 공유하거든요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="manage" data-reveal>
+      <h2 class="tut-section__title">책상 목록 보기 &amp; 잃어버린 책상 치우기</h2>
+      <div class="tut-section__body">
+        <pre class="code-block"><code>git worktree list     # 현재 열려 있는 책상 전체 보기
+git worktree prune    # 폴더를 그냥 지워버렸을 때 썩은 기록 정리</code></pre>
+        <p><span class="cmd-pill">list</span>로 "내가 책상을 몇 개나 펼쳐뒀더라?"를 확인하고, <span class="cmd-pill">prune</span>은 폴더를 <code>remove</code> 안 하고 그냥 삭제했을 때 남는 찌꺼기를 치워요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="agentic" data-reveal>
+      <h2 class="tut-section__title">에이전틱 코딩 — 여러 AI가 책상마다 앉아서</h2>
+      <div class="tut-section__body">
+        <p>최근 많이 쓰이는 패턴이에요. <strong>기능을 여러 개로 쪼개서, 각 worktree에서 AI 에이전트(또는 동료)가 동시에 코딩</strong>하게 한 뒤, 메인에서 합치는 방식이에요.</p>
+        <pre class="code-block"><code># 기능별 책상을 미리 깔기
+git worktree add ../proj-cases   feature/cases
+git worktree add ../proj-assets  feature/assets
+git worktree add ../proj-qa      feature/qa
+
+# 각 폴더에서 에이전트를 따로 띄워 동시에 작업
+cd ../proj-cases  &amp;&amp;  claude   # 사례 갤러리 담당
+cd ../proj-assets &amp;&amp;  claude   # 인터랙티브 자산 담당 (동시 진행)
+
+# 다 되면 메인에서 합치고 책상 정리
+cd ../proj
+git merge feature/cases feature/assets</code></pre>
+        <p>Claude Code처럼 에이전트를 다루는 도구는 <strong>worktree 격리</strong>를 직접 지원해요. <code>claude --worktree</code>(또는 <code>-w</code>)로 격리된 세션을 바로 열 수 있고, 에이전트를 띄울 때 자동으로 전용 worktree에 넣어주는 옵션도 있어요. 핵심 장점: <strong>한 에이전트가 실험하다 main을 더럽혀도, 다른 에이전트의 책상은 멀쩡해요.</strong></p>
+        <div class="side-note side-note--tip" style="margin-top:16px">
+          <span class="side-note__label">팁</span>
+          <p>기능이 서로 독립적일수록(같은 파일을 안 건드릴수록) 병렬 worktree가 빛을 발해요. 같은 파일을 동시에 고치면 결국 병합 충돌이 나거든요. "각자 다른 폴더/파일 담당"이 병렬 개발의 전제예요.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 주의 박스 -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p>worktree를 다 썼으면 <strong><code>git worktree remove</code>로 정리</strong>하세요. 폴더를 그냥 삭제하면 git이 "책상이 아직 열려 있다"고 착각해요(이때 <code>prune</code>으로 치우면 됨). 그리고 <strong>같은 브랜치를 두 worktree에서 동시에 열 수는 없어요</strong> — 한 브랜치는 한 책상에서만.</p>
+    </div>
+
+    <!-- 알아두면 좋은 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>worktree는 <code>clone</code>과 달라요. <code>clone</code>은 사진첩을 <strong>통째로 복사</strong>하는 거고(별개 저장소), worktree는 <strong>같은 사진첩을 다른 폴더에서 열어보는</strong> 거예요. 그래서 worktree끼리는 커밋이 즉시 공유돼요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T22 한 장 요약</h2>
+      <p class="cheat-card__sub">git worktree 핵심 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git worktree add &lt;경로&gt; &lt;브랜치&gt;</span><span class="cheat-card__desc">새 책상(worktree) 추가. 그 폴더에 해당 브랜치가 열림.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git worktree list</span><span class="cheat-card__desc">현재 열린 worktree 전체 보기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git worktree remove &lt;경로&gt;</span><span class="cheat-card__desc">다 쓴 worktree 정리. (폴더 그냥 지우지 말 것)</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">git worktree prune</span><span class="cheat-card__desc">폴더를 그냥 지운 뒤 남은 찌꺼기 정리.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">claude --worktree (-w)</span><span class="cheat-card__desc">격리된 worktree 세션에서 Claude Code 실행.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager (이전=T12 git-advanced. T22는 심화 부록이라 다음 없음) -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="git-advanced.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T12 한 단계 더 깊이: 고급 기법</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#what">worktree가 뭔가요?</a>
+      <a class="sidebar-toc__link" href="#why">언제 쓰나요?</a>
+      <a class="sidebar-toc__link" href="#commands">실전 명령어</a>
+      <a class="sidebar-toc__link" href="#manage">목록 보기 &amp; 정리</a>
+      <a class="sidebar-toc__link" href="#agentic">에이전틱 코딩</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → glossary-tooltip (용어 툴팁) -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>
