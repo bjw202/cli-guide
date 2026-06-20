@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T08 빌드와 배포 — Tauri 가이드</title>
+<meta name="description" content="Tauri 빌드 — tauri.conf.json 설정, cargo tauri build → 운영체제별 인스톨러(.msi/.dmg/.deb/.AppImage). Tauri 2 모바일 타겟." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T08 · 빌드·배포</p>
+  <h1 class="page-header__title">빌드와 배포 — 완성품 포장하기</h1>
+  <p class="page-header__subhead">개발이 끝나면 완성품을 포장해야 해요. 운영체제마다 다른 상자(<code>.msi</code>/<code>.dmg</code>/<code>.deb</code>)에 담아, 사용자가 설치할 수 있게 만드는 과정이에요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>요리가 완성되면 <strong>포장</strong>해서 내보내야 해요. 윈도우 고객에게는 윈도우 상자, 맥 고객에게는 맥 상자 — <strong>운영체제마다 다른 포장</strong>이 필요해요. Tauri가 이 포장을 한 번에 해줘요.</p>
+    </div>
+
+    <section class="tut-section" id="config" data-reveal>
+      <h2 class="tut-section__title">tauri.conf.json — 앱 명세서</h2>
+      <div class="tut-section__body">
+        <p>빌드 전에 앱의 "명세서"를 적어요 — 창 크기, 앱 이름, 아이콘, 번들 식별자, 권한.</p>
+        <pre class="code-block code-block--rust"><code>{
+  "productName": "내 앱",
+  "version": "0.1.0",
+  "identifier": "com.example.my-app",
+  "build": { "frontendDist": "../dist" },
+  "app": {
+    "windows": [{ "title": "내 앱", "width": 800, "height": 600 }]
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="build" data-reveal>
+      <h2 class="tut-section__title">cargo tauri build — 포장 시작</h2>
+      <div class="tut-section__body">
+        <p>명령 한 줄이면 운영체제별 인스톨러가 만들어져요. Rust는 릴리즈 최적화까지 알아서 해요.</p>
+        <pre class="code-block code-block--rust"><code>npm run tauri build
+<span class="cmt"># → src-tauri/target/release/bundle/ 에 산출물</span></code></pre>
+        <p>산출물은 운영체제에 따라:</p>
+        <div class="cheat-card__list">
+          <div class="cheat-card__row"><span class="cheat-card__cmd">Windows</span><span class="cheat-card__desc"><code>.msi</code> / <code>.exe</code> (NSIS) 설치 파일.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">macOS</span><span class="cheat-card__desc"><code>.dmg</code> / <code>.app</code>. (코드 서명/공증 권장.)</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">Linux</span><span class="cheat-card__desc"><code>.deb</code> / <code>.AppImage</code> / <code>.rpm</code>.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요 — 모바일</span>
+      <p><strong>Tauri 2</strong>는 같은 코드베이스로 모바일까지 빌드해요. <code>cargo tauri android build</code> / <code>cargo tauri ios build</code>. <strong>Electron엔 없는</strong> Tauri만의 강점 — 데스크톱·모바일을 하나의 코드로.</p>
+    </div>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>앱 크기는 보통 <strong>3~10MB</strong> 수준이에요(T01 참고). Electron 대비 20~50배 가벼운 이유가 빌드 산출물에서도 드러나요. Chromium을 번들하지 않으니까요.</p>
+    </div>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T08 한 장 요약</h2>
+      <p class="cheat-card__sub">빌드 산출물</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">tauri.conf.json</span><span class="cheat-card__desc">앱 명세(이름/아이콘/창/권한).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">cargo tauri build</span><span class="cheat-card__desc">운영체제별 인스톨러 생성.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Windows</span><span class="cheat-card__desc">.msi / .exe (NSIS).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">macOS</span><span class="cheat-card__desc">.dmg / .app (서명/공증 권장).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Linux</span><span class="cheat-card__desc">.deb / .AppImage / .rpm.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">모바일 (Tauri 2)</span><span class="cheat-card__desc">cargo tauri android/ios build.</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="ipc-commands.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T07 IPC</span>
+      </a>
+      <a class="pager__card pager__card--next" href="mini-project.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T09 실전 미니 프로젝트</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#config">tauri.conf.json</a>
+      <a class="sidebar-toc__link" href="#build">빌드 산출물</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tauri 가이드 — 웹으로 만드는 가볍고 빠른 데스크톱 앱</title>
+<meta name="description" content="Tauri(Rust)로 데스크톱 앱을 만드는 워크플로우. 왜 쓰는지, 어떻게 돌아가는지, 무엇으로 만드는지 — 비유 먼저, 따뜻하게." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+</head>
+<body class="tpl-home">
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="tutorial/why-tauri.html">T01 왜 Tauri인가</a>
+          <a class="gh-dropdown__link" href="tutorial/architecture.html">T03 아키텍처</a>
+          <a class="gh-dropdown__link" href="tutorial/rust-basics.html">T06 Rust 문법</a>
+          <a class="gh-dropdown__link" href="tutorial/ipc-commands.html">T07 IPC</a>
+          <a class="gh-dropdown__link" href="tutorial/mini-project.html">T09 실전 미니</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="ref/cheatsheet.html">치트시트</a>
+          <a class="gh-dropdown__link" href="ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="ref/faq.html">FAQ</a>
+        </div>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<header class="page-header" style="text-align:center">
+  <p class="page-header__eyebrow">시리즈 3편 · Tauri 가이드</p>
+  <h1 class="page-header__title" style="font-size:var(--fs-hero)">웹으로 만드는,<br><span style="color:var(--tauri-rust)">가볍고 빠른 진짜 데스크톱 앱</span></h1>
+  <p class="page-header__subhead" style="max-width:620px;margin:12px auto 0">Tauri는 웹 기술로 화면을 그리고, Rust로 일을 시키고, 운영체제의 창으로 띄웁니다. Electron의 무거움 없이 — 비유 먼저, 따뜻하게.</p>
+</header>
+
+<main class="tpl-home" style="max-width:1000px;margin:0 auto;padding:0 24px 64px">
+
+  <!-- 3개 문 -->
+  <section class="three-doors__grid" aria-label="시작하기">
+    <a class="door" href="tutorial/why-tauri.html">
+      <div class="door__icon" aria-hidden="true">🦀</div>
+      <h2 class="door__title">처음부터 읽기</h2>
+      <p class="door__sub">T01 왜 Tauri인가</p>
+      <p class="door__desc">탄생 배경과 Electron 비교부터. "왜?"로 시작하는 시그니처 흐름.</p>
+    </a>
+    <a class="door" href="tutorial/architecture.html">
+      <div class="door__icon" aria-hidden="true">🏗️</div>
+      <h2 class="door__title">구조만 보기</h2>
+      <p class="door__sub">T03 3계층 아키텍처</p>
+      <p class="door__desc">프론트엔드 ↔ IPC ↔ Rust. 식당 비유로 한눈에.</p>
+    </a>
+    <a class="door" href="tutorial/mini-project.html">
+      <div class="door__icon" aria-hidden="true">🚀</div>
+      <h2 class="door__title">직접 만들기</h2>
+      <p class="door__sub">T09 실전 미니 프로젝트</p>
+      <p class="door__desc">이름 입력 → Rust 명령 → 결과. 가장 작은 앱 회로 체험.</p>
+    </a>
+  </section>
+
+  <!-- 한눈 요약 -->
+  <section style="margin-top:48px" data-reveal>
+    <div class="side-note side-note--metaphor">
+      <span class="side-note__label">비유</span>
+      <p>Electron은 앱마다 <strong>브라우저를 한 벌씩 들고 다니</strong>는 겁니다. Tauri는 운영체제가 이미 깔아둔 <strong>창을 빌려 쓰</strong>고, 일은 Rust 주방에 맡깁니다. 그래서 설치 파일이 수 MB, 메모리도 가벼워요.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a> · <a href="https://tauri.app" rel="noopener">공식 문서</a></p>
+  </div>
+</footer>
+
+<script src="js/nav.js" defer></script>
+<script src="js/progress.js" defer></script>
+<script src="js/reveal.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+/* =================================================================
+   SPEC-GIT-GITHUB-IMPL-001 — 디자인 토큰 (시리즈 공유)
+   tmux style.css :root 와 변수명/값 동일 (읽기 전용 참조).
+   본 사이트 전용 신규 토큰만 별도 표기.
+   ================================================================= */
+
+:root {
+  /* ---------- 배경 ---------- */
+  --bg-base: #FFFBF5;        /* 따뜻한 크림색 */
+  --bg-surface: #FFFFFF;     /* 카드 하양 */
+  --bg-soft: #FFF6EC;        /* 살짝 더 깊은 크림 */
+
+  /* ---------- primary (코랄) ---------- */
+  --primary: #FF8A5B;
+  --primary-dark: #E66E3F;
+  --primary-soft: #FFE3D4;
+
+  /* ---------- accent (인디고) ---------- */
+  /* 결정 6.4: tmux #3D5FE0 은 오타. design-guide 값 #3D5AFE 사용. */
+  --accent: #3D5AFE;
+  --accent-soft: #E2E8FB;
+  /* 신규(본 사이트 전용): accent-soft 배경 위 텍스트용 어두운 변형.
+     #3D5AFE on #E2E8FB = 4.20:1(AA 미달) → --accent-dark #2A47D4 = 5.82:1(AA 충족, REQ-012). */
+  --accent-dark: #2A47D4;
+
+  /* ---------- secondary (민트) ---------- */
+  --secondary: #26A69A;
+  --secondary-soft: #C9EBE6;
+
+  /* ---------- warning ---------- */
+  --warning: #EF5350;
+  --warning-soft: #FDECEA;
+
+  /* ---------- 텍스트 ---------- */
+  --text-primary: #2D2A26;
+  --text-secondary: #7A726B;
+  --text-tertiary: #A39A92;
+
+  /* ---------- side-note 박스 배경 (tmux 공유) ---------- */
+  --note-metaphor: #FFF7E6;  /* 비유 */
+  --note-history: #F5EFE0;   /* 역사 */
+  --note-tip: #E6F7F4;       /* 팁 */
+  --note-warn: #FDECEA;      /* 주의 */
+  --note-extra: #F1ECFB;     /* 알아두면 좋은 */
+
+  /* ---------- side-note 테두리 (tmux 공유) ---------- */
+  --border-metaphor: #F5C451;
+  --border-history: #C9B58A;
+  --border-tip: #5FC3BA;
+  --border-warn: #E89492;
+  --border-extra: #B7A3E0;
+
+  /* ---------- 본 사이트 전용 신규 토큰 ---------- */
+  --note-case: #E8F5EE;        /* 사례 콜아웃 배경 */
+  --border-case: #2E7D52;      /* 사례 콜아웃 테두리 */
+  --git-green: #2E7D52;        /* commit 노드 / 성공 병합 */
+  --village-indigo: #5B6CFF;   /* 마을 / 협업 메타포 */
+
+  /* ---------- Tauri 전용 액센트 (Rust crab 톤) ---------- */
+  --tauri-rust: #CE412B;        /* Rust 코드 강조 / crab 마스코트 */
+  --tauri-rust-soft: #F8E4DF;   /* Rust 코드 블록 배경 */
+  --tauri-rust-dark: #A8341F;   /* soft 배경 위 텍스트 (AA: 5.6:1) */
+
+  /* ---------- 터미널 색 (tmux 공유, 데모용) ---------- */
+  --term-bg: #2D2A26;
+  --term-text: #F5EFE0;
+  --term-green: #7FD4A2;
+  --term-coral: #FF8A5B;
+  --term-mint: #5FC3BA;
+  --term-dim: #8C857C;
+  --term-border: #4A443E;
+
+  /* ---------- 타이포 ---------- */
+  --font-sans: 'Pretendard Variable', Pretendard, 'Nunito Sans', 'Spoqa Han Sans Neo',
+               -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo',
+               'Malgun Gothic', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---------- 타입 스케일 (tmux 공유) ---------- */
+  --fs-hero: clamp(38px, 6.2vw, 68px);
+  --fs-section: clamp(30px, 4.2vw, 42px);
+  --fs-subhead: clamp(21px, 2.4vw, 25px);
+  --fs-body: 18px;
+  --fs-body-sm: 16px;
+  --fs-mono: 15px;
+  --fs-note: 15px;
+  --fs-small: 13px;
+
+  /* ---------- 간격 (tmux 공유 + 신규 content-xwide) ---------- */
+  --space-section: clamp(96px, 12vw, 150px);
+  --space-component: clamp(40px, 5vw, 64px);
+  --content-width: 760px;
+  --content-wide: 1040px;
+  --content-xwide: 1200px;   /* 신규: 멀티페이지 헤더용 */
+
+  /* ---------- 라운드 (tmux 공유) ---------- */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* ---------- 그림자 (tmux 공유) ---------- */
+  --shadow-xs: 0 1px 2px rgba(45, 42, 38, 0.04);
+  --shadow-sm: 0 2px 8px rgba(45, 42, 38, 0.06);
+  --shadow-md: 0 8px 24px rgba(45, 42, 38, 0.08);
+  --shadow-lg: 0 18px 48px rgba(255, 138, 91, 0.14);
+  --shadow-keycap: 0 2px 0 rgba(45, 42, 38, 0.18), 0 1px 0 rgba(45, 42, 38, 0.06);
+
+  /* ---------- 모션 (tmux 공유) ---------- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --dur-fast: 0.18s;
+  --dur: 0.32s;
+  --dur-slow: 0.6s;
+
+  /* ---------- 헤더 (신규) ---------- */
+  --header-h: 64px;
+}

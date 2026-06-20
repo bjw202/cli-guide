@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T04 개발 흐름 한눈에 — Tauri 가이드</title>
+<meta name="description" content="Tauri 개발 흐름 — scaffold → dev(핫리로드) → 작성 → build → 인스톨러. 요리법 비유로 한눈에." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T04 · 흐름</p>
+  <h1 class="page-header__title">개발 흐름 한눈에 — 요리법</h1>
+  <p class="page-header__subhead">재료 준비(scaffold) → 시식하며 개발(dev) → 완성품 포장(build). Tauri 개발은 요리법처럼 정해진 단계를 따라요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>요리를 상상해 보세요. <strong>재료 준비</strong>(scaffold) → <strong>시식하며 개발</strong>(dev, 저장하면 바로 갈아줌) → <strong>완성품 포장</strong>(build). Tauri CLI가 이 요리법을 한 줄씩 실행해 줘요.</p>
+    </div>
+
+    <!-- WorkflowStepper 자산 (REQ-004) -->
+    <section class="asset workflow-stepper" data-asset="workflow-stepper" data-reveal aria-label="개발 워크플로우 스텝퍼">
+      <h2 class="asset__title">🔁 흐름 — 재생하거나 각 단계를 눌러 보세요</h2>
+      <div class="asset__controls">
+        <button class="asset__btn asset__btn--play" type="button" data-workflow-play style="background:var(--tauri-rust)">▶ 흐름 재생</button>
+      </div>
+      <div class="workflow-stepper__track" data-workflow-track></div>
+      <div class="workflow-stepper__detail" data-workflow-detail></div>
+    </section>
+
+    <section class="tut-section" id="commands" data-reveal>
+      <h2 class="tut-section__title">명령 3개로 끝나는 개발</h2>
+      <div class="tut-section__body">
+        <pre class="code-block code-block--rust"><code><span class="cmt"># 1. 앱 뼈대 만들기 (scaffold)</span>
+npm create tauri-app@latest
+
+<span class="cmt"># 2. 개발 — 핫 리로드 (프론트 + Rust 동시)</span>
+cd my-app
+npm run tauri dev
+
+<span class="cmt"># 3. 빌드 — 운영체제별 인스톨러</span>
+npm run tauri build</code></pre>
+        <p>사실 이게 핵심이에요. <strong>3개 명령</strong>으로 앱 하나가 만들어져요. 나머지는 프론트엔드 짜듯 화면을 만들고, Rust에 명령을 추가하는 일이에요.</p>
+      </div>
+    </section>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p><span class="cmd-pill">npm run tauri dev</span>를 켜둔 채 코드를 고치면, 저장 즉시 화면이 갱신돼요. 프론트는 Vite가, Rust는 cargo가 각자 핫 리로드해요 — 두 세계가 동시에 "뜨거운" 상태를 유지해요.</p>
+    </div>
+
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요</span>
+      <p>처음 <span class="cmd-pill">cargo tauri dev</span>는 Rust 의존성을 컴파일하느라 <strong>몇 분 걸려요</strong>. 이후엔 캐시가 있어 빨라요. "멈춘 것 같다" 싶어도 기다리세요 — Rust 컴파일은 첫 번째가 가장 느려요.</p>
+    </div>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T04 한 장 요약</h2>
+      <p class="cheat-card__sub">개발 흐름 명령</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">npm create tauri-app@latest</span><span class="cheat-card__desc">scaffold — 앱 뼈대(프론트+Rust) 생성.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">npm run tauri dev</span><span class="cheat-card__desc">dev — 핫 리로드 개발. 프론트+Rust 동시.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">npm run tauri build</span><span class="cheat-card__desc">build — 운영체제별 인스톨러 생성.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">첫 컴파일</span><span class="cheat-card__desc">Rust 의존성 때문에 느림. 캐시 후엔 빠름.</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="architecture.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T03 3계층 아키텍처</span>
+      </a>
+      <a class="pager__card pager__card--next" href="tooling.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T05 도구 생태계</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#commands">명령 3개</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/workflow-stepper.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

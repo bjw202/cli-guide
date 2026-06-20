@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R03 FAQ — Tauri 가이드</title>
+<meta name="description" content="Tauri 자주 묻는 질문 — Rust 어렵지 않나요? v1과 v2 차이? Electron 마이그레이션? 모바일 진짜 되나요?" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../tutorial/why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="../tutorial/architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="../tutorial/rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="../tutorial/ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="../tutorial/mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">참조 · R03</p>
+  <h1 class="page-header__title">자주 묻는 질문 (FAQ)</h1>
+  <p class="page-header__subhead">Tauri를 처음 접할 때 품게 되는 의문들. 솔직하게, 비유로 답해요.</p>
+</header>
+
+<main class="tpl-ref" style="max-width:800px;margin:0 auto;padding:0 24px 64px">
+
+  <details class="faq-item" open>
+    <summary class="faq-q">Rust, 어렵지 않나요?</summary>
+    <div class="faq-a">
+      <p>깊이 들어가면 어려워요(소유권·수명). 하지만 <strong>Tauri 앱을 만드는 데 필요한 Rust는 최소</strong>예요 — 본 가이드 T06의 7가지만 알면 예제가 읽혀요. 프론트엔드는 이미 아는 웹 기술 그대로고, Rust는 "명령 몇 개 짜기"로 시작해요. 점차 늘려가면 됩니다.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">Tauri v1과 v2의 차이는?</summary>
+    <div class="faq-a">
+      <p><strong>v2(2024~)</strong>의 큰 변화: (1) <strong>모바일(iOS/Android) 지원</strong>, (2) <strong>ACL 기반 최소권한 보안</strong>, (3) 새로운 플러그인 시스템. 본 가이드는 v2 기준이에요. 새 프로젝트는 무조건 v2로 시작하세요.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">기존 Electron 앱을 Tauri로 옮길 수 있나요?</summary>
+    <div class="faq-a">
+      <p>프론트엔드(웹)는 거의 그대로 쓸 수 있어요. 하지만 <strong>백엔드를 Node.js에서 Rust로 다시 짜야</strong> 해요. IPC(invoke/command) 패턴으로 옮기는 작업이 주된 몫이에요. 점진적 마이그레이션보단 "프론트 재사용 + 백엔드 재작성" 접근이 현실적이에요.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">모바일 진짜 되나요?</summary>
+    <div class="faq-a">
+      <p>Tauri 2에서 <strong>가능</strong>해요. <code>cargo tauri android build</code> / <code>ios build</code>. 다만 앱스토어 심사·코드 서명·네이티브 권한 등은 데스크톱과 다른 별도 과정이에요. 본 가이드는 "가능하다"까지 다루고, 심사 절차는 범위 밖이에요.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">왜 Electron처럼 무겁지 않은 건가요?</summary>
+    <div class="faq-a">
+      <p>운영체제가 이미 깔아둔 <strong>웹뷰를 빌려 쓰</strong>기 때문이에요. Electron은 앱마다 Chromium을 번들하지만, Tauri는 WebView2/WKWebView/WebKitGTK를 써요. 그래서 설치 파일이 수 MB. 백엔드도 Rust라 가벼운 네이티브 바이너리예요. (T01/T02 참고)</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">처음 cargo tauri dev가 왜 이렇게 느리죠?</summary>
+    <div class="faq-a">
+      <p>첫 실행은 Rust 의존성을 컴파일하느라 <strong>몇 분 걸려요</strong>. 캐시가 만들어지면 이후엔 빨라요. "멈춘 것 같다" 싶어도 기다리세요. Rust 컴파일은 첫 번째가 가장 느려요. (T04 참고)</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary class="faq-q">어떤 프론트엔드 프레임워크가 좋나요?</summary>
+    <div class="faq-a">
+      <p>이미 아는 것으로 시작하세요. React·Vue·Svelte 전부 공식 템플릿이 있어요. <code>npm create tauri-app</code>이 선택지를 줘요. 처음이라면 vanilla(순수 HTML/JS)로 골격을 잡고 나중에 프레임워크를 얹어도 돼요.</p>
+    </div>
+  </details>
+
+</main>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<style>
+.faq-item { background: var(--bg-surface); border:1px solid rgba(45,42,38,0.08); border-radius: var(--r-md); margin-bottom:12px; overflow:hidden; }
+.faq-q { cursor:pointer; padding:16px 20px; font-weight:700; color:var(--text-primary); font-size:var(--fs-body); list-style:none; display:flex; justify-content:space-between; align-items:center; }
+.faq-q::-webkit-details-marker { display:none; }
+.faq-q::after { content:'▾'; color:var(--text-tertiary); transition: transform var(--dur-fast) var(--ease-out); }
+.faq-item[open] .faq-q::after { transform: rotate(180deg); }
+.faq-a { padding:0 20px 18px; color:var(--text-secondary); font-size:var(--fs-body-sm); line-height:1.7; }
+.faq-a p { margin:0; }
+</style>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T09 실전 미니 프로젝트 — Tauri 가이드</title>
+<meta name="description" content="이름 입력 → Rust greet 명령 → 결과 표시. 가장 작은 Tauri 앱 회로를 전부 한 페이지에. 직접 주문 넣어보세요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T09 · 실전 (터미널)</p>
+  <h1 class="page-header__title">실전 미니 — "안녕, {이름}!" 앱</h1>
+  <p class="page-header__subhead">배운 것 전부를 한 회로로 엮어요: scaffold → Rust 명령 → 프론트 invoke → 빌드. 가장 작지만 온전한 Tauri 앱이에요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>이제 직접 <strong>주문을 넣어보</strong>세요. 손님이름을 적어 주문서(invoke)를 주방(Rust)에 보내면, 주방이 "안녕, {이름}!" 하고 요리해 돌려줘요. Tauri의 전체 회로가 이 한 흐름에 다 들어 있어요.</p>
+    </div>
+
+    <!-- InvokeSimulator 실전 버전 (REQ-002) -->
+    <section class="asset invoke-sim" data-asset="invoke-sim" data-reveal aria-label="미니 앱 데모">
+      <h2 class="asset__title">🚀 직접 주문 넣어보기</h2>
+      <p class="asset__hint">실제 Tauri 없이도 회로를 체험할 수 있어요. 이름을 바꿔 보세요.</p>
+      <p class="invoke-sim__label">손님 이름</p>
+      <input class="invoke-sim__input" type="text" data-invoke-input value="지웅" aria-label="손님 이름 입력" />
+      <button class="invoke-sim__btn" type="button" data-invoke-btn>invoke('greet')</button>
+      <div class="invoke-sim__out" data-invoke-out><span class="js-cmd">// 버튼을 누르면 주문이 시작돼요</span></div>
+    </section>
+
+    <section class="tut-section" id="steps" data-reveal>
+      <h2 class="tut-section__title">5단계로 만드는 미니 앱</h2>
+      <div class="tut-section__body">
+        <pre class="code-block code-block--rust"><code><span class="cmt"># 1. scaffold</span>
+npm create tauri-app@latest  <span class="cmt"># → vanilla 선택</span>
+
+<span class="cmt"># 2. Rust 명령 추가 (src-tauri/src/main.rs 또는 lib.rs)</span>
+#[tauri::command]
+fn greet(name: &amp;str) -> String {
+    format!("안녕, {}!", name)
+}
+
+<span class="cmt"># 3. 명령 등록</span>
+.invoke_handler(tauri::generate_handler![greet])
+
+<span class="cmt"># 4. 프론트에서 호출 (index.html 의 JS)</span>
+import { invoke } from '@tauri-apps/api/core';
+const msg = await invoke('greet', { name: '지웅' });
+
+<span class="cmt"># 5. 빌드</span>
+npm run tauri build</code></pre>
+      </div>
+    </section>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>이 5단계가 <strong>Tauri 앱의 전부</strong>라고 해도 과언이 아니에요. 실제 앱은 "명령 더 만들기 + 화면 더 꾸미기 + 권한 더 허용하기"의 반복이에요. 골격은 이게 전부.</p>
+    </div>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>이름 대신 파일 읽기·시스템 호출·데이터베이스 같은 "진짜 일"을 Rust 명령에 넣으면, 그게 곧 <strong>실사용 앱</strong>이 돼요. 프론트는 그저 결과를 보여주는 역할이에요.</p>
+    </div>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T09 한 장 요약</h2>
+      <p class="cheat-card__sub">Tauri 앱 만들기 5단계</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">1. scaffold</span><span class="cheat-card__desc">npm create tauri-app — 뼈대 생성.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">2. 명령 작성</span><span class="cheat-card__desc">#[tauri::command] fn ... — Rust에 기능 추가.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">3. 명령 등록</span><span class="cheat-card__desc">generate_handler![...] — 명단에 추가.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">4. 프론트 호출</span><span class="cheat-card__desc">invoke('이름') — 화면에서 부르기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">5. 빌드</span><span class="cheat-card__desc">cargo tauri build — 인스톨러 생성.</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="build-deploy.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T08 빌드와 배포</span>
+      </a>
+      <a class="pager__card pager__card--next" href="../ref/cheatsheet.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">참조 — 치트시트</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#steps">5단계</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/ipc-simulator.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

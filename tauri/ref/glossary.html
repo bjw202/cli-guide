@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>R02 용어집 — Tauri 가이드</title>
+<meta name="description" content="Tauri/Rust 용어집 — Tauri, Rust, IPC, invoke, command, ownership, Result, Option, ACL 등. 비유 한 문장 + 정의." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../tutorial/why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="../tutorial/architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="../tutorial/rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="../tutorial/ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="../tutorial/mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">참조 · R02</p>
+  <h1 class="page-header__title">용어집 — 두려운 단어 사전</h1>
+  <p class="page-header__subhead">Tauri·Rust 용어마다 일상 비유 한 문장을 먼저, 그 다음 정의. 본문에서 <code>data-term</code> 용어에 hover하면 툴팁으로도 떠요.</p>
+</header>
+
+<main class="tpl-ref" style="max-width:800px;margin:0 auto;padding:0 24px 64px">
+
+  <div class="glossary">
+    <article class="glossary__item"><h2 class="glossary__term">Tauri</h2><p class="glossary__metaphor">비유 — 웹으로 화면을 그리고, Rust로 일을 시키고, 운영체제의 창으로 띄우는 가벼운 데스크톱 앱 프레임워크.</p><p class="glossary__def">공식: Rust 백엔드 + OS 네이티브 웹뷰 + 임의의 프론트엔드로 크로스플랫폼 앱을 만드는 프레임워크 (tauri.app).</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">Electron</h2><p class="glossary__metaphor">비유 — 웹 기술로 데스크톱 앱을 만드는 older 형. Chromium을 앱마다 번들해 무겁다.</p><p class="glossary__def">공식: Chromium + Node.js 번들 기반의 데스크톱 앱 프레임워크. GitHub 2013.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">webview (웹뷰)</h2><p class="glossary__metaphor">비유 — 운영체제가 기본 탑재한 웹 렌더러. Tauri가 Chromium 대신 빌려 쓰는 "식당 홀".</p><p class="glossary__def">공식: WebView2(Win) / WKWebView(mac) / WebKitGTK(Linux) — OS 제공 웹 렌더링 컴포넌트.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">Rust</h2><p class="glossary__metaphor">비유 — 빠르고 메모리 안전한 시스템 언어. Tauri의 "주방" 언어.</p><p class="glossary__def">공식: 소유권 기반 메모리 안전성을 가진 시스템 프로그래밍 언어. 가비지컬렉터 없이 안전 (rust-lang.org).</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">cargo</h2><p class="glossary__metaphor">비유 — Rust의 빌드·패키지 매니저. npm 같은 존재. 의존성은 Cargo.toml.</p><p class="glossary__def">공식: Rust 공식 빌드 시스템·패키지 매니저. Cargo.toml에 의존성을 선언.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">crate (크레이트)</h2><p class="glossary__metaphor">비유 — Rust의 패키지 단위. npm의 package 같은 것.</p><p class="glossary__def">공식: Rust의 컴파일 단위/패키지. crates.io에서 배포.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">rustup</h2><p class="glossary__metaphor">비유 — Rust 버전 관리자. "Rust의 nvm".</p><p class="glossary__def">공식: Rust 툴체인(컴파일러/cargo 등) 버전 관리자.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">IPC (프로세스 간 통신)</h2><p class="glossary__metaphor">비유 — Tauri에선 프론트↔Rust의 "주문서(invoke) ↔ 명령(command)" 통로.</p><p class="glossary__def">공식: Inter-Process Communication. Tauri는 프론트엔드(JS)와 백엔드(Rust) 사이의 안전한 메시지 통신.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">invoke()</h2><p class="glossary__metaphor">비유 — 프론트가 Rust 명령을 부르는 "주문서". await로 결과를 받아요.</p><p class="glossary__def">공식: @tauri-apps/api/core의 함수. 프론트엔드에서 Rust command를 비동기 호출.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">#[tauri::command]</h2><p class="glossary__metaphor">비유 — Rust 함수를 프론트에 노출시키는 표시(매크로). 주방의 "요리법".</p><p class="glossary__def">공식: Rust 함수를 프론트엔드 invoke로 호출 가능하게 등록하는 속성 매크로.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">macro (매크로)</h2><p class="glossary__metaphor">비유 — 코드를 만들어내는 코드. "이 함수에 특별한 능력을 부여"하는 주문.</p><p class="glossary__def">공식: 메타프로그래밍 장치. #[...] 속성 매크로, macro_rules! 등.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">ownership (소유권)</h2><p class="glossary__metaphor">비유 — "이 값은 누가 관리하나"를 정하는 Rust의 규칙. 본 가이드에선 깊이 다루지 않아요.</p><p class="glossary__def">공식: 값의 수명과 해제 책임을 컴파일 타임에 정하는 Rust 핵심 규칙.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">&amp; (borrow, 빌림)</h2><p class="glossary__metaphor">비유 — 값을 소유하지 않고 "빌려 읽는다"는 표시.</p><p class="glossary__def">공식: 참조(reference). 소유권 이전 없이 값을 빌려 쓰는 것.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">Result</h2><p class="glossary__metaphor">비유 — "성공하거나 실패할 수 있음"을 나타내는 타입. 예외 대신 쓰는 안전한 방식.</p><p class="glossary__def">공식: enum Result&lt;T, E&gt; = Ok(T) | Err(E). Rust의 표준 에러 처리 타입.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">Option</h2><p class="glossary__metaphor">비유 — "값이 있거나 없을 수 있음"을 나타내는 타입. null 대신.</p><p class="glossary__def">공식: enum Option&lt;T&gt; = Some(T) | None. Rust의 null 안전 대체.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">struct</h2><p class="glossary__metaphor">비유 — 관련 데이터를 하나로 묶는 상자.</p><p class="glossary__def">공식: 필드 모음으로 구조체를 정의하는 Rust 타입.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">enum</h2><p class="glossary__metaphor">비유 — "경우의 수"를 나열한 타입.</p><p class="glossary__def">공식: 가능한 변형(variant)들을 나열하는 타입. Rust enum은 데이터를 가질 수 있음.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">match</h2><p class="glossary__metaphor">비유 — switch의 강력한 사촌.</p><p class="glossary__def">공식: 패턴 매칭 제어문. 모든 경우를 빠짐없이 다뤄야 함.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">let mut</h2><p class="glossary__metaphor">비유 — 변수를 "바꿀 수 있게" 만드는 키워드. Rust는 기본이 불변이라 필요해요.</p><p class="glossary__def">공식: 가변 변수 바인딩. 기본 let은 불변.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">ACL (Tauri 2 권한)</h2><p class="glossary__metaphor">비유 — Tauri 2의 최소권한 모델. 모든 API는 명시적 허용 필요. 기본은 차단.</p><p class="glossary__def">공식: capabilities/ 설정으로 명령·API 접근을 명시 허용하는 권한 시스템.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">bundle (번들)</h2><p class="glossary__metaphor">비유 — 운영체제별 설치 파일. .msi/.dmg/.deb 같은 "포장 상자".</p><p class="glossary__def">공식: cargo tauri build가 생성하는 플랫폼별 설치 패키지.</p></article>
+    <article class="glossary__item"><h2 class="glossary__term">LSP</h2><p class="glossary__metaphor">비유 — IDE에 코드 지능(자동완성/이동)을 제공하는 표준.</p><p class="glossary__def">공식: Language Server Protocol. rust-analyzer가 Rust LSP 구현.</p></article>
+  </div>
+
+</main>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

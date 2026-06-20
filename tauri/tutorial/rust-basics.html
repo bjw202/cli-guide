@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T06 Rust 대표 문법 (얕게) — Tauri 가이드</title>
+<meta name="description" content="Tauri 예제를 읽기 위한 Rust 최소 문법 7가지 — fn, let/mut, match, struct/enum, Result/Option, &, #[tauri::command]. 깊이 들어가지 않는다." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T06 · 문법 (얕게)</p>
+  <h1 class="page-header__title">Rust 대표 문법 7가지 — Tauri를 읽기 위해</h1>
+  <p class="page-header__subhead">Rust를 마스터하려는 게 아니에요. <strong>Tauri 예제를 읽을 수 있는 최소 7가지</strong>만. 이것만 알면 다음 페이지(IPC)가 술술 읽혀요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Rust는 <strong>안전한 주방 규칙</strong>이에요. "칼을 쓸 땐 이렇게", "재료는 이렇게 보관" 같은 규칙이 많아요. 하지만 Tauri 앱을 만들 때는 규칙 전부를 외울 필요 없어요 — 자주 쓰는 7가지만 알면 돼요.</p>
+    </div>
+
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">조심하세요 — 범위 안내</span>
+      <p>본 가이드는 <strong>Rust를 가르치지 않아요</strong>. 소유권·수명·트레이트 같은 심층은 별도 Rust 입문 자료로 미뤄요. 여기선 7가지만 가볍게 훑고, 곧바로 Tauri에 씁니다.</p>
+    </div>
+
+    <section class="tut-section" id="fn" data-reveal>
+      <h2 class="tut-section__title">1. fn — 함수</h2>
+      <div class="tut-section__body">
+        <p>함수를 만드는 키워드. <code>fn 이름(매개변수) -&gt; 반환타입</code>.</p>
+        <pre class="code-block code-block--rust"><code>fn greet(name: &amp;str) -> String {
+    format!("안녕, {}!", name)
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="let" data-reveal>
+      <h2 class="tut-section__title">2. let / let mut — 변수 (기본이 불변)</h2>
+      <div class="tut-section__body">
+        <p>Rust 변수는 <strong>기본이 불변(immutable)</strong>. 바꾸려면 <code>mut</code>를 붙여요. "실수로 바꿨다"를 컴파일러가 막아줘요.</p>
+        <pre class="code-block code-block--rust"><code>let count = 5;          <span class="cmt">// 불변 — 못 바꿈</span>
+let mut total = 0;       <span class="cmt">// 가변 — 바꿀 수 있음</span>
+total = total + 1;</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="match" data-reveal>
+      <h2 class="tut-section__title">3. match — 패턴 매칭</h2>
+      <div class="tut-section__body">
+        <p>switch의 강력한 사촌. 가능한 경우를 빠짐없이 다뤄요.</p>
+        <pre class="code-block code-block--rust"><code>match status {
+    Ok(v)  => println!("성공: {}", v),
+    Err(e) => println!("에러: {}", e),
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="struct-enum" data-reveal>
+      <h2 class="tut-section__title">4. struct / enum — 데이터와 경우의 수</h2>
+      <div class="tut-section__body">
+        <p><code>struct</code>는 관련 데이터를 묶고, <code>enum</code>은 "경우의 수"를 정의해요.</p>
+        <pre class="code-block code-block--rust"><code>struct User { name: String, age: u32 }
+enum Status { Win, Lose, Draw }</code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="result-option" data-reveal>
+      <h2 class="tut-section__title">5. Result / Option — 실패·없음을 타입으로</h2>
+      <div class="tut-section__body">
+        <p>Rust엔 <strong>null이나 예외 대신 타입</strong>을 써요. <code>Option</code>은 "있을 수도/없을 수도", <code>Result</code>는 "성공/실패"를 표현해요.</p>
+        <pre class="code-block code-block--rust"><code>fn find(id: u32) -> Option&lt;User&gt; { ... }   <span class="cmt">// 없을 수도</span>
+fn load(path: &amp;str) -> Result&lt;Data, Error&gt; { ... } <span class="cmt">// 실패할 수도</span></code></pre>
+      </div>
+    </section>
+
+    <section class="tut-section" id="borrow" data-reveal>
+      <h2 class="tut-section__title">6. &amp; — "빌려 쓴다" (소유권 냄새만)</h2>
+      <div class="tut-section__body">
+        <p><code>&amp;</code>는 값을 <strong>빌려 쓴다</strong>는 뜻. <code>&amp;str</code>은 "문자열을 소유하지 않고 빌려 읽는다"는 의미예요. 깊은 소유권 개념은 여기서 다루지 않아요 — "<code>&amp;</code>가 붙으면 빌려 쓴다"만 기억하세요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="command" data-reveal>
+      <h2 class="tut-section__title">7. #[tauri::command] — Tauri 명령 (매크로)</h2>
+      <div class="tut-section__body">
+        <p>Tauri가 프론트엔드에 노출할 Rust 함수에 붙이는 표시. 이게 있어야 프론트에서 <code>invoke('greet')</code>로 부를 수 있어요. (다음 페이지 T07에서 바로 씁니다.)</p>
+        <pre class="code-block code-block--rust"><code>#[tauri::command]
+fn greet(name: String) -> String {
+    format!("안녕, {}!", name)
+}</code></pre>
+      </div>
+    </section>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><code>#[]</code> 모양은 <strong>매크로(macro)</strong>라 불려요. "이 함수에 특별한 능력을 부여"하는 주문 같은 거예요. <code>#[tauri::command]</code>는 "이 함수를 프론트에서 부를 수 있게 만들어 줘"라는 주문이에요.</p>
+    </div>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T06 한 장 요약</h2>
+      <p class="cheat-card__sub">Rust 7가지만</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">fn</span><span class="cheat-card__desc">함수 정의.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">let / let mut</span><span class="cheat-card__desc">변수. 기본 불변, mut 붙여야 변경.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">match</span><span class="cheat-card__desc">패턴 매칭 (switch 강화판).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">struct / enum</span><span class="cheat-card__desc">데이터 묶기 / 경우의 수.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Result / Option</span><span class="cheat-card__desc">실패·없음을 타입으로 (null/예외 대신).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">&amp;</span><span class="cheat-card__desc">빌려 쓴다 (소유권 냄새만).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">#[tauri::command]</span><span class="cheat-card__desc">프론트에 노출할 Rust 함수 표시 (매크로).</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="tooling.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T05 도구 생태계</span>
+      </a>
+      <a class="pager__card pager__card--next" href="ipc-commands.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T07 프론트·Rust 대화 (IPC)</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#fn">1. fn</a>
+      <a class="sidebar-toc__link" href="#let">2. let/mut</a>
+      <a class="sidebar-toc__link" href="#match">3. match</a>
+      <a class="sidebar-toc__link" href="#struct-enum">4. struct/enum</a>
+      <a class="sidebar-toc__link" href="#result-option">5. Result/Option</a>
+      <a class="sidebar-toc__link" href="#borrow">6. &amp;</a>
+      <a class="sidebar-toc__link" href="#command">7. #[tauri::command]</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

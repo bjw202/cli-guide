@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T05 도구 생태계 — Tauri 가이드</title>
+<meta name="description" content="Tauri 개발의 6가지 핵심 도구 — rustup, cargo, Tauri CLI, rust-analyzer, IDE, Vite. 각각의 역할과 설치 명령." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+        <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+        <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+        <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+        <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+      </div></div>
+      <div class="gh-nav__item"><button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button><div class="gh-dropdown" role="menu">
+        <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+        <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+      </div></div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T05 · 도구</p>
+  <h1 class="page-header__title">도구 생태계 — 주방 도구 정리</h1>
+  <p class="page-header__subhead">Tauri 개발에 필요한 도구 6가지. 모두 외울 필요 없어요 — 이름과 용도만 알면 검색할 수 있어요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>주방</strong>을 상상해 보세요. <strong>rustup</strong>은 칼·프라이팬의 버전을 관리하는 도구함, <strong>cargo</strong>는 식자재 창고(npm 같은), <strong>Tauri CLI</strong>는 "Tauri 주방 세트"를 한 번에 깔아주는 키트. <strong>rust-analyzer</strong>는 주방장의 두뇌(자동완성)이에요.</p>
+    </div>
+
+    <section class="tut-section" id="install" data-reveal>
+      <h2 class="tut-section__title">설치 — 단 2단계</h2>
+      <div class="tut-section__body">
+        <pre class="code-block code-block--rust"><code><span class="cmt"># 1. Rust 설치 (rustup — 버전 관리자)</span>
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+<span class="cmt"># 2. Tauri 앱 만들기 (이 명령 하나로 cargo·CLI·Vite 세팅까지)</span>
+npm create tauri-app@latest</code></pre>
+        <p><strong>사실 이게 전부</strong>예요. <span class="cmd-pill">rustup</span>으로 Rust를 깔고, <span class="cmd-pill">npm create tauri-app</span>으로 앱을 만들면 나머지 도구는 알아서 따라와요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="catalog" data-reveal>
+      <h2 class="tut-section__title">도구 6종 — 역할 한눈에</h2>
+      <div class="tut-section__body">
+        <div class="cheat-card__list">
+          <div class="cheat-card__row"><span class="cheat-card__cmd">rustup</span><span class="cheat-card__desc">Rust 툴체인 관리자. "Rust의 nvm". 버전 설치/전환.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">cargo</span><span class="cheat-card__desc">빌드·패키지 매니저. "Rust의 npm". 의존성은 <code>Cargo.toml</code>.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">Tauri CLI</span><span class="cheat-card__desc">앱 스캐폴드/dev/build. <code>cargo tauri dev</code> / <code>cargo tauri build</code>.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">rust-analyzer</span><span class="cheat-card__desc">LSP(자동완성/타입/이동). IDE의 두뇌.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">RustRover / VS Code</span><span class="cheat-card__desc">IDE. RustRover(JetBrains)가 정석, VS Code + rust-analyzer도 충분.</span></div>
+          <div class="cheat-card__row"><span class="cheat-card__cmd">Vite</span><span class="cheat-card__desc">프론트엔드 번들러. Tauri 공식 권장. <code>create tauri-app</code>에 포함.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tut-section" id="cargotoml" data-reveal>
+      <h2 class="tut-section__title">Cargo.toml — Rust의 package.json</h2>
+      <div class="tut-section__body">
+        <p>프론트엔드의 <code>package.json</code>처럼, Rust는 <code>Cargo.toml</code>에 의존성을 적어요. cargo가 이 파일을 읽고 알아서 다운로드·빌드해요.</p>
+        <pre class="code-block code-block--rust"><code>[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }</code></pre>
+      </div>
+    </section>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>처음엔 <strong>VS Code + rust-analyzer</strong>면 충분해요(무료). Rust를 본격적으로 한다면 JetBrains <strong>RustRover</strong>가 정석이에요. 둘 다 rust-analyzer 기반이라 자동완성 품질이 비슷해요.</p>
+    </div>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T05 한 장 요약</h2>
+      <p class="cheat-card__sub">도구 6종</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">rustup</span><span class="cheat-card__desc">Rust 버전 관리자.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">cargo</span><span class="cheat-card__desc">빌드·패키지 매니저 (Cargo.toml).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Tauri CLI</span><span class="cheat-card__desc">dev / build / scaffold.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">rust-analyzer</span><span class="cheat-card__desc">IDE 자동완성(LSP).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">IDE</span><span class="cheat-card__desc">RustRover(정석) / VS Code(무료충분).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Vite</span><span class="cheat-card__desc">프론트 번들러 (create tauri-app에 포함).</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="dev-workflow.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T04 개발 흐름</span>
+      </a>
+      <a class="pager__card pager__card--next" href="rust-basics.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T06 Rust 대표 문법</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#install">설치 2단계</a>
+      <a class="sidebar-toc__link" href="#catalog">도구 6종</a>
+      <a class="sidebar-toc__link" href="#cargotoml">Cargo.toml</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T02 Electron과 비교 — Tauri 가이드</title>
+<meta name="description" content="Electron과 Tauri의 10항목 객관 비교 — 백엔드·웹뷰·크기·메모리·보안·모바일·성숙도·진입장벽. 정답이 아니라 트레이드오프." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Tauri 가이드</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="why-tauri.html">T01 왜 Tauri인가</a>
+          <a class="gh-dropdown__link" href="architecture.html">T03 아키텍처</a>
+          <a class="gh-dropdown__link" href="rust-basics.html">T06 Rust 문법</a>
+          <a class="gh-dropdown__link" href="ipc-commands.html">T07 IPC</a>
+          <a class="gh-dropdown__link" href="mini-project.html">T09 실전 미니</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+        </div>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">tmux</a>
+      <a class="gh-series-link" href="../git-github/index.html">Git/GitHub</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T02 · 객관 비교</p>
+  <h1 class="page-header__title">Electron과 비교 — 트레이드오프의 지도</h1>
+  <p class="page-header__subhead">둘 다 "웹으로 데스크톱 앱"입니다. 차이는 브라우저를 들고 다니느냐, 빌리느냐. 어느 한쪽이 무조건 좋은 게 아니에요 — 목적에 따라 다릅니다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>둘 다 웹으로 만든 앱이에요. 차이는 <strong>'브라우저를 들고 다니느냐(Electron), 빌리느냐(Tauri)'</strong>. 배낭을 메느냐 손만 들고 가느냐와 같아요 — 가벼운 쪽이 무조건 정답은 아니에요. 배낭엔 도구가 듬뿍 들어 있으니까요.</p>
+    </div>
+
+    <!-- CompareToggle 자산 (REQ-005) -->
+    <section class="asset" data-asset="compare-toggle" data-reveal aria-label="Electron vs Tauri 비교">
+      <h2 class="asset__title">🔍 무엇이 다른가 — 클릭해서 비교해 보세요</h2>
+      <p class="asset__hint">버튼을 누르면 해당 열이 강조돼요. 같은 버튼을 다시 누르면 해제.</p>
+      <div class="compare-toggle">
+        <button class="compare-toggle__btn" type="button" data-compare-focus="electron" aria-pressed="false">Electron 보기</button>
+        <button class="compare-toggle__btn" type="button" data-compare-focus="tauri" aria-pressed="false">Tauri 보기</button>
+      </div>
+
+      <table class="compare-table" data-compare-table>
+        <thead>
+          <tr>
+            <th scope="col">항목</th>
+            <th scope="col" class="col-electron">Electron</th>
+            <th scope="col" class="col-tauri">Tauri</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>백엔드 언어</td><td class="col-electron">Node.js (JS/TS)</td><td class="col-tauri"><strong>Rust</strong> (네이티브 바이너리)</td></tr>
+          <tr><td>웹뷰</td><td class="col-electron">Chromium 번들 포함</td><td class="col-tauri"><strong>OS 네이티브 웹뷰</strong></td></tr>
+          <tr><td>설치 파일 크기</td><td class="col-electron">~100~200MB</td><td class="col-tauri"><strong>~3~10MB</strong></td></tr>
+          <tr><td>메모리 사용</td><td class="col-electron">~100~300MB</td><td class="col-tauri"><strong>~30~80MB</strong></td></tr>
+          <tr><td>보안 모델</td><td class="col-electron">Node 권한 광범위</td><td class="col-tauri"><strong>권한 기반(ACL, v2)</strong> 최소권한</td></tr>
+          <tr><td>프론트엔드</td><td class="col-electron">웹 기술</td><td class="col-tauri">웹 기술 (동일)</td></tr>
+          <tr><td>모바일</td><td class="col-electron">불가 (별도 Capacitor)</td><td class="col-tauri"><strong>가능 (Tauri 2)</strong></td></tr>
+          <tr><td>성숙도·생태계</td><td class="col-electron"><strong>매우 성숙, 거대</strong></td><td class="col-tauri">성장 중 (v2 2024~)</td></tr>
+          <tr><td>대표 앱</td><td class="col-electron">VS Code, Slack, Discord</td><td class="col-tauri">1Password, Cody, Pomofocus</td></tr>
+          <tr><td>시작 장벽</td><td class="col-electron"><strong>JS만 알면 됨</strong></td><td class="col-tauri">JS + Rust 기초</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>정답이 아니라 <strong>트레이드오프</strong>예요. <strong>가벼움·보안·모바일</strong>이 중요하면 Tauri, <strong>생태계·자료 풍부함·JS만으로 충분</strong>이면 Electron. 본 가이드는 이 객관적 지도를 숨기지 않고 보여드려요.</p>
+    </div>
+
+    <section class="tut-section" id="when-electron" data-reveal>
+      <h2 class="tut-section__title">언제 Electron이 나을까</h2>
+      <div class="tut-section__body">
+        <ul>
+          <li>팀이 전부 JS/TS만 쓰고 Rust 학습 비용을 피하고 싶을 때.</li>
+          <li>방대한 npm 생태계·Electron 관련 자료·예제가 즉시 필요할 때.</li>
+          <li>이미 검증된 대형 앱(VS Code 급)의 패턴을 그대로 따라가고 싶을 때.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="tut-section" id="when-tauri" data-reveal>
+      <h2 class="tut-section__title">언제 Tauri가 나을까</h2>
+      <div class="tut-section__body">
+        <ul>
+          <li>가벼운 설치 파일과 낮은 메모리가 중요한 도구·유틸리티 앱.</li>
+          <li>Rust의 안전성·속도를 활용하고 싶을 때.</li>
+          <li>데스크톱과 모바일을 하나의 코드베이스로 (Tauri 2).</li>
+          <li>최소권한 보안(ACL)이 요구되는 환경.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T02 한 장 요약</h2>
+      <p class="cheat-card__sub">Electron vs Tauri 트레이드오프</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">가벼움·보안·모바일</span><span class="cheat-card__desc">→ Tauri. 크기 ~3~10MB, ACL, iOS/Android.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">생태계·JS만·자료</span><span class="cheat-card__desc">→ Electron. 성숙, VS Code·Slack.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">공통점</span><span class="cheat-card__desc">둘 다 웹 기술(React/Vue/Svelte)로 프론트엔드.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">핵심 차이</span><span class="cheat-card__desc">웹뷰 — Chromium 번들(Electron) vs OS 네이티브(Tauri).</span></div>
+      </div>
+    </div>
+
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="why-tauri.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T01 왜 Tauri인가</span>
+      </a>
+      <a class="pager__card pager__card--next" href="architecture.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T03 3계층 아키텍처</span>
+      </a>
+    </nav>
+  </main>
+
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#when-electron">언제 Electron</a>
+      <a class="sidebar-toc__link" href="#when-tauri">언제 Tauri</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Tauri 가이드</strong> · 웹 개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 시리즈: <a href="../tmux/index.html">tmux</a> · <a href="../git-github/index.html">Git/GitHub</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/tauri-compare.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>
