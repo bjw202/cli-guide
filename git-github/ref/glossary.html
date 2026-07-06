@@ -23,11 +23,32 @@
       <div class="gh-nav__item">
         <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
         <div class="gh-dropdown" role="menu">
-          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리란</a>
-          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정→묶기→기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
           <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
           <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
           <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
         </div>
       </div>
       <div class="gh-nav__item">
@@ -328,6 +349,34 @@
         <p class="glossary__metaphor">비유 — "이 폴더는 이 팀이 책임져요"라고 적어둔 담당자 배정표.</p>
         <p class="glossary__def">공식 정의: 경로 패턴별 소유자(팀/사용자)를 지정해 PR에 자동 리뷰어로 지정하는 파일 (docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).</p>
         <a class="glossary__link" href="../tutorial/github-review.html">→ T17 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="github-projects" data-topic="github">
+        <h2 class="glossary__term js-search-text">GitHub Projects (v2) / Status 필드</h2>
+        <p class="glossary__metaphor">비유 — 회의실 화이트보드. 할 일 쪽지(Issue·PR)를 붙여 '지금 어디쯤 왔는지'를 한눈에 보는 판.</p>
+        <p class="glossary__def">공식 정의: Issue·PR을 끌어와 커스텀 필드로 관리하는 유연한 프로젝트 보드. Status는 열(칸)을 만드는 단일 선택 필드이며, board/table/roadmap 뷰로 같은 데이터를 다르게 본다 (docs.github.com/issues/planning-and-tracking-with-projects).</p>
+        <a class="glossary__link" href="../tutorial/github-projects.html">→ T23 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="permission-level" data-topic="github">
+        <h2 class="glossary__term js-search-text">permission level (권한 레벨)</h2>
+        <p class="glossary__metaphor">비유 — 회사 건물의 출입카드 등급. 등급에 따라 열 수 있는 방이 달라진다.</p>
+        <p class="glossary__def">공식 정의: 저장소 접근 권한의 5단계 — read / triage / write / maintain / admin. 위 등급은 아래 등급의 권한을 포함한다. 권한과 branch protection은 독립된 두 관문이라, write가 있어도 보호된 브랜치엔 직접 push하지 못할 수 있다 (docs.github.com/organizations/managing-user-access-to-your-organizations-repositories).</p>
+        <a class="glossary__link" href="../tutorial/github-org-teams.html">→ T24 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="gh-cli" data-topic="github">
+        <h2 class="glossary__term js-search-text">gh CLI</h2>
+        <p class="glossary__metaphor">비유 — 로봇을 위한 표준 창구. 화면을 클릭하는 대신 정해진 문장으로 GitHub에 요청한다.</p>
+        <p class="glossary__def">공식 정의: 터미널에서 GitHub을 다루는 공식 명령줄 도구. <code>gh auth login</code>, <code>gh issue list</code>, <code>gh pr create</code> 등. 원시 REST/GraphQL API보다 안정적·인증 간편·스크립트 친화적이라 자동화·AI 에이전트가 즐겨 쓴다 (cli.github.com).</p>
+        <a class="glossary__link" href="../tutorial/github-automation-model.html">→ T26 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="gitops" data-topic="github">
+        <h2 class="glossary__term js-search-text">GitOps</h2>
+        <p class="glossary__metaphor">비유 — "저장소가 유일한 진실, 병합이 곧 승인". 도구가 아니라 일하는 태도.</p>
+        <p class="glossary__def">공식 정의: git 저장소를 선언적 단일 진실의 원천으로 삼아, 변경을 PR로 제안하고 병합(merge)으로 공식화하는 운영 철학. 흔히 언급되는 ArgoCD·Flux는 저장소 상태에 클러스터를 자동 동기화하는 특정 도구로, 철학 자체와는 구분해야 한다 (철학은 도구 없이도 적용 가능).</p>
+        <a class="glossary__link" href="../tutorial/github-automation-model.html">→ T26 자세히</a>
       </article>
 
       <p class="ref-empty">조건에 맞는 용어가 없어요. 필터나 검색어를 바꿔보세요.</p>

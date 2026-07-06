@@ -84,6 +84,8 @@
   top: 100%;
   left: 0;
   min-width: 220px;
+  max-height: 70vh;
+  overflow-y: auto;
   background: var(--bg-surface);
   border: 1px solid rgba(45, 42, 38, 0.1);
   border-radius: var(--r-md);

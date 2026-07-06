@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T25 PR과 Merge, 코드 너머의 결재 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="PR과 Merge를 '결재 문서함'이라는 비유로 다시 봐요. PR-open=기안 상신, review=검토의견, approve=결재 서명, merge=공식 시행, close=반려, revert=승인 철회. 코드가 아닌 어떤 문서든 '제안→검토→승인→공식화'에 쓸 수 있다는 이야기, 비개발자를 위한 diff 읽는 법, '1 PR = 1 승인 단위' 원칙까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T25 · GitHub 운영모델 심화</p>
+  <h1 class="page-header__title">PR과 Merge, 코드 너머의 결재</h1>
+  <p class="page-header__subhead">PR과 Merge는 사실 '코드 전용' 기능이 아니에요. '제안하고 → 검토받고 → 승인되면 공식이 되는' 결재 시스템이에요. 코딩을 한 줄도 몰라도, 어떤 팀이든 이 흐름을 그대로 빌려 쓸 수 있답니다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>연구·행정·운영팀이 보고서·규정·데이터 파일을 GitHub에 올려두고, PR로 개정을 제안하고 결재하듯 승인해요. 코드가 아니라 '문서'를 다루는 팀도 이 결재 흐름 하나만으로 협업이 훨씬 깔끔해져요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-13">업무 승인 체계 사례 보기 →</a>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">결재 문서함을 떠올려 보세요</h2>
+      <div class="tut-section__body">
+        <p>회사에서 무언가를 바꾸려면 그냥 바꾸지 않죠. 기안서를 써서 올리고(상신), 관련자가 검토의견을 달고, 결재권자가 서명하면, 그제야 공식적으로 시행돼요. 반대로 문제가 있으면 반려되고, 이미 시행된 것도 나중에 철회할 수 있어요.</p>
+        <p>GitHub의 <strong>PR(Pull Request)</strong>과 <strong>Merge(병합)</strong>가 바로 이 결재 문서함과 똑같은 구조예요. T16에서 PR을 '변경을 제안하는 대화'로 배웠다면, 이번엔 한 걸음 물러서서 <strong>'결재 시스템'이라는 더 큰 그림</strong>으로 볼게요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>Merge(병합)</strong>는 '결재 완료 도장'이에요. 도장이 찍히는 순간, 제안이던 변경이 <em>공식 기록</em>이 돼요. 그리고 그 도장을 누가 언제 찍었는지도 함께 남아요. 나중에 "이건 언제, 누구 승인으로 바뀐 거죠?"라는 질문에 문서함이 스스로 답해 주는 셈이에요.</p>
+    </div>
+
+    <section class="tut-section" id="mapping" data-reveal>
+      <h2 class="tut-section__title">결재 용어로 다시 읽는 PR</h2>
+      <div class="tut-section__body">
+        <p>PR의 각 단계를 사무실 결재 용어로 나란히 놓으면, 낯설던 단어들이 갑자기 익숙해져요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">GitHub 용어</th>
+            <th scope="col">결재 문서함으로 치면</th>
+            <th scope="col">무슨 뜻</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">PR open (열기)</th>
+            <td>기안 상신</td>
+            <td>"이렇게 바꾸고 싶어요" 하고 제안서를 올림</td>
+          </tr>
+          <tr>
+            <th scope="row">review comment</th>
+            <td>검토의견</td>
+            <td>관련자가 "여긴 이렇게" 하고 의견을 달아줌</td>
+          </tr>
+          <tr>
+            <th scope="row">Approve (승인)</th>
+            <td>결재 서명</td>
+            <td>"좋습니다" 하고 승인 도장을 찍음</td>
+          </tr>
+          <tr>
+            <th scope="row">Merge (병합)</th>
+            <td>공식 승인·시행</td>
+            <td>변경이 공식 기록으로 반영됨 (되돌리기 어려운 확정)</td>
+          </tr>
+          <tr>
+            <th scope="row">Close (병합 없이 닫기)</th>
+            <td>반려</td>
+            <td>제안을 받아들이지 않고 접음</td>
+          </tr>
+          <tr>
+            <th scope="row">Revert (되돌리기)</th>
+            <td>승인 철회</td>
+            <td>이미 시행된 변경을 되돌림 — 이 철회 자체도 영구 기록으로 남음</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tut-section__body">
+        <p>특히 <strong>Revert</strong>가 흥미로워요. 결재를 철회한다고 원래 기안이 '없던 일'이 되진 않죠. "이런 결재가 있었고, 이런 이유로 철회했다"가 기록에 함께 남아요. GitHub의 revert도 똑같아요 — 지우는 게 아니라 <em>되돌린다는 사실을 새 기록으로 추가</em>해요. 그래서 나중에 흐름 전체를 되짚어 볼 수 있어요. (T11에서 만난 revert의 그 성격이에요.)</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="beyond-code" data-reveal>
+      <h2 class="tut-section__title">코드가 아니어도 돼요 — 핵심 메시지</h2>
+      <div class="tut-section__body">
+        <p>이 페이지에서 꼭 가져갈 한 가지. PR/Merge는 <strong>코드 전용 기능이 아니에요</strong>. 그건 <em>차이를 볼 수 있는(diffable) 모든 파일</em>에 쓸 수 있는 범용 결재 도구예요.</p>
+        <ul>
+          <li><strong>문서</strong> — 규정, 매뉴얼, 보고서, 회의록의 개정을 PR로 제안하고 승인해요.</li>
+          <li><strong>설정 파일</strong> — 서비스 설정값 변경을 눈으로 검토하고 승인 후 반영해요.</li>
+          <li><strong>데이터</strong> — 표·목록·명단 같은 자료의 수정을 이력과 함께 남겨요.</li>
+          <li><strong>기획·정책</strong> — "이렇게 바꾸자"는 제안을 글로 올리고, 관련자 승인을 받아 확정해요.</li>
+        </ul>
+        <p>한 줄로 요약하면 이래요. <strong>'제안 → 검토 → 승인 → 공식화'가 필요한 팀이라면, 코드가 0줄이어도 이 흐름을 그대로 빌려 쓸 수 있어요.</strong> 텍스트로 된 파일이기만 하면, GitHub는 그걸 '결재 대상'으로 똑같이 대접해 줘요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>많은 팀이 규정집·위키·정책 문서를 GitHub에 두는 이유가 이거예요. "누가, 언제, 왜, 누구 승인으로 이 규정을 바꿨는가"가 자동으로 남거든요. 종이 결재판이 하던 일을, 검색 가능하고 영원히 사라지지 않는 형태로 옮겨 놓은 셈이에요.</p>
+    </div>
+
+    <section class="tut-section" id="diff-primer" data-reveal>
+      <h2 class="tut-section__title">비개발자를 위한 diff 읽는 법</h2>
+      <div class="tut-section__body">
+        <p>PR을 검토하려면 <strong>diff(차이)</strong>를 볼 줄 알아야 해요. 겁먹지 마세요. 코드가 아니라 <em>문서</em>의 diff는 생각보다 훨씬 쉬워요. 규칙은 딱 세 가지예요.</p>
+        <ul>
+          <li><strong>빨간 줄 (앞에 <code>-</code>)</strong> — <strong>지워진</strong> 내용이에요. "원래 이랬는데 뺐어요."</li>
+          <li><strong>초록 줄 (앞에 <code>+</code>)</strong> — <strong>추가된</strong> 내용이에요. "이렇게 새로 넣었어요."</li>
+          <li><strong>색 없는 줄 (부호 없음)</strong> — <strong>안 바뀐</strong> 내용이에요. 어디가 바뀌었는지 알아보라고 주변을 함께 보여주는 '맥락'일 뿐이에요.</li>
+        </ul>
+        <p>아래는 어떤 안내 문서의 문장 하나를 고친 diff예요. 코드가 아니라 그냥 한국어 문장이죠?</p>
+      </div>
+      <pre class="code-block"><code>  환영합니다. 이용 안내를 읽어 주세요.
+- 문의는 평일 오전 9시부터 오후 5시까지 받습니다.
++ 문의는 평일 오전 9시부터 오후 6시까지 받습니다.
++ 주말·공휴일에는 답변이 하루 늦어질 수 있습니다.
+  감사합니다.</code></pre>
+      <div class="tut-section__body">
+        <p>읽어볼까요? 첫 줄과 마지막 줄은 <em>안 바뀐 맥락</em>이에요. 빨간 줄에서 '오후 5시'가 <em>빠지고</em>, 초록 줄에서 '오후 6시'로 <em>바뀌었</em>고, 안내 한 문장이 <em>새로 추가</em>됐네요. 이게 diff 읽기의 전부예요. 검토자는 이 세 색만 따라가며 "이 변경, 승인해도 될까?"를 판단하면 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="one-pr-one-unit" data-reveal>
+      <h2 class="tut-section__title">1 PR = 1 승인 단위</h2>
+      <div class="tut-section__body">
+        <p>결재를 올릴 때 서로 관련 없는 일 열 가지를 한 장에 몰아 담으면, 결재권자는 머리가 아파요. "이건 승인이고 저건 반려하고 싶은데, 한 장에 묶여 있으니 어쩌지?" 하게 되죠.</p>
+        <p>그래서 좋은 원칙이 <strong>'1 PR = 1 승인 단위'</strong>예요. 하나의 PR에는 <em>하나의 목적</em>만 담아요. '오타 수정'과 '정책 변경'은 각각 다른 PR로 나누는 거예요. 이렇게 하면:</p>
+        <ul>
+          <li>검토자가 한 번에 <strong>한 가지</strong>만 판단하면 되니 부담이 줄어요.</li>
+          <li>일부만 문제가 있어도, 그 PR만 반려하고 나머지는 통과시킬 수 있어요.</li>
+          <li>나중에 revert할 때도 '그 변경 하나만' 깔끔하게 되돌릴 수 있어요.</li>
+        </ul>
+        <p>작게 나눌수록 결재가 빨라져요. 큰 제안서 하나보다, 명확한 제안서 여러 장이 훨씬 잘 굴러가요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>이 페이지는 <a href="github-issues-pr.html">T16 Issue와 PR</a>과 <a href="github-review.html">T17 코드 리뷰</a>가 코드 중심으로 다룬 내용을, '코드 너머'로 넓힌 편이에요. 흐름이 헷갈리면 두 페이지를 다시 펼쳐 보세요. 같은 뼈대에 '결재'라는 옷을 입힌 것뿐이라는 게 보일 거예요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T25 한 장 요약</h2>
+      <p class="cheat-card__sub">PR/Merge = 코드 너머의 범용 결재 시스템</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">PR open</span><span class="cheat-card__desc">기안 상신 — "이렇게 바꾸고 싶어요" 제안.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">review comment</span><span class="cheat-card__desc">검토의견 — 관련자가 의견을 달아줌.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Approve</span><span class="cheat-card__desc">결재 서명 — "좋습니다" 승인.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Merge</span><span class="cheat-card__desc">공식 승인·시행 — 변경이 공식 기록이 됨.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Close</span><span class="cheat-card__desc">반려 — 병합 없이 제안을 접음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Revert</span><span class="cheat-card__desc">승인 철회 — 되돌림 자체도 영구 기록으로 남음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">코드 너머</span><span class="cheat-card__desc">문서·설정·데이터 등 diff 가능한 어떤 파일에도 적용 — 코드 0줄이어도 됨.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">diff 색</span><span class="cheat-card__desc">빨강(−)=삭제, 초록(+)=추가, 색 없음=안 바뀐 맥락.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">1 PR = 1 승인</span><span class="cheat-card__desc">한 PR엔 한 목적만 — 검토 부담↓, 부분 반려·되돌리기 쉬움.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-org-teams.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T24 조직과 팀, 권한이 흐르는 방식</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-automation-model.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T26 로봇이 GitHub과 대화하는 법</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">결재 문서함</a>
+      <a class="sidebar-toc__link" href="#mapping">결재 용어로 읽기</a>
+      <a class="sidebar-toc__link" href="#beyond-code">코드가 아니어도</a>
+      <a class="sidebar-toc__link" href="#diff-primer">diff 읽는 법</a>
+      <a class="sidebar-toc__link" href="#one-pr-one-unit">1 PR = 1 승인</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

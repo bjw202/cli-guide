@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T24 조직과 팀, 권한이 흐르는 방식 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="Organization과 Team을 '회사 건물의 출입카드 등급'이라는 비유로 설명해요. 개인 계정과 조직의 차이, 5단계 권한(Read/Triage/Write/Maintain/Admin) 비교표, 'write 권한이 있어도 branch protection이 막을 수 있다'는 핵심 역설, CODEOWNERS와 팀 권한의 관계까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T24 · GitHub 운영모델 심화</p>
+  <h1 class="page-header__title">조직과 팀, 권한이 흐르는 방식</h1>
+  <p class="page-header__subhead">여럿이 함께 쓰는 저장소는 '누가 무엇까지 할 수 있는가'를 정해야 해요. GitHub는 이걸 출입카드 등급처럼 다뤄요. 그리고 아주 중요한 역설 하나 — 권한이 있어도 못 하는 일이 있다는 사실을 함께 짚어볼게요.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>연구소·행정부서·운영팀처럼 사람이 많은 곳일수록 '누가 어디까지 손댈 수 있는가'가 중요해져요. GitHub의 조직·팀·권한은 이런 곳에서 '실수로 중요한 걸 건드리는 사고'를 막는 안전장치로 쓰여요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-13">팀 운영 사례 보기 →</a>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">회사 건물의 출입카드 등급</h2>
+      <div class="tut-section__body">
+        <p>큰 회사 건물을 떠올려 보세요. 방문객 카드는 로비까지만, 일반 직원 카드는 사무실까지, 팀장 카드는 회의실과 자료실까지, 관리자 카드는 서버실까지 열 수 있어요. 같은 건물이지만 카드 등급에 따라 갈 수 있는 곳이 달라요.</p>
+        <p>GitHub의 <strong>권한(permission)</strong>도 똑같아요. 같은 저장소라도 누구는 읽기만, 누구는 코드까지 올리고, 누구는 설정까지 바꿀 수 있어요. 이 등급을 잘 나눠 두면, 실수도 줄고 사고도 막을 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>Organization</strong>은 '회사'고, <strong>Team</strong>은 그 안의 '부서'예요. 사람마다 카드를 일일이 발급하는 대신, "이 부서는 이 자료실까지"라고 부서 단위로 등급을 주면 관리가 훨씬 쉬워요. 새 직원이 와도 부서에 넣기만 하면 카드 등급이 자동으로 따라와요.</p>
+    </div>
+
+    <section class="tut-section" id="org-vs-personal" data-reveal>
+      <h2 class="tut-section__title">개인 계정과 조직은 달라요</h2>
+      <div class="tut-section__body">
+        <p><strong>개인 계정(personal account)</strong>은 말 그대로 '내 집'이에요. 저장소가 다 내 것이고, 내가 초대한 사람에게만 권한을 나눠줘요. 혼자 쓰거나 소수와 협업할 때 충분해요.</p>
+        <p><strong>Organization(조직)</strong>은 '공동 건물'이에요. 저장소의 주인이 특정 개인이 아니라 조직 자체예요. 사람이 나가도 저장소는 조직에 남고, 팀 단위로 권한을 주고, 결제·보안 정책도 한곳에서 관리해요. 회사·오픈소스 커뮤니티·스터디 모임이 조직을 만드는 이유예요. T21에서 organization을 가볍게 스쳤다면, 여기서는 그 안의 '권한이 흐르는 방식'을 제대로 볼게요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="teams" data-reveal>
+      <h2 class="tut-section__title">Team: 사람을 묶는 서랍</h2>
+      <div class="tut-section__body">
+        <p>조직에 사람이 많아지면, 한 명 한 명에게 권한을 주는 건 금방 지쳐요. <strong>Team</strong>은 사람들을 부서처럼 묶는 서랍이에요. '연구팀', '행정팀', '운영팀'을 만들고, 팀 단위로 "이 저장소는 write까지, 저 저장소는 read만"이라고 정하면 끝이에요.</p>
+        <p>팀은 계층(부모 팀 아래 하위 팀)도 만들 수 있어서, 큰 조직의 부서 구조를 그대로 옮겨 담을 수 있어요. 사람이 팀에 들어오고 나가는 것만 관리하면, 권한은 팀을 따라 자동으로 흐르게 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="permission-levels" data-reveal>
+      <h2 class="tut-section__title">5단계 출입카드: 권한 레벨</h2>
+      <div class="tut-section__body">
+        <p>저장소 권한은 크게 <strong>다섯 등급</strong>이에요. 아래로 갈수록 할 수 있는 일이 많아지고, 위 등급은 아래 등급이 할 수 있는 일을 전부 포함해요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">권한 레벨</th>
+            <th scope="col">할 수 있는 일 (아래로 갈수록 누적)</th>
+            <th scope="col">누구에게</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Read (읽기)</th>
+            <td>코드·Issue·PR 보기, 댓글 달기, clone·pull</td>
+            <td>구경하는 사람, 외부 참관자</td>
+          </tr>
+          <tr>
+            <th scope="row">Triage (분류)</th>
+            <td>+ Issue·PR 정리(라벨·담당자 지정, 닫기/열기). 코드는 못 올림</td>
+            <td>이슈를 정리하는 운영·커뮤니티 담당</td>
+          </tr>
+          <tr>
+            <th scope="row">Write (쓰기)</th>
+            <td>+ 브랜치에 push, PR 만들기, 코드 기여</td>
+            <td>실제로 작업하는 팀원</td>
+          </tr>
+          <tr>
+            <th scope="row">Maintain (관리)</th>
+            <td>+ 일부 저장소 설정 관리(민감 설정·삭제는 제외)</td>
+            <td>프로젝트 리드, 관리 보조</td>
+          </tr>
+          <tr>
+            <th scope="row">Admin (관리자)</th>
+            <td>+ 모든 설정, 권한 부여, branch protection 규칙 변경, 저장소 삭제</td>
+            <td>저장소 책임자</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tut-section__body">
+        <p>대부분의 팀원은 <strong>Write</strong>면 충분해요. 코드를 올리고 PR을 만드는 데 필요한 권한이 다 들어있거든요. Admin은 되도록 적게 — 건물 서버실 열쇠를 아무나 갖고 있으면 안 되는 것과 같아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="paradox" data-reveal>
+      <h2 class="tut-section__title">핵심 역설: 권한이 있어도 못 할 수 있어요</h2>
+      <div class="tut-section__body">
+        <p>여기가 이 페이지에서 가장 중요한 부분이에요. 방금 "Write 권한이 있으면 push할 수 있다"고 했죠. 그런데 <strong>Write 권한이 있어도 main 브랜치에 직접 반영하지 못하는</strong> 경우가 있어요. 왜일까요?</p>
+        <p>이유는 <strong>권한 레벨</strong>과 <strong>branch protection(브랜치 보호)</strong>이 <em>서로 다른, 독립된 두 개의 관문</em>이기 때문이에요. 둘은 겹겹이 쌓인 문이라, 앞문을 통과해도 뒷문이 잠겨 있으면 못 지나가요.</p>
+        <ul>
+          <li><strong>권한 레벨</strong>은 "너는 이 저장소에서 무엇까지 할 수 있는가"를 정해요. (출입카드 등급)</li>
+          <li><strong>branch protection</strong>은 "이 특정 브랜치(main)는 어떤 절차를 반드시 거쳐야 하는가"를 정해요. (특정 방의 잠금 규칙)</li>
+        </ul>
+        <p>그래서 Write 카드를 가진 사람도, main이 보호되어 있으면 곧바로 push하지 못하고 <em>반드시 PR을 거쳐 리뷰·승인을 받아야</em> 해요. 카드 등급이 낮아서가 아니라, 그 방 자체에 '반드시 노크하고 허락받고 들어오라'는 규칙이 걸려 있는 거예요. branch protection은 <a href="github-review.html">T17 코드 리뷰</a>에서 처음 만났던 그 규칙이에요.</p>
+      </div>
+    </section>
+
+    <!-- 주의 박스: 역설 강조 -->
+    <div class="side-note side-note--warning" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>"권한을 줬는데 왜 main에 못 올리죠?"라는 질문은 대부분 이 역설 때문이에요. 권한 레벨을 올려도 소용없어요 — 막고 있는 건 권한이 아니라 <strong>branch protection 규칙</strong>이니까요. 이건 버그가 아니라 <em>의도된 안전장치</em>예요. 중요한 줄기일수록 "카드 등급과 상관없이 절차를 지켜라"가 맞는 방향이에요.</p>
+    </div>
+
+    <section class="tut-section" id="codeowners-teams" data-reveal>
+      <h2 class="tut-section__title">CODEOWNERS와 팀 권한이 만나면</h2>
+      <div class="tut-section__body">
+        <p>T17에서 배운 <strong>CODEOWNERS</strong>를 기억하나요? '이 경로가 바뀌면 이 사람/팀이 리뷰한다'를 적어두는 파일이었죠. 이게 팀 권한과 만나면 아주 매끄럽게 돌아가요.</p>
+        <p>CODEOWNERS에 개인 대신 <strong>팀</strong>을 적어두면, 해당 경로를 건드리는 PR이 열릴 때 그 팀이 <strong>필수 리뷰어로 자동 지정</strong>돼요. 사람이 나가고 들어와도, 팀 명단만 관리하면 리뷰어가 늘 최신 상태로 유지돼요.</p>
+      </div>
+      <pre class="code-block"><code># .github/CODEOWNERS — 개인 대신 '팀'을 지정
+# 문서 경로가 바뀌면 문서팀 전체가 자동 리뷰어
+/docs/           @our-org/docs-team
+# 데이터 파일은 연구팀이 리뷰
+/data/           @our-org/research-team
+# 설정 파일은 운영팀이 리뷰
+/config/         @our-org/ops-team</code></pre>
+      <div class="tut-section__body">
+        <p>여기서 세 겹이 함께 작동해요. <strong>팀 권한</strong>이 '누가 무엇을 할 수 있나'를, <strong>CODEOWNERS</strong>가 '누가 어디를 검토하나'를, <strong>branch protection</strong>이 '그 검토를 반드시 거치게' 강제해요. 세 가지가 맞물리면, 큰 조직도 실수 없이 질서 있게 협업할 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T24 한 장 요약</h2>
+      <p class="cheat-card__sub">조직·팀·권한 — 출입카드 등급처럼</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Organization</span><span class="cheat-card__desc">저장소를 개인이 아닌 조직이 소유하는 '공동 건물'.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Team</span><span class="cheat-card__desc">사람을 부서처럼 묶어 권한을 팀 단위로 부여.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Read</span><span class="cheat-card__desc">보기·댓글·clone·pull.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Triage</span><span class="cheat-card__desc">+ Issue·PR 정리(라벨·닫기). 코드는 못 올림.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Write</span><span class="cheat-card__desc">+ push·PR 생성. 대부분 팀원에게 적당.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Maintain</span><span class="cheat-card__desc">+ 일부 설정 관리(민감 설정·삭제 제외).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Admin</span><span class="cheat-card__desc">+ 모든 설정·권한·branch protection·삭제. 최소 인원에게만.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">핵심 역설</span><span class="cheat-card__desc">Write 권한이 있어도 branch protection이 main 직접 반영을 막을 수 있음 — 권한과 보호는 별개의 관문.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">CODEOWNERS + 팀</span><span class="cheat-card__desc">경로별로 팀을 필수 리뷰어로 자동 지정. 명단만 관리하면 최신 유지.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-projects.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T23 칸반보드로 일의 흐름 보기</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-approval-workflow.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T25 PR과 Merge, 코드 너머의 결재</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">출입카드 등급</a>
+      <a class="sidebar-toc__link" href="#org-vs-personal">개인 계정 vs 조직</a>
+      <a class="sidebar-toc__link" href="#teams">Team</a>
+      <a class="sidebar-toc__link" href="#permission-levels">5단계 권한</a>
+      <a class="sidebar-toc__link" href="#paradox">핵심 역설</a>
+      <a class="sidebar-toc__link" href="#codeowners-teams">CODEOWNERS와 팀</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>

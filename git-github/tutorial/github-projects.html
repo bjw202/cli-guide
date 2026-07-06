@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>T23 칸반보드로 일의 흐름 보기 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="GitHub Projects(v2)를 '회의실 화이트보드'라는 비유로 설명해요. Issue와의 차이, Status 커스텀 필드, 필드 종류(text/number/date/single-select/iteration), board·table·roadmap 뷰, 한 이슈가 여러 보드에 올라가는 원리까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 5분할 (REQ-008): tokens → base → layout → components → pages -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<header class="page-header">
+  <p class="page-header__eyebrow">튜토리얼 · T23 · GitHub 운영모델 심화</p>
+  <h1 class="page-header__title">칸반보드로 일의 흐름 보기 — GitHub Projects</h1>
+  <p class="page-header__subhead">Issue가 '할 일 쪽지'라면, Projects는 그 쪽지들을 붙여 한눈에 흐름을 보는 '화이트보드'예요. 어떤 일이 지금 어디쯤 왔는지, 팀 전체가 같은 그림을 보게 해 주는 도구랍니다.</p>
+</header>
+
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 사례 콜아웃 -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>연구팀이 '자료 수집 → 검토 → 정리 → 발표'라는 여러 단계 일을 화이트보드로 관리하듯, GitHub Projects도 코드가 아닌 '일의 진행 상황'을 보여주는 데 자주 쓰여요. 개발이 아니어도 '단계가 있는 일'이라면 어디든 어울려요.</p>
+      <a class="case-callout-link" href="../cases/index.html#t2-13">팀 운영 사례 보기 →</a>
+    </div>
+
+    <section class="tut-section" id="metaphor" data-reveal>
+      <h2 class="tut-section__title">회의실 화이트보드를 떠올려 보세요</h2>
+      <div class="tut-section__body">
+        <p>회의실 벽에 큰 화이트보드가 있고, 거기에 '할 일 / 하는 중 / 검토 / 완료'라는 칸이 그어져 있다고 상상해 보세요. 각자 맡은 일을 포스트잇에 적어 붙이고, 일이 진행될 때마다 포스트잇을 오른쪽 칸으로 옮겨요. 지나가던 누구든 그 보드만 보면 "아, 이 일은 지금 검토 중이구나"를 알 수 있죠.</p>
+        <p><strong>GitHub Projects</strong>는 바로 그 화이트보드의 디지털 버전이에요. 흩어져 있던 할 일들을 한 판 위에 모아, 지금 무엇이 어디쯤 와 있는지 팀 전체가 같은 그림으로 보게 해 줘요.</p>
+      </div>
+    </section>
+
+    <!-- 비유 박스 (REQ-002: 기술어 앞 비유 선행) -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p><strong>Projects(v2)</strong>는 '조립식 화이트보드'예요. 칸의 이름도, 붙이는 쪽지에 적을 항목(마감일·우선순위·담당자)도 내 팀에 맞게 직접 정할 수 있어요. 정해진 양식이 아니라, 우리 일에 맞게 판을 짜 맞추는 느낌이에요.</p>
+    </div>
+
+    <section class="tut-section" id="what-is" data-reveal>
+      <h2 class="tut-section__title">Projects는 Issue를 대신하지 않아요</h2>
+      <div class="tut-section__body">
+        <p>여기서 자주 헷갈리는 부분을 짚고 갈게요. T16에서 배운 <strong>Issue</strong>는 '할 일 하나하나를 적는 쪽지'예요. 반면 <strong>Project</strong>는 그 쪽지들을 <em>끌어와 붙이는 판</em>이에요. 둘은 경쟁 관계가 아니라 짝꿍이에요.</p>
+        <p>같은 Issue 하나가 판 위에서는 카드로 보이고, 판을 떠나도 Issue 그 자체는 그대로 남아요. Projects는 '새로운 할 일 저장소'가 아니라, 이미 있는 Issue와 PR을 모아 <strong>흐름과 상태로 보여주는 렌즈</strong>라고 생각하면 딱 맞아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="status-field" data-reveal>
+      <h2 class="tut-section__title">칸의 정체: Status 필드</h2>
+      <div class="tut-section__body">
+        <p>화이트보드의 '할 일 / 하는 중 / 검토 / 완료' 칸은 어디서 왔을까요? 이건 <strong>Status(상태)</strong>라는 <strong>단일 선택(single-select) 필드</strong>예요. 카드마다 상태를 하나 고르게 되어 있고, 같은 상태를 가진 카드끼리 한 칸(열)에 모여요.</p>
+        <p>기본값은 보통 <code>Todo</code> / <code>In Progress</code> / <code>Review</code> / <code>Done</code> 같은 값이지만, 이름도 개수도 우리 팀 방식대로 바꿀 수 있어요. 예를 들어 행정팀이라면 '접수 / 검토 / 결재대기 / 완료'로 고쳐 쓸 수 있죠. 카드를 다른 칸으로 끌어다 놓으면, 그 카드의 Status 값이 자동으로 바뀌어요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="field-types" data-reveal>
+      <h2 class="tut-section__title">쪽지에 무엇을 적을까: 필드 종류</h2>
+      <div class="tut-section__body">
+        <p>Status 말고도, 카드에 원하는 정보를 붙일 수 있어요. 이게 <strong>커스텀 필드</strong>예요. 자주 쓰는 종류를 표로 정리했어요.</p>
+      </div>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th scope="col">필드 종류</th>
+            <th scope="col">무엇을 담나</th>
+            <th scope="col">예시</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">text (텍스트)</th>
+            <td>자유롭게 쓰는 짧은 글</td>
+            <td>메모, 담당 부서 이름</td>
+          </tr>
+          <tr>
+            <th scope="row">number (숫자)</th>
+            <td>숫자 값 (합계·정렬 가능)</td>
+            <td>예상 소요 일수, 우선순위 점수</td>
+          </tr>
+          <tr>
+            <th scope="row">date (날짜)</th>
+            <td>특정 날짜 하나</td>
+            <td>마감일, 착수 예정일</td>
+          </tr>
+          <tr>
+            <th scope="row">single-select (단일 선택)</th>
+            <td>미리 정한 값 중 하나</td>
+            <td>Status, 우선순위(높음/중간/낮음)</td>
+          </tr>
+          <tr>
+            <th scope="row">iteration (반복 주기)</th>
+            <td>1~2주 단위의 작업 기간</td>
+            <td>이번 주 스프린트, 다음 주 스프린트</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="tut-section__body">
+        <p><strong>iteration</strong>이 조금 낯설 수 있어요. '2주씩 끊어서 일한다'는 주기를 미리 만들어 두고, 카드를 그 주기에 배정하는 거예요. "이건 이번 2주 안에, 저건 다음 2주에" 하고 시간의 서랍에 나눠 담는 셈이에요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>필드는 '내 팀 언어'로 지을수록 좋아요. 개발팀이 아니어도 '검토자', '반려 사유', '결재 단계' 같은 필드를 만들어 쓰면, Projects가 곧 우리 팀 맞춤 업무 보드가 돼요. 정답 양식은 없어요. 우리 일에 맞으면 그게 정답이에요.</p>
+    </div>
+
+    <section class="tut-section" id="views" data-reveal>
+      <h2 class="tut-section__title">같은 자료, 다른 안경: 세 가지 뷰</h2>
+      <div class="tut-section__body">
+        <p>Projects의 강점은 <strong>같은 데이터를 여러 방식으로 볼 수 있다</strong>는 거예요. 안경만 바꿔 끼면 같은 카드들이 전혀 다르게 보여요.</p>
+        <ul>
+          <li><strong>board 뷰(보드)</strong> — 우리가 계속 이야기한 화이트보드 모습. 칸(열)으로 나뉘어 있어 '흐름'을 보기 좋아요. 카드를 끌어 옮기며 상태를 바꿔요.</li>
+          <li><strong>table 뷰(표)</strong> — 스프레드시트처럼 줄과 칸으로 보는 모습. 마감일·담당자·우선순위를 나란히 놓고 비교하거나 정렬할 때 편해요.</li>
+          <li><strong>roadmap 뷰(로드맵)</strong> — 달력 위에 막대로 펼쳐 보는 모습. "이 일은 이번 달, 저 일은 다음 달"처럼 '시간 위의 계획'을 한눈에 봐요.</li>
+        </ul>
+        <p>중요한 건, 세 뷰가 <em>서로 다른 자료가 아니라는</em> 점이에요. 카드는 하나인데, 보는 안경만 다른 거예요. 표에서 마감일을 고치면 로드맵에도 그대로 반영돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="multi-board" data-reveal>
+      <h2 class="tut-section__title">한 쪽지가 여러 보드에 붙을 수 있어요</h2>
+      <div class="tut-section__body">
+        <p>재미있는 사실 하나. 같은 Issue 하나가 <strong>여러 Project 보드에 동시에 올라갈 수 있어요</strong>. 예를 들어 '홈페이지 개편'이라는 일 하나가, 기획팀 보드에서는 '이번 분기 목표' 칸에, 운영팀 보드에서는 '검토 대기' 칸에 동시에 보일 수 있죠.</p>
+        <p>이건 포스트잇을 복사한 게 아니에요. <em>같은 쪽지를 두 화이트보드가 함께 바라보는</em> 것에 가까워요. 그래서 한쪽에서 일이 끝나면, 그 사실을 다른 보드에서도 확인할 수 있어요. 팀마다 관심사는 다르지만 '일 자체'는 하나로 이어지는 셈이에요.</p>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>처음부터 완벽한 보드를 만들려 애쓰지 마세요. 칸 3개(할 일 / 하는 중 / 완료)로 시작해, 팀이 익숙해지면 필드와 뷰를 하나씩 늘려가면 돼요. 화이트보드도 처음엔 선 몇 개로 시작하잖아요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">T23 한 장 요약</h2>
+      <p class="cheat-card__sub">GitHub Projects — 일의 흐름을 보는 화이트보드</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Projects(v2)</span><span class="cheat-card__desc">Issue·PR을 끌어와 상태로 보여주는 조립식 보드. Issue를 대체하지 않음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Status 필드</span><span class="cheat-card__desc">칸(열)을 만드는 단일 선택 필드. Todo/In Progress/Review/Done 등 자유 변경.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">text</span><span class="cheat-card__desc">자유롭게 쓰는 짧은 글 필드.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">number</span><span class="cheat-card__desc">숫자 값. 정렬·비교 가능.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">date</span><span class="cheat-card__desc">날짜 하나 (마감일 등).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">single-select</span><span class="cheat-card__desc">미리 정한 값 중 하나 선택 (우선순위 등).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">iteration</span><span class="cheat-card__desc">1~2주 단위 작업 주기. 시간의 서랍에 나눠 담기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">board 뷰</span><span class="cheat-card__desc">칸으로 보는 화이트보드. 흐름 파악에 좋음.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">table 뷰</span><span class="cheat-card__desc">스프레드시트처럼 정렬·비교.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">roadmap 뷰</span><span class="cheat-card__desc">달력 위 막대로 시간 계획을 조망.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">여러 보드 공유</span><span class="cheat-card__desc">한 Issue가 여러 Project 보드에 동시에 올라갈 수 있음.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="github-extras.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T21 GitHub, 더 넓은 세계</span>
+      </a>
+      <a class="pager__card pager__card--next" href="github-org-teams.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">T24 조직과 팀, 권한이 흐르는 방식</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#metaphor">회의실 화이트보드</a>
+      <a class="sidebar-toc__link" href="#what-is">Issue와의 차이</a>
+      <a class="sidebar-toc__link" href="#status-field">Status 필드</a>
+      <a class="sidebar-toc__link" href="#field-types">필드 종류</a>
+      <a class="sidebar-toc__link" href="#views">세 가지 뷰</a>
+      <a class="sidebar-toc__link" href="#multi-board">여러 보드에 붙기</a>
+    </div>
+  </aside>
+</div>
+
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+</body>
+</html>
