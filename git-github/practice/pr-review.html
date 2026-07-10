@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P05 Files changed에서 리뷰하기 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="PR #57의 변경 파일 2개를 직접 리뷰해봐요. 라인 코멘트와 배치 리뷰(Start a review → pending → Submit review), Comment·Approve·Request changes의 차이, 그리고 비개발자가 언제 Approve를 피해야 하는지까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 6분할: tokens → base → layout → components → pages → gh-ui -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+<link rel="stylesheet" href="../css/gh-ui.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">실전 · P05 · GitHub 협업</p>
+  <h1 class="page-header__title">Files changed에서 리뷰하기</h1>
+  <p class="page-header__subhead">PR #57의 '변경 파일' 탭이 리뷰의 진짜 무대예요. 바뀐 코드를 줄 단위로 보며 의견을 남기고, 여러 코멘트를 묶어 한 번에 제출해요. 아래 화면에서 직접 리뷰를 시작해보고, 비개발자에게 꼭 필요한 판단 기준까지 챙겨볼게요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>코드 리뷰는 <strong>원고 교정</strong>과 똑같아요. 편집자는 원고 옆 여백에 "이 문장 어색해요", "여기 오타요" 같은 메모를 달죠. 그리고 메모를 한 줄씩 따로 보내는 게 아니라, <strong>다 모아서 한 번에</strong> "검토 끝났습니다"라며 돌려줘요. GitHub 리뷰도 이 방식이에요. 코드 옆에 코멘트를 달고, 모아서 한꺼번에 제출해요.</p>
+    </div>
+
+    <section class="tut-section" id="diff" data-reveal>
+      <h2 class="tut-section__title">변경 파일과 diff 읽기</h2>
+      <div class="tut-section__body">
+        <p><strong>Files changed</strong>(변경 파일) 탭을 열면 <strong>diff</strong>(디프, 차이)가 나와요. 바뀌기 <strong>전 줄은 빨간 배경</strong>, 바뀐 <strong>후 줄은 초록 배경</strong>으로 보여줘요. 줄 앞의 빨강은 지워진 줄, 초록은 새로 넣은 줄이에요. PR #57은 파일 두 개를 고쳤어요. 아래 화면에서 직접 리뷰를 해볼 수 있어요. 코드 줄 위에 마우스를 올리면 왼쪽에 파란 <strong>+</strong> 버튼이 나타나요. 눌러서 그 줄에 코멘트를 달아보세요.</p>
+      </div>
+    </section>
+
+    <!-- mock UI: gh-diff — data-asset 은 .ghui-diff 자체에. 2개 파일. -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. PR 57번의 변경 파일 두 개를 줄 단위로 보여줘요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-diff" data-asset="gh-diff" data-gh-diff-mode="unified">
+          <div class="ghui-diff__toolbar">
+            <div class="ghui-diff__modes">
+              <button type="button" class="ghui-diff__mode is-active" data-gh-mode="unified">Unified</button>
+              <button type="button" class="ghui-diff__mode" data-gh-mode="split">Split</button>
+            </div>
+            <button type="button" class="ghui-diff__review-btn" data-gh-review>Review changes <span class="ghui-diff__review-count" data-gh-review-count hidden>0</span></button>
+          </div>
+
+          <!-- 파일 1 -->
+          <div class="ghui-diff__file-head">
+            <span class="ghui-diff__file-name">src/components/LoginButton.jsx</span>
+            <label class="ghui-diff__viewed"><input type="checkbox"> Viewed</label>
+          </div>
+          <div class="ghui-diff__scroll"><div class="ghui-diff__body">
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">10</span><span class="ghui-diff__ln">10</span>
+              <code class="ghui-diff__content">export function LoginButton() {</code>
+            </div>
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">11</span><span class="ghui-diff__ln">11</span>
+              <code class="ghui-diff__content">  return (</code>
+            </div>
+            <div class="ghui-diff__row ghui-diff__row--del" data-gh-line>
+              <span class="ghui-diff__ln">12</span><span class="ghui-diff__ln"></span>
+              <code class="ghui-diff__content">    &lt;button className="login" onClick={login}&gt;</code>
+            </div>
+            <div class="ghui-diff__row ghui-diff__row--add" data-gh-line>
+              <span class="ghui-diff__ln"></span><span class="ghui-diff__ln">12</span>
+              <code class="ghui-diff__content">    &lt;button className="login login--lg" onClick={login}&gt;</code>
+            </div>
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">13</span><span class="ghui-diff__ln">13</span>
+              <code class="ghui-diff__content">      로그인</code>
+            </div>
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">14</span><span class="ghui-diff__ln">14</span>
+              <code class="ghui-diff__content">    &lt;/button&gt;</code>
+            </div>
+          </div></div>
+
+          <!-- 파일 2 -->
+          <div class="ghui-diff__file-head">
+            <span class="ghui-diff__file-name">src/styles/login.css</span>
+            <label class="ghui-diff__viewed"><input type="checkbox"> Viewed</label>
+          </div>
+          <div class="ghui-diff__scroll"><div class="ghui-diff__body">
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">3</span><span class="ghui-diff__ln">3</span>
+              <code class="ghui-diff__content">.login {</code>
+            </div>
+            <div class="ghui-diff__row ghui-diff__row--del" data-gh-line>
+              <span class="ghui-diff__ln">4</span><span class="ghui-diff__ln"></span>
+              <code class="ghui-diff__content">  padding: 4px 8px;</code>
+            </div>
+            <div class="ghui-diff__row ghui-diff__row--add" data-gh-line>
+              <span class="ghui-diff__ln"></span><span class="ghui-diff__ln">4</span>
+              <code class="ghui-diff__content">  padding: 12px 20px;</code>
+            </div>
+            <div class="ghui-diff__row" data-gh-line>
+              <span class="ghui-diff__ln">5</span><span class="ghui-diff__ln">5</span>
+              <code class="ghui-diff__content">}</code>
+            </div>
+            <div class="ghui-diff__row ghui-diff__row--add" data-gh-line>
+              <span class="ghui-diff__ln"></span><span class="ghui-diff__ln">6</span>
+              <code class="ghui-diff__content">.login--lg { min-height: 44px; }</code>
+            </div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>코드가 낯설어도 diff는 읽을 수 있어요. 여기서 민수 님은 로그인 버튼에 <code>login--lg</code>라는 '큰 버튼' 표시를 더하고(파일 1), 스타일에서 여백(<code>padding</code>)을 넓히고 최소 높이 44px를 넣었어요(파일 2). 즉 <strong>버튼을 손가락으로 누르기 쉽게 키운</strong> 거예요. #42의 "모바일에서 잘 안 눌려요"와 딱 맞아떨어지죠. 코드를 몰라도, 바뀐 방향이 문제와 맞는지는 볼 수 있어요.</p>
+    </div>
+
+    <section class="tut-section" id="review-tools" data-reveal>
+      <h2 class="tut-section__title">리뷰 도구 한 벌</h2>
+      <div class="tut-section__body">
+        <p>diff 화면에는 리뷰를 돕는 작은 도구들이 있어요. 하나씩 볼게요.</p>
+        <ul>
+          <li><strong>라인 코멘트</strong> — 코드 줄 번호에 마우스를 올리면 나타나는 파란 <code>+</code>를 눌러, 그 줄에 딱 붙는 의견을 남겨요.</li>
+          <li><strong>멀티라인 코멘트</strong> — 여러 줄에 걸친 의견이라면, <code>+</code>를 <strong>드래그</strong>하거나 시작 줄을 누른 뒤 끝 줄을 <strong>Shift+클릭</strong>해 범위로 코멘트를 달아요.</li>
+          <li><code>Suggested change</code>(제안 변경) — 말로 "이렇게 바꾸면 어때요" 대신, <strong>바뀐 코드 자체를 제안</strong>해요. 작성자는 <code>Commit suggestion</code>(제안 커밋)으로 클릭 한 번에 반영할 수 있고, 여러 제안을 모아 <strong>한 번에 커밋(batch)</strong>할 수도 있어요.</li>
+          <li><code>Viewed</code>(확인함) — 파일별로 "이 파일은 다 봤어요" 체크박스예요. 단, 그 파일이 <strong>이후에 또 바뀌면 자동으로 해제</strong>돼서, 새로 바뀐 부분을 다시 보게 해줘요.</li>
+          <li>기어(⚙) 아이콘 → <code>Hide whitespace</code>(공백 무시) — 띄어쓰기·들여쓰기만 바뀐 줄을 diff에서 숨겨, 진짜 바뀐 내용에 집중하게 해줘요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="tut-section" id="unified-split" data-reveal>
+      <h2 class="tut-section__title">보기 방식: Unified와 Split</h2>
+      <div class="tut-section__body">
+        <p>실제 GitHub의 diff 화면에는 오른쪽 위 <strong>기어(⚙) 아이콘</strong>이 있어요. 거기서 diff를 보는 방식을 두 가지 중에 고를 수 있어요.</p>
+        <ul>
+          <li><code>Unified</code>(통합 보기) — 지운 줄과 넣은 줄을 <strong>위아래로 한 흐름</strong>에 이어 보여줘요. 화면이 좁을 때 편해요.</li>
+          <li><code>Split</code>(분할 보기) — 왼쪽에 '바뀌기 전', 오른쪽에 '바뀐 후'를 <strong>나란히</strong> 놓아요. 무엇이 무엇으로 바뀌었는지 짝지어 보기 좋아요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="side-note side-note--warn" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>위 재현 화면의 <code>Unified</code>/<code>Split</code> 버튼은 <strong>안내만 바뀌고 화면 모양은 그대로예요</strong>. 이 학습용 mock에는 Split(분할) 보기를 그리는 기능이 아직 없어서, 눌러도 좌우로 나뉘지 않아요(다시 그려지지 않아요). 진짜 GitHub에서는 앞서 말한 <strong>기어(⚙) 메뉴</strong>로 통합/분할을 오갈 수 있으니, 개념만 여기서 익혀두고 실제 전환은 GitHub에서 확인하세요.</p>
+    </div>
+
+    <section class="tut-section" id="batch-flow" data-reveal>
+      <h2 class="tut-section__title">배치 리뷰: 코멘트를 모아 한 번에</h2>
+      <div class="tut-section__body">
+        <p>리뷰의 핵심은 <strong>모아서 제출</strong>이에요. 코멘트를 하나 달 때마다 알림이 가면 작성자가 피곤하니까, 다 적은 뒤 한 번에 보내요. 위 화면에서 <code>+</code>를 눌러 코멘트를 달면, 흐름이 이렇게 이어져요.</p>
+        <ul>
+          <li><code>Start a review</code>(리뷰 시작) — 첫 코멘트를 담으면 리뷰가 시작돼요. 이때 코멘트는 <strong>pending</strong>(대기) 상태예요.</li>
+          <li><strong>pending은 지금 나에게만 보여요.</strong> 작성자는 아직 못 봐요. 마음 편히 여러 줄에 계속 달 수 있어요.</li>
+          <li><code>Add review comment</code>(리뷰 코멘트 추가) — 두 번째부터는 이 버튼으로 계속 배치에 담아요.</li>
+          <li><code>Review changes</code>(변경 사항 검토) → 마지막에 종류를 골라 <code>Submit review</code>(리뷰 제출)를 누르면, 담아둔 코멘트가 <strong>한꺼번에 공개</strong>돼요.</li>
+        </ul>
+        <p>딱 한 줄만 짧게 남기고 싶다면, 배치를 거치지 않는 <code>Add single comment</code>(단건 코멘트)를 쓰면 즉시 하나만 제출돼요. "한 번에 모아 제출"이 배치 리뷰, "지금 하나만"이 단건이에요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="comment-vs-approve" data-reveal>
+      <h2 class="tut-section__title">Comment · Approve · Request changes, 무엇을 고를까</h2>
+      <div class="tut-section__body">
+        <p><code>Submit review</code> 직전에 세 가지 종류 중 하나를 골라요. 원문 라벨 그대로예요.</p>
+        <ul>
+          <li><code>Comment</code>(코멘트) — 승인도 반대도 아닌 <strong>일반 의견</strong>이에요. "이건 어때요?", "궁금해요" 같은 말을 남길 때.</li>
+          <li><code>Approve</code>(승인) — "이대로 합쳐도 좋아요"라는 <strong>확인 도장</strong>이에요. 저장소 규칙에 따라, 승인이 병합의 필수 조건이 되기도 해요.</li>
+          <li><code>Request changes</code>(수정 요청) — "이건 고쳐야 합쳐요"라는 <strong>보류</strong>예요. 병합을 막는 신호가 될 수 있어요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- REQ-013: 비개발자가 언제 Comment / 언제 Approve를 피해야 하는지 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p><strong>비개발자를 위한 판단 기준.</strong> 여러분이 볼 수 있는 건 보통 "무엇을·왜 바꿨는가"이지, "이 코드가 기술적으로 안전한가"는 아니에요. 그러니 이렇게 하세요.</p>
+      <ul>
+        <li>기획 의도·화면 동작·문구가 맞는지 확인하고 싶다면 → <code>Comment</code>(코멘트)로 남겨요. "로그인 문구가 '로그인'이 맞아요" 같은 확인은 큰 도움이 돼요.</li>
+        <li><code>Approve</code>(승인)는 <strong>코드의 기술적 타당성까지 책임진다는 뜻</strong>이라, 코드를 판단할 수 없다면 <strong>피하는 게 맞아요</strong>. 승인은 코드를 읽을 수 있는 리뷰어(예: 하늘·민수)에게 맡기세요.</li>
+        <li>뭔가 이상해 보이지만 확신이 없다면 <code>Request changes</code>(수정 요청) 대신 <code>Comment</code>로 <strong>질문</strong>을 남기는 편이 부드러워요.</li>
+      </ul>
+    </div>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p><strong>Copilot code review</strong>(코파일럿 코드 리뷰, 2025년 4월 정식 출시)를 켜두면 AI가 자동으로 리뷰를 달아줘요. 다만 Copilot은 <strong>항상 <code>Comment</code>(코멘트)만</strong> 남겨요. 즉 자동 리뷰는 <strong>병합을 막지 않아요</strong>. 사람이 남기는 <code>Approve</code>/<code>Request changes</code>와 역할이 달라서, 참고 의견으로만 쌓여요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">P05 한 장 요약</h2>
+      <p class="cheat-card__sub">diff 읽기 · 배치 리뷰 · 승인 판단</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">diff 색</span><span class="cheat-card__desc">빨강=지운 줄, 초록=넣은 줄. 줄 단위로 확인.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">라인 코멘트</span><span class="cheat-card__desc">줄 번호 hover → 파란 +. 여러 줄은 드래그·Shift+클릭.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Suggested change</span><span class="cheat-card__desc">코드 자체를 제안. Commit suggestion으로 반영, batch 커밋 가능.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Viewed</span><span class="cheat-card__desc">파일별 확인함. 파일이 또 바뀌면 자동 해제.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Unified / Split</span><span class="cheat-card__desc">기어 메뉴로 통합 보기·분할 보기 전환. Hide whitespace로 공백 무시.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">배치 리뷰</span><span class="cheat-card__desc">Start a review → pending(본인만) → Submit review로 한 번에 공개.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">단건</span><span class="cheat-card__desc">Add single comment는 즉시 하나만 제출.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">3종 결과</span><span class="cheat-card__desc">Comment(의견) · Approve(승인) · Request changes(수정 요청).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">비개발자</span><span class="cheat-card__desc">확인은 Comment로. 코드 판단 못 하면 Approve는 피하기. Copilot은 항상 Comment.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="pr-anatomy.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">P04 PR 화면 해부: 4탭과 merge box</span>
+      </a>
+      <a class="pager__card pager__card--next" href="projects-ops.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">P06 보드 운영: 뷰·필드·자동화</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#diff">변경 파일과 diff</a>
+      <a class="sidebar-toc__link" href="#review-tools">리뷰 도구 한 벌</a>
+      <a class="sidebar-toc__link" href="#unified-split">Unified와 Split</a>
+      <a class="sidebar-toc__link" href="#batch-flow">배치 리뷰 흐름</a>
+      <a class="sidebar-toc__link" href="#comment-vs-approve">Comment·Approve·Request</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → gh-ui -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
+</body>
+</html>

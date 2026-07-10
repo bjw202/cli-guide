@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P06 보드 운영: 뷰·필드·자동화 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="도서관 리뉴얼 보드로 Projects를 운영해봐요. 카드를 다음 열로 옮기며 Board·Table·Roadmap 뷰, Group by·Slice by, 필드 종류, 항목 추가 4경로, 그리고 자동화까지 어디를 누르는지 짚어봐요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 6분할: tokens → base → layout → components → pages → gh-ui -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+<link rel="stylesheet" href="../css/gh-ui.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">실전 · P06 · GitHub 협업</p>
+  <h1 class="page-header__title">보드 운영: 뷰·필드·자동화</h1>
+  <p class="page-header__subhead">Projects는 이슈와 PR을 한눈에 늘어놓고 옮기며 관리하는 '작업 현황판'이에요. 도서관 리뉴얼 보드에서 카드를 직접 옮겨보고, 같은 데이터를 다르게 보는 뷰, 카드에 붙는 필드, 항목을 넣는 방법, 그리고 손을 덜어주는 자동화까지 짚어볼게요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Projects 보드는 <strong>주방의 주문표 레일</strong>과 똑같아요. 새 주문은 '대기'에 붙고, 요리가 시작되면 '조리 중'으로, 다 되면 '나감'으로 표를 <strong>왼쪽에서 오른쪽으로 밀어</strong> 옮기죠. 누가 봐도 지금 무엇이 어디까지 왔는지 한눈에 보여요. GitHub Projects도 이슈·PR이라는 '표'를 열에서 열로 옮기며 진행 상황을 드러내요.</p>
+    </div>
+
+    <section class="tut-section" id="board" data-reveal>
+      <h2 class="tut-section__title">도서관 리뉴얼 보드 옮겨보기</h2>
+      <div class="tut-section__body">
+        <p>아래는 <code>도서관 리뉴얼 보드</code>예요. 열이 네 개(<code>Todo</code>·<code>In Progress</code>·<code>Review</code>·<code>Done</code>) 있고, 카드 하나가 이슈나 PR 하나예요. <strong>카드를 클릭(또는 키보드로 Enter)하면 다음 열로 옮겨가고</strong>, 카드 안의 <code>Status</code>(상태) 값과 열 위의 개수도 같이 바뀌어요. 지원 님이 「대출 연장 기능」을 <code>Todo</code>에서 오른쪽으로 밀어보세요. 칸반은 이렇게 '표를 옮기는' 게 전부예요.</p>
+      </div>
+    </section>
+
+    <!-- mock UI: gh-board — data-asset 은 .ghui-board 자체. 4열, 빈 열도 cards div 유지 -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. 도서관 리뉴얼 보드의 네 열과 카드를 보여줘요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-board__scroll">
+          <div class="ghui-board" data-asset="gh-board">
+
+            <div class="ghui-board__col" data-gh-col="Todo">
+              <div class="ghui-board__col-head">Todo <span class="ghui-board__col-count" data-gh-count>0</span></div>
+              <div class="ghui-board__cards">
+                <article class="ghui-board__card" data-gh-card-title="#38 대출 연장 기능">
+                  <div class="ghui-board__card-title">대출 연장 기능 #38</div>
+                  <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#8250df">지</span> 지원</div>
+                  <div class="ghui-board__card-status">Status: <b data-gh-status>Todo</b></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="ghui-board__col" data-gh-col="In Progress">
+              <div class="ghui-board__col-head">In Progress <span class="ghui-board__col-count" data-gh-count>0</span></div>
+              <div class="ghui-board__cards">
+                <article class="ghui-board__card" data-gh-card-title="#42 로그인 버튼이 안 눌려요">
+                  <div class="ghui-board__card-title">로그인 버튼이 안 눌려요 #42</div>
+                  <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#1f883d">민</span> 민수</div>
+                  <div class="ghui-board__card-status">Status: <b data-gh-status>In Progress</b></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="ghui-board__col" data-gh-col="Review">
+              <div class="ghui-board__col-head">Review <span class="ghui-board__col-count" data-gh-count>0</span></div>
+              <div class="ghui-board__cards">
+                <article class="ghui-board__card" data-gh-card-title="PR #57 로그인 버튼 클릭 영역 수정">
+                  <div class="ghui-board__card-title">로그인 버튼 클릭 영역 수정 PR #57</div>
+                  <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#0969da">하</span> 하늘 리뷰 중</div>
+                  <div class="ghui-board__card-status">Status: <b data-gh-status>Review</b></div>
+                </article>
+              </div>
+            </div>
+
+            <div class="ghui-board__col" data-gh-col="Done">
+              <div class="ghui-board__col-head">Done <span class="ghui-board__col-count" data-gh-count>0</span></div>
+              <div class="ghui-board__cards"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>보드가 처음이라면 칸반 개념부터 짚고 오면 편해요. <a href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>에서 열·카드·흐름의 기본을 그림으로 다뤄요. 이 실전 페이지는 "그래서 화면에서 어디를 누르나"에 집중해요.</p>
+    </div>
+
+    <section class="tut-section" id="views" data-reveal>
+      <h2 class="tut-section__title">같은 데이터, 다른 뷰</h2>
+      <div class="tut-section__body">
+        <p>Projects의 핵심은 <strong>데이터는 하나인데 보는 방식은 여러 가지</strong>라는 점이에요. 위에서 옮긴 카드들은 그대로인데, 상단의 뷰 탭만 바꾸면 전혀 다른 모양으로 같은 항목을 보여줘요.</p>
+        <ul>
+          <li><code>Board</code>(보드) — 방금 본 열-카드 칸반이에요. 상태별로 늘어놓고 옮기기 좋아요.</li>
+          <li><code>Table</code>(표) — 엑셀처럼 한 줄에 한 항목, 열에 필드값이 놓여요. 값을 한꺼번에 훑고 채우기 좋아요.</li>
+          <li><code>Roadmap</code>(로드맵) — 날짜 축 위에 항목을 막대로 펼쳐요. "언제부터 언제까지"를 볼 때 써요.</li>
+        </ul>
+        <p>뷰는 여러 개를 <strong>저장</strong>해 둘 수 있어요. 이렇게 조건을 걸어 저장해 둔 화면을 <code>saved view</code>(저장된 뷰)라고 해요. "내 담당만 보는 표", "이번 주 로드맵"처럼 자주 쓰는 화면을 탭으로 남겨두는 거예요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="fields" data-reveal>
+      <h2 class="tut-section__title">카드에 붙는 필드</h2>
+      <div class="tut-section__body">
+        <p>카드(이슈·PR)에는 GitHub 기본 정보 말고도, 보드에서 직접 만드는 <strong>커스텀 필드</strong>를 붙일 수 있어요. 위 카드의 <code>Status</code>도 그런 필드 중 하나예요. 만들 수 있는 필드 종류는 이래요.</p>
+        <ul>
+          <li><code>Text</code>(텍스트) — 자유롭게 적는 메모칸.</li>
+          <li><code>Number</code>(숫자) — 우선순위 점수, 예상 규모 같은 수치.</li>
+          <li><code>Date</code>(날짜) — 마감 예정일 같은 날짜 하나.</li>
+          <li><code>Single select</code>(단일 선택) — <code>Status</code>처럼 정해둔 보기 중 하나를 고르는 칸.</li>
+          <li><code>Iteration</code>(반복) — 한 주·두 주 같은 반복 주기를 붙이는 칸. 스프린트 단위 관리에 써요.</li>
+        </ul>
+        <p>여기에 더해, 이슈끼리의 관계에서 자동으로 채워지는 필드도 있어요.</p>
+        <ul>
+          <li><code>Parent issue</code>(상위 이슈) — 하위 이슈가 어느 부모에 속하는지 보여줘요.</li>
+          <li><code>Sub-issue progress</code>(하위 이슈 진행률) — 부모 카드에 "3개 중 1개 완료" 같은 진행 막대가 떠요. 이슈 #38의 <strong>1/3</strong>이 여기에 나타나요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="tut-section" id="group-slice" data-reveal>
+      <h2 class="tut-section__title">Group by · Slice by · 합계</h2>
+      <div class="tut-section__body">
+        <p>필드를 만들었으면, 그 필드로 화면을 <strong>묶고 나눠</strong> 볼 수 있어요.</p>
+        <ul>
+          <li><code>Group by</code>(그룹 기준) — 고른 필드값끼리 항목을 묶어요. <code>Status</code>로 그룹하면 방금 본 보드처럼 상태별 묶음이 되고, <code>Assignees</code>(담당자)로 그룹하면 사람별 묶음이 돼요.</li>
+          <li><code>Slice by</code>(슬라이스) — 화면 왼쪽에 값 목록을 세워두고, 하나를 누르면 그 값에 해당하는 항목만 걸러 보여줘요. 큰 보드에서 "지금은 이 라벨만" 하고 좁혀 볼 때 편해요.</li>
+          <li><code>Field sums</code>(필드 합계) — 열 머리에서 숫자 필드를 합산해요. 예상 규모 점수의 합 같은 걸 열별로 볼 수 있어요.</li>
+          <li><code>Insights</code>(인사이트) — 보드 데이터를 막대·선 <strong>차트</strong>로 그려, 시간에 따른 변화를 보여줘요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="side-note side-note--warn" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>모든 필드로 <code>Group by</code>(그룹 기준)를 걸 수 있는 건 아니에요. <code>title</code>(제목), <code>labels</code>(라벨), <code>reviewers</code>(리뷰어), 그리고 <code>linked PR</code>(연결된 PR) 필드로는 <strong>그룹을 나눌 수 없어요</strong>. 라벨은 한 항목에 여러 개가 붙을 수 있어 하나의 묶음으로 딱 나뉘지 않기 때문이에요. 이 네 가지로 묶으려다 안 되면 "고장"이 아니라 원래 그래요.</p>
+    </div>
+
+    <section class="tut-section" id="add-items" data-reveal>
+      <h2 class="tut-section__title">항목을 보드에 넣는 4가지 길</h2>
+      <div class="tut-section__body">
+        <p>이슈나 PR을 보드에 올리는 방법은 네 가지예요. 손으로 넣는 길 셋, 자동으로 들어오게 하는 길 하나예요.</p>
+        <ul>
+          <li><strong>이슈 사이드바의 기어(⚙)</strong> — 이슈 화면 오른쪽 <code>Projects</code> 칸의 기어를 눌러 이 보드를 고르면 카드로 올라와요.</li>
+          <li><strong>프로젝트의 <code>+</code> 버튼</strong> — 보드 맨 아래 <code>+</code>로 기존 이슈를 검색해 붙이거나, 새 항목을 바로 적어 넣어요.</li>
+          <li><strong><code>Auto-add</code>(자동 추가) 워크플로</strong> — "이 라벨이 붙은 이슈는 자동으로 이 보드에" 같은 규칙을 걸어두면 손대지 않아도 들어와요.</li>
+          <li><strong><code>gh project item-add</code></strong> — 터미널에서 명령 한 줄로 항목을 추가해요. 자동화 스크립트에서 자주 써요.</li>
+        </ul>
+        <p>한 프로젝트에는 항목을 <strong>최대 50,000개</strong>까지 담을 수 있어요. 웬만한 팀은 부딪힐 일이 없는 넉넉한 한도예요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="automation" data-reveal>
+      <h2 class="tut-section__title">손을 덜어주는 자동화</h2>
+      <div class="tut-section__body">
+        <p>보드에는 <strong>내장 자동화(워크플로)</strong>가 있어서, 정해진 일이 벌어지면 카드를 알아서 움직여줘요. GitHub이 공식으로 확정해 둔 것 중, 마음 놓고 믿어도 되는 건 다음 네 가지예요.</p>
+        <ul>
+          <li>이슈나 PR이 <strong>close(닫힘)</strong>되면 그 카드의 <code>Status</code>가 자동으로 <code>Done</code>으로 바뀌어요.</li>
+          <li>PR이 <strong>merge(병합)</strong>되면 역시 <code>Status</code>가 <code>Done</code>으로 바뀌어요.</li>
+          <li><code>Auto-add to project</code>(프로젝트에 자동 추가) — 조건에 맞는 이슈·PR을 보드에 자동으로 올려줘요.</li>
+          <li><code>Auto-archive items</code>(항목 자동 보관) — 조건에 맞는 오래된 항목을 보드에서 자동으로 치워(보관) 화면을 깔끔하게 해줘요.</li>
+        </ul>
+        <p>즉 PR #57이 병합되면, 그 카드는 누가 옮기지 않아도 <code>Done</code>으로 미끄러져 들어가요. 위 mock에서 손으로 옮겨본 그 움직임을, 실제로는 자동화가 대신 해주는 셈이에요.</p>
+      </div>
+    </section>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>자동화 목록은 <strong>조직·시점에 따라 달라져요</strong>. 위 네 가지 말고도 화면에 다른 규칙이 보일 수 있는데, 그 이름과 동작은 팀 설정에 따라 다르니 여기서 외우려 하지 마세요. 내 보드에 실제로 무엇이 켜져 있는지는 프로젝트 오른쪽 위 <code>…</code> 메뉴 → <code>Workflows</code>(워크플로)에서 직접 확인하세요. 거기에 켜고 끌 수 있는 규칙이 그대로 나와요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">P06 한 장 요약</h2>
+      <p class="cheat-card__sub">뷰 · 필드 · Group/Slice · 자동화</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">카드 이동</span><span class="cheat-card__desc">카드 클릭/Enter → 다음 열로. Status·개수 자동 동기.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">뷰 3종</span><span class="cheat-card__desc">Board(보드) · Table(표) · Roadmap(로드맵). saved view로 저장.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">필드</span><span class="cheat-card__desc">Text·Number·Date·Single select·Iteration + Parent issue·Sub-issue progress.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Group by</span><span class="cheat-card__desc">title·labels·reviewers·linked PR로는 그룹 불가.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Slice/합계</span><span class="cheat-card__desc">Slice by로 값별 필터, Field sums 합계, Insights 차트.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">항목 추가</span><span class="cheat-card__desc">사이드바 기어 · 프로젝트 + · Auto-add · gh project item-add. 최대 5만 개.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">자동화 4종</span><span class="cheat-card__desc">close→Done · merge→Done · Auto-add to project · Auto-archive items.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">그 외 규칙</span><span class="cheat-card__desc">… 메뉴 → Workflows에서 직접 확인(조직·시점마다 다름).</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="pr-review.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">P05 Files changed에서 리뷰하기</span>
+      </a>
+      <a class="pager__card pager__card--next" href="milestone-release.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">P07 Milestone과 릴리스</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#board">보드 옮겨보기</a>
+      <a class="sidebar-toc__link" href="#views">같은 데이터, 다른 뷰</a>
+      <a class="sidebar-toc__link" href="#fields">카드에 붙는 필드</a>
+      <a class="sidebar-toc__link" href="#group-slice">Group by·Slice by·합계</a>
+      <a class="sidebar-toc__link" href="#add-items">항목 추가 4가지 길</a>
+      <a class="sidebar-toc__link" href="#automation">손을 덜어주는 자동화</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → gh-ui -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
+</body>
+</html>
