@@ -71,6 +71,26 @@
           </div>
         </div>
 
+        <!-- 실전 드롭다운 -->
+        <div class="gh-nav__item">
+          <button class="gh-nav__trigger"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            실전 <span aria-hidden="true">▾</span>
+          </button>
+          <div class="gh-dropdown" role="menu">
+            <a class="gh-dropdown__link" href="practice/repo-tour.html">P01 저장소 한 바퀴</a>
+            <a class="gh-dropdown__link" href="practice/issue-anatomy.html">P02 이슈 화면 해부</a>
+            <a class="gh-dropdown__link" href="practice/issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+            <a class="gh-dropdown__link" href="practice/pr-anatomy.html">P04 PR 화면 해부</a>
+            <a class="gh-dropdown__link" href="practice/pr-review.html">P05 Files changed 리뷰</a>
+            <a class="gh-dropdown__link" href="practice/projects-ops.html">P06 보드 운영</a>
+            <a class="gh-dropdown__link" href="practice/milestone-release.html">P07 Milestone과 릴리스</a>
+            <a class="gh-dropdown__link" href="practice/nondev-playbook.html">P08 비개발자 플레이북</a>
+          </div>
+        </div>
+
         <!-- 참조 드롭다운 -->
         <div class="gh-nav__item">
           <button class="gh-nav__trigger"
@@ -150,6 +170,17 @@
         <a class="mobile-drawer__link" href="tutorial/github-org-teams.html">T24 조직·팀·권한</a>
         <a class="mobile-drawer__link" href="tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
         <a class="mobile-drawer__link" href="tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+      </div>
+      <div class="mobile-drawer__section">
+        <p class="mobile-drawer__title">실전</p>
+        <a class="mobile-drawer__link" href="practice/repo-tour.html">P01 저장소 한 바퀴</a>
+        <a class="mobile-drawer__link" href="practice/issue-anatomy.html">P02 이슈 화면 해부</a>
+        <a class="mobile-drawer__link" href="practice/issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+        <a class="mobile-drawer__link" href="practice/pr-anatomy.html">P04 PR 화면 해부</a>
+        <a class="mobile-drawer__link" href="practice/pr-review.html">P05 Files changed 리뷰</a>
+        <a class="mobile-drawer__link" href="practice/projects-ops.html">P06 보드 운영</a>
+        <a class="mobile-drawer__link" href="practice/milestone-release.html">P07 Milestone과 릴리스</a>
+        <a class="mobile-drawer__link" href="practice/nondev-playbook.html">P08 비개발자 플레이북</a>
       </div>
       <div class="mobile-drawer__section">
         <p class="mobile-drawer__title">참조</p>
@@ -237,7 +268,7 @@
         <a class="door" href="tutorial/git-concept.html">
           <div class="door__icon" aria-hidden="true">📖</div>
           <h3 class="door__title">튜토리얼 트랙</h3>
-          <p class="door__sub">T01부터 21페이지 순서대로</p>
+          <p class="door__sub">T01부터 26페이지 순서대로</p>
           <p class="door__desc">처음부터 끝까지 차근차근. 개념→설치→기초→브랜치→원격→GitHub까지.</p>
         </a>
 
@@ -255,6 +286,14 @@
           <h3 class="door__title">사례 갤러리</h3>
           <p class="door__sub">소설가부터 리눅스 커널까지, 이렇게도 써요</p>
           <p class="door__desc">비개발자 14종 + 전문가 12종 사례. 다양한 직업이 Git을 어떻게 쓰는지.</p>
+        </a>
+
+        <!-- Door 4: 실전 협업 트랙 -->
+        <a class="door" href="practice/repo-tour.html">
+          <div class="door__icon" aria-hidden="true">🧭</div>
+          <h3 class="door__title">실전 협업 트랙</h3>
+          <p class="door__sub">P01~P08, GitHub 화면을 직접 짚어가며</p>
+          <p class="door__desc">비개발자가 실제 GitHub에서 어디를 누르는지. 이슈·PR·리뷰·보드·마일스톤을 화면 그대로.</p>
         </a>
 
       </div>
@@ -328,6 +367,7 @@
       <div class="search-tabs" id="search-tabs" role="tablist" aria-label="결과 종류">
         <button class="search-tab is-active" type="button" role="tab" data-tab="all" aria-selected="true">전체</button>
         <button class="search-tab" type="button" role="tab" data-tab="tutorial" aria-selected="false">튜토리얼</button>
+        <button class="search-tab" type="button" role="tab" data-tab="practice" aria-selected="false">실전</button>
         <button class="search-tab" type="button" role="tab" data-tab="reference" aria-selected="false">참조</button>
         <button class="search-tab" type="button" role="tab" data-tab="case" aria-selected="false">사례</button>
         <button class="search-tab" type="button" role="tab" data-tab="command" aria-selected="false">명령어</button>
@@ -376,6 +416,15 @@
   {"type":"tutorial","id":"t24","title":"조직과 팀, 권한이 흐르는 방식","summary":"Organization·Team, 5단계 권한(read/triage/write/maintain/admin). write 권한과 branch protection의 역설.","url":"tutorial/github-org-teams.html","keywords":["organization","조직","team","팀","권한","permission","권한레벨","branch protection","codeowners","심화"]},
   {"type":"tutorial","id":"t25","title":"PR과 Merge, 코드 너머의 결재","summary":"PR/Merge를 결재 시스템으로 재해석. 코드가 아닌 문서·설정·데이터에도 적용. diff 읽는 법, 1 PR=1 승인.","url":"tutorial/github-approval-workflow.html","keywords":["pr","merge","결재","승인","approve","revert","diff","문서","운영모델","심화"]},
   {"type":"tutorial","id":"t26","title":"로봇이 GitHub과 대화하는 법","summary":"자동화·AI가 gh CLI로 GitHub 조작. 폴링 vs 이벤트 기반, GitOps 철학과 도구의 구분, 저장소=경계.","url":"tutorial/github-automation-model.html","keywords":["gh cli","자동화","automation","ai","에이전트","폴링","polling","webhook","gitops","argocd","flux","심화"]},
+
+  {"type":"practice","id":"p01","title":"저장소 한 바퀴, 나는 어느 탭에 사나","summary":"GitHub 저장소 상단 탭(Code·Issues·PR·Actions·Projects)을 한 바퀴 돌며 비개발자가 주로 머무는 곳을 짚는다.","url":"practice/repo-tour.html","keywords":["저장소","탭","repo","repository","code","실전"]},
+  {"type":"practice","id":"p02","title":"이슈 화면 해부: 사이드바 9칸","summary":"Issue 화면의 오른쪽 사이드바 9칸(Assignees·Labels·Projects·Milestone 등)을 하나씩 해부한다.","url":"practice/issue-anatomy.html","keywords":["이슈","issue","사이드바","라벨","label","assignee"]},
+  {"type":"practice","id":"p03","title":"잘 쓴 이슈, 나쁜 이슈","summary":"좋은 이슈와 나쁜 이슈를 비교하고, 템플릿·트리아지·검색 qualifier로 이슈를 정돈하는 법.","url":"practice/issue-triage.html","keywords":["이슈","트리아지","triage","템플릿","template","검색","qualifier"]},
+  {"type":"practice","id":"p04","title":"PR 화면 해부: 4탭과 merge box","summary":"Pull Request의 4개 탭(Conversation·Commits·Checks·Files changed)과 merge box를 해부한다.","url":"practice/pr-anatomy.html","keywords":["pr","pull request","merge","병합","draft","탭"]},
+  {"type":"practice","id":"p05","title":"Files changed에서 리뷰하기","summary":"Files changed 탭에서 코멘트·제안·approve로 코드 리뷰하는 실전 절차.","url":"practice/pr-review.html","keywords":["리뷰","review","코멘트","comment","approve","diff"]},
+  {"type":"practice","id":"p06","title":"보드 운영: 뷰·필드·자동화","summary":"GitHub Projects 보드를 뷰·필드·자동화로 운영하는 칸반 실전.","url":"practice/projects-ops.html","keywords":["프로젝트","projects","보드","칸반","kanban","자동화"]},
+  {"type":"practice","id":"p07","title":"Milestone과 릴리스","summary":"마일스톤으로 진행률을 묶고 릴리스로 버전을 배포하는 흐름.","url":"practice/milestone-release.html","keywords":["마일스톤","milestone","릴리스","release","진행률","버전"]},
+  {"type":"practice","id":"p08","title":"비개발자 플레이북","summary":"비개발자가 GitHub에서 바로 쓰는 체크리스트와 gh CLI 기본기를 담은 플레이북.","url":"practice/nondev-playbook.html","keywords":["비개발자","플레이북","playbook","체크리스트","gh cli","checklist"]},
 
   {"type":"reference","id":"r01","title":"명령어 사전","summary":"git 명령어·옵션 검색/필터 사전 (알파벳/주제/난이도).","url":"ref/command-dictionary.html","keywords":["명령어","사전","dictionary","command","레퍼런스"]},
   {"type":"reference","id":"r02","title":"용어집 — 두려운 단어 사전","summary":"commit/branch/rebase/PR 등 용어 + 비유 + 정의.","url":"ref/glossary.html","keywords":["용어집","glossary","사전","단어"]},

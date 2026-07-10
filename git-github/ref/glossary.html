@@ -52,6 +52,19 @@
         </div>
       </div>
       <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">실전 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../practice/repo-tour.html">P01 저장소 한 바퀴</a>
+          <a class="gh-dropdown__link" href="../practice/issue-anatomy.html">P02 이슈 화면 해부</a>
+          <a class="gh-dropdown__link" href="../practice/issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+          <a class="gh-dropdown__link" href="../practice/pr-anatomy.html">P04 PR 화면 해부</a>
+          <a class="gh-dropdown__link" href="../practice/pr-review.html">P05 Files changed 리뷰</a>
+          <a class="gh-dropdown__link" href="../practice/projects-ops.html">P06 보드 운영</a>
+          <a class="gh-dropdown__link" href="../practice/milestone-release.html">P07 Milestone과 릴리스</a>
+          <a class="gh-dropdown__link" href="../practice/nondev-playbook.html">P08 비개발자 플레이북</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
         <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
         <div class="gh-dropdown" role="menu">
           <a class="gh-dropdown__link" href="command-dictionary.html">명령어 사전</a>
@@ -64,7 +77,7 @@
         <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
       </div>
       <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
-      <a class="gh-series-link" href="../tmux/index.html">시리즈: tmux</a>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
     </nav>
     <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
   </div>
@@ -379,6 +392,41 @@
         <a class="glossary__link" href="../tutorial/github-automation-model.html">→ T26 자세히</a>
       </article>
 
+      <article class="glossary__item js-ref-item" id="sub-issue" data-topic="github">
+        <h2 class="glossary__term js-search-text">sub-issue (하위 이슈)</h2>
+        <p class="glossary__metaphor">비유 — 큰 할 일 쪽지 밑에 작은 할 일 쪽지들을 핀으로 매달기. 부모가 "3개 중 1개 끝"처럼 진행률을 보여줘요.</p>
+        <p class="glossary__def">공식 정의: 부모 이슈 아래에 계층으로 매다는 자식 이슈. 부모당 최대 100개·최대 8단계까지 중첩되며 <code>Create sub-issue</code>(하위 이슈 만들기) 버튼으로 만든다. 부모는 완료 개수(예: 1/3)를 진행률로 표시한다 (docs.github.com/issues/tracking-your-work-with-issues).</p>
+        <a class="glossary__link" href="../practice/issue-anatomy.html">→ P02 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="issue-type" data-topic="github">
+        <h2 class="glossary__term js-search-text">issue type (이슈 유형)</h2>
+        <p class="glossary__metaphor">비유 — 쪽지를 버그·기능·작업 세 서랍 중 하나에 넣는 분류. 라벨은 여러 장 붙지만 유형은 딱 하나예요.</p>
+        <p class="glossary__def">공식 정의: 조직 수준에서 이슈를 분류하는 유형(2025-04 GA). 기본값은 <code>Bug</code>·<code>Feature</code>·<code>Task</code> 셋이며 조직 <code>Settings</code>(설정) → <code>Planning</code>(계획) → <code>Issue types</code>(이슈 유형)에서 관리하고 조직당 최대 25개. 라벨과 달리 이슈 하나에 유형은 최대 하나만 붙는다 (docs.github.com/issues/tracking-your-work-with-issues).</p>
+        <a class="glossary__link" href="../practice/issue-anatomy.html">→ P02 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="merge-queue" data-topic="github">
+        <h2 class="glossary__term js-search-text">merge queue (병합 큐)</h2>
+        <p class="glossary__metaphor">비유 — 승인된 PR들을 한 줄로 세워 한 번에 하나씩, 최신 main에 맞춰 검사한 뒤 들여보내는 개찰구.</p>
+        <p class="glossary__def">공식 정의: 승인된 PR을 큐에 세워 하나씩 병합하되, 병합 직전 각 PR을 최신 default 브랜치에 합쳐 검사한다. 그래서 통과한 PR도 베이스가 움직여 main을 깨는 일을 막는다. 병합 상자에 <code>Merge when ready</code>(준비되면 병합)로 나타난다 (docs.github.com/pull-requests).</p>
+        <a class="glossary__link" href="../practice/pr-anatomy.html">→ P04 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="ruleset" data-topic="github">
+        <h2 class="glossary__term js-search-text">ruleset (규칙셋)</h2>
+        <p class="glossary__metaphor">비유 — 브랜치에 거는 이름표 붙은 규칙 묶음. 여러 묶음이 동시에 겹치면 가장 엄격한 쪽이 이겨요.</p>
+        <p class="glossary__def">공식 정의: 저장소나 조직 수준에서 브랜치·태그에 적용하는 이름 있고 버전 관리되는 규칙 묶음. classic branch protection의 후신이자 상위집합으로, 여러 ruleset이 동시에 적용되면 효과가 합쳐진다(가장 엄격한 규칙 우선). 강제 전 evaluate 모드로 시험 적용할 수 있다 (docs.github.com/repositories/configuring-branches).</p>
+        <a class="glossary__link" href="../tutorial/github-security.html">→ T19 자세히</a>
+      </article>
+
+      <article class="glossary__item js-ref-item" id="suggested-change" data-topic="github">
+        <h2 class="glossary__term js-search-text">suggested change (제안 변경)</h2>
+        <p class="glossary__metaphor">비유 — 리뷰어가 고칠 문장을 대신 써주고, 글쓴이는 복붙 없이 버튼 한 번으로 반영.</p>
+        <p class="glossary__def">공식 정의: 특정 줄(들)을 이렇게 바꾸자고 정확한 대체 코드를 제시하는 리뷰 코멘트. 작성자가 <code>Commit suggestion</code>(제안 커밋하기)으로 반영하며, 여러 제안을 한 커밋으로 묶을 수도 있다. 복사·붙여넣기가 필요 없다 (docs.github.com/pull-requests).</p>
+        <a class="glossary__link" href="../practice/pr-review.html">→ P05 자세히</a>
+      </article>
+
       <p class="ref-empty">조건에 맞는 용어가 없어요. 필터나 검색어를 바꿔보세요.</p>
     </div>
 
@@ -404,7 +452,7 @@
 <footer class="global-footer">
   <div class="global-footer__inner">
     <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
-    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../tmux/index.html">시리즈: tmux 가이드</a></p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
   </div>
 </footer>
 

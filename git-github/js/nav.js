@@ -18,6 +18,10 @@
       const trigger = item.querySelector('.gh-nav__trigger');
       if (!trigger) return;
 
+      // 드롭다운 없는 트리거(예: '사례')는 평범한 링크다.
+      // 여기서 가로채면 preventDefault 때문에 이동이 막힌다.
+      if (!item.querySelector('.gh-dropdown')) return;
+
       // 클릭 시 토글 (터치/키보드 모두 대응)
       trigger.addEventListener('click', (e) => {
         e.preventDefault();
@@ -43,6 +47,7 @@
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.gh-nav__item')) {
         items.forEach((item) => {
+          if (!item.querySelector('.gh-dropdown')) return;
           item.classList.remove('gh-nav__item--open');
           const t = item.querySelector('.gh-nav__trigger');
           if (t) t.setAttribute('aria-expanded', 'false');
@@ -134,6 +139,7 @@
       tutorial: { label: '튜토리얼', order: 1 },
       ref: { label: '참조', order: 2 },
       cases: { label: '사례 갤러리', order: 3 },
+      practice: { label: '실전', order: 4 },
     };
 
     // 페이지 제목: <title> 태그에서 추출, 없으면 파일명

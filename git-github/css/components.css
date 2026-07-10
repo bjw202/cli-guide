@@ -1491,3 +1491,32 @@ body.search-open .search-overlay,
   }
   .pr-flow__node.is-active, .pipeline__stage.is-active { transform: none; }
 }
+
+/* =================================================================
+   좁은 화면 가로 스크롤 방지 (REQ-018)
+   아래 요소들은 콘텐츠 최소 너비가 375px 뷰포트를 넘어 body 를 밀어낸다.
+   데스크톱 모양은 그대로 두고 모바일에서만 줄바꿈을 허용한다.
+   [주의] 각 컴포넌트의 기본 규칙보다 뒤에 와야 white-space 를 덮는다.
+   ================================================================= */
+@media (max-width: 768px) {
+  /* 긴 git 명령어 칩 — 한 줄 유지를 포기하고 접는다 */
+  .cmd-pill,
+  .cheat-card__cmd {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  /* 용어집의 긴 영문 토큰 (staging area / index 등) */
+  .glossary {
+    overflow-wrap: anywhere;
+  }
+
+  /* 비교표는 auto 레이아웃이라 열 최소 너비만큼 늘어난다 */
+  .comparison-table {
+    table-layout: fixed;
+  }
+  .comparison-table th,
+  .comparison-table td {
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P04 PR 화면 해부: 4탭과 merge box — Git &amp; GitHub 안내서</title>
+<meta name="description" content="PR #57 화면을 탭으로 짚어가며 해부해요. Conversation·Commits·Checks·Files changed 4탭, Draft에서 Ready for review 전환, 닫기 키워드(Closes #42)의 조건, 그리고 병합 상자(merge box)와 병합 3종까지." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 6분할: tokens → base → layout → components → pages → gh-ui -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+<link rel="stylesheet" href="../css/gh-ui.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">실전 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="repo-tour.html">P01 저장소 한 바퀴</a>
+          <a class="gh-dropdown__link" href="issue-anatomy.html">P02 이슈 화면 해부</a>
+          <a class="gh-dropdown__link" href="issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+          <a class="gh-dropdown__link" href="pr-anatomy.html" aria-current="page">P04 PR 화면 해부</a>
+          <a class="gh-dropdown__link" href="pr-review.html">P05 Files changed 리뷰</a>
+          <a class="gh-dropdown__link" href="projects-ops.html">P06 보드 운영</a>
+          <a class="gh-dropdown__link" href="milestone-release.html">P07 Milestone과 릴리스</a>
+          <a class="gh-dropdown__link" href="nondev-playbook.html">P08 비개발자 플레이북</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">실전 · P04 · GitHub 협업</p>
+  <h1 class="page-header__title">PR 화면 해부: 4탭과 merge box</h1>
+  <p class="page-header__subhead">이슈가 '고쳐 달라는 요청'이라면, PR(Pull request)은 '이렇게 고쳤어요, 봐 주세요'라는 제출물이에요. 민수 님이 올린 PR #57을 열어, 위쪽 네 개의 탭과 아래쪽 병합 상자가 각각 무엇을 보여주는지 하나씩 짚어볼게요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>PR은 학교에 내는 <strong>수행평가 제출함</strong> 같아요. 겉에는 '누가·무엇을 고쳤는지' 설명서(Conversation)가 붙고, 안에는 실제 답안(Commits·Files changed)이 들어 있어요. 선생님(검토자)이 확인 도장을 찍고, 통과 검사(Checks)가 모두 초록불이 되면, 비로소 제출함이 <strong>병합(merge)</strong>돼요. 오늘은 이 제출함을 겉부터 안까지 열어봐요.</p>
+    </div>
+
+    <section class="tut-section" id="tabs" data-reveal>
+      <h2 class="tut-section__title">PR 위쪽 네 개의 탭</h2>
+      <div class="tut-section__body">
+        <p>PR #57 <strong>「로그인 버튼 클릭 영역 수정」</strong>을 열었어요. 민수 님이 <code>fix/login-hitbox</code> 브랜치에서 고친 것을 <code>main</code> 브랜치로 넣어달라고 올린 제출물이에요. 화면 위쪽에 탭이 네 개 있어요. 아래 화면에서 탭을 눌러보세요. 각 탭이 무엇을 보여주는지 바로 확인할 수 있어요.</p>
+      </div>
+    </section>
+
+    <!-- mock UI 1: gh-tabs — PR #57 4탭 -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. PR 57번의 네 개 탭이에요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-issue__title">로그인 버튼 클릭 영역 수정 <span class="ghui-issue__num">#57</span></div>
+        <div class="ghui-issue__meta">
+          <span class="ghui-badge ghui-badge--open">Open</span>
+          <span class="ghui-avatar" style="--avatar-bg:#1f883d">민</span>
+          <span><strong>민수</strong> 님이 <code>fix/login-hitbox</code> → <code>main</code> 병합을 요청했어요</span>
+        </div>
+
+        <div class="ghui-tabs" data-asset="gh-tabs">
+          <div class="ghui-tabs__list" role="tablist" aria-label="PR 탭">
+            <button type="button" role="tab" id="pr-t1" aria-controls="pr-p1" aria-selected="true" class="ghui-tabs__tab is-active">Conversation</button>
+            <button type="button" role="tab" id="pr-t2" aria-controls="pr-p2" aria-selected="false" class="ghui-tabs__tab">Commits <span class="ghui-tabs__count">2</span></button>
+            <button type="button" role="tab" id="pr-t3" aria-controls="pr-p3" aria-selected="false" class="ghui-tabs__tab">Checks</button>
+            <button type="button" role="tab" id="pr-t4" aria-controls="pr-p4" aria-selected="false" class="ghui-tabs__tab">Files changed <span class="ghui-tabs__count">2</span></button>
+          </div>
+          <div class="ghui-tabs__panels">
+            <div role="tabpanel" id="pr-p1" aria-labelledby="pr-t1" class="ghui-tabs__panel">
+              <p><strong>Conversation</strong>(대화) — PR의 <strong>겉표지</strong>예요. 왜 고쳤는지 설명과 댓글, 리뷰 결과가 시간순으로 쌓여요.</p>
+              <div class="ghui-issue__comment">
+                <div class="ghui-issue__comment-head"><span class="ghui-avatar" style="--avatar-bg:#1f883d">민</span> <strong>민수</strong> · 작성</div>
+                <div class="ghui-issue__comment-body">
+                  <p>로그인 버튼의 클릭 영역이 너무 작아 모바일에서 잘 안 눌렸어요. 버튼을 키우고 최소 높이를 넣었어요.</p>
+                  <p><code>Closes #42</code></p>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" id="pr-p2" aria-labelledby="pr-t2" class="ghui-tabs__panel" hidden>
+              <p><strong>Commits</strong>(커밋) — 이 PR에 담긴 <strong>저장 지점 목록</strong>이에요. 어떤 순서로 고쳐왔는지 발자국이 보여요. 여기선 2개예요.</p>
+              <ul>
+                <li><code>a1b2c3d</code> 버튼 클릭 영역 확대</li>
+                <li><code>e4f5g6h</code> 최소 높이 44px 추가</li>
+              </ul>
+            </div>
+            <div role="tabpanel" id="pr-p3" aria-labelledby="pr-t3" class="ghui-tabs__panel" hidden>
+              <p><strong>Checks</strong>(검사) — 자동으로 돌아간 <strong>통과 검사 결과</strong>예요. 빌드·테스트 같은 로봇 검사가 초록불인지 빨간불인지 보여줘요.</p>
+              <ul>
+                <li><span class="ghui-badge ghui-badge--open">pass</span> CI 빌드(빌드·테스트) 통과</li>
+                <li><span class="ghui-badge ghui-badge--open">pass</span> Lint(코드 스타일 검사) 통과</li>
+              </ul>
+            </div>
+            <div role="tabpanel" id="pr-p4" aria-labelledby="pr-t4" class="ghui-tabs__panel" hidden>
+              <p><strong>Files changed</strong>(변경 파일) — 실제로 <strong>바뀐 코드</strong>를 줄 단위로 보여줘요. 리뷰는 주로 여기서 해요. 이 PR은 파일 2개를 고쳤어요. (다음 P05에서 이 탭을 깊게 다뤄요.)</p>
+              <ul>
+                <li><code>src/components/LoginButton.jsx</code></li>
+                <li><code>src/styles/login.css</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>비개발자는 보통 <strong>Conversation</strong>(대화) 탭에서 대부분의 일을 봐요. "왜 고쳤는지, 언제 통과됐는지, 누가 승인했는지"가 전부 여기에 모이거든요. <strong>Files changed</strong>(변경 파일)는 코드가 낯설면 훑어보기만 해도 괜찮아요. 대신 "무엇을·왜 바꿨는지"를 설명하는 Conversation의 글을 잘 읽는 게 더 중요해요.</p>
+    </div>
+
+    <section class="tut-section" id="draft" data-reveal>
+      <h2 class="tut-section__title">아직 준비 중이에요: Draft → Ready for review</h2>
+      <div class="tut-section__body">
+        <p>PR을 열었다고 바로 "봐 주세요"가 되는 건 아니에요. 아직 다듬는 중이라면 <strong>Draft</strong>(초안) 상태로 올릴 수 있어요. 제출함에 "작성 중" 팻말을 붙여둔 셈이에요.</p>
+        <ul>
+          <li><strong>Draft 상태에서는 자동 리뷰 요청이 가지 않아요.</strong> 검토자들에게 "아직 보지 마세요"라고 알려주는 거라, 괜히 미완성 코드로 알림을 보내지 않아요.</li>
+          <li>다 준비되면 <code>Ready for review</code>(리뷰 준비 완료)를 눌러요. 이때 비로소 <strong>CODEOWNERS</strong>(코드 담당자) 규칙에 따라 정해진 검토자에게 알림이 가요.</li>
+        </ul>
+        <p>그래서 순서를 이렇게 기억하면 좋아요. <strong>초안으로 열기 → 다듬기 → Ready for review로 전환 → 그제야 리뷰어 호출.</strong></p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="closing-keywords" data-reveal>
+      <h2 class="tut-section__title">닫기 키워드: Closes #42</h2>
+      <div class="tut-section__body">
+        <p>PR #57 본문을 보면 <code>Closes #42</code>라는 한 줄이 있었죠. 이건 마법의 주문이에요. "이 PR이 병합되면 <strong>이슈 #42도 자동으로 닫아줘</strong>"라는 뜻이거든요. 우리 이야기에서 딱 그렇게 이어져요. PR #57이 병합되면 지원 님이 올린 #42 「로그인 버튼이 안 눌려요」가 저절로 닫혀요.</p>
+        <p>쓸 수 있는 닫기 키워드는 여러 개예요. <code>Closes</code>, <code>Fixes</code>, <code>Resolves</code> 뒤에 <code>#이슈번호</code>를 붙이면 돼요. 그런데 여기엔 <strong>꼭 알아야 할 조건</strong>이 하나 있어요.</p>
+      </div>
+    </section>
+
+    <!-- REQ-009 필수: 닫기 키워드는 default 브랜치를 대상으로 할 때만 -->
+    <div class="side-note side-note--warn" data-reveal>
+      <span class="side-note__label">주의</span>
+      <p>닫기 키워드(<code>Closes #42</code> 등)는 <strong>그 PR이 저장소의 default 브랜치(보통 <code>main</code>)를 대상으로 병합될 때만</strong> 이슈를 자동으로 닫아요. 만약 PR이 <code>main</code>이 아니라 다른 개발용 브랜치를 향하고 있다면, 병합돼도 이슈는 <strong>닫히지 않아요</strong>. 우리 PR #57은 <code>fix/login-hitbox</code> → <code>main</code>이라 조건을 만족해요. 그래서 병합 순간 #42가 닫혀요. "분명 Closes를 적었는데 이슈가 안 닫혔어요"의 대부분은 이 브랜치 조건 때문이에요.</p>
+    </div>
+
+    <section class="tut-section" id="mergebox" data-reveal>
+      <h2 class="tut-section__title">병합 상자(merge box)</h2>
+      <div class="tut-section__body">
+        <p>PR 화면 맨 아래에는 <strong>병합 상자(merge box)</strong>가 있어요. "지금 이 PR을 합쳐도 되나?"를 판단해주는 안내판이에요. 필요한 검사(required checks)가 모두 초록불이면 병합 버튼이 켜지고, 하나라도 빨간불이거나 대기 중이면 잠겨요. 아래에서 왼쪽의 동그란 토글을 눌러 검사를 통과/실패로 바꿔보세요. 상태 글자와 아래 병합 버튼이 함께 바뀌어요.</p>
+      </div>
+    </section>
+
+    <!-- mock UI 2: gh-mergebox — data-asset 과 .ghui-mergebox 같은 요소 -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. PR 57번의 병합 상자예요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-mergebox is-ready" data-asset="gh-mergebox">
+          <ul class="ghui-mergebox__checks">
+            <li class="ghui-mergebox__check is-pass" data-gh-check>
+              <button class="ghui-mergebox__toggle" type="button" aria-pressed="true" aria-label="CI 빌드 검사 통과/실패 토글"></button>
+              <span class="ghui-mergebox__check-label"><span data-gh-check-name>CI 빌드(빌드·테스트)</span> — <span data-gh-check-state>통과</span></span>
+            </li>
+            <li class="ghui-mergebox__check is-pass" data-gh-check>
+              <button class="ghui-mergebox__toggle" type="button" aria-pressed="true" aria-label="Lint 검사 통과/실패 토글"></button>
+              <span class="ghui-mergebox__check-label"><span data-gh-check-name>Lint(코드 스타일 검사)</span> — <span data-gh-check-state>통과</span></span>
+            </li>
+            <li class="ghui-mergebox__check is-pass" data-gh-check>
+              <button class="ghui-mergebox__toggle" type="button" aria-pressed="true" aria-label="리뷰어 승인 검사 통과/실패 토글"></button>
+              <span class="ghui-mergebox__check-label"><span data-gh-check-name>리뷰어 1명 승인(하늘)</span> — <span data-gh-check-state>통과</span></span>
+            </li>
+          </ul>
+          <div class="ghui-mergebox__action">
+            <span class="ghui-mergebox__status"><span class="ghui-mergebox__status-dot"></span><span data-gh-merge-status>병합할 수 있음</span></span>
+            <button class="ghui-mergebox__merge" type="button" data-gh-merge>Squash and merge <span class="ghui-mergebox__caret" aria-hidden="true">▾</span></button>
+            <p class="ghui-mergebox__reason" data-gh-reason hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>병합 상자에는 상황에 따라 버튼이 더 나타나요.</p>
+      <ul>
+        <li><code>Update branch</code>(브랜치 업데이트) — 그새 <code>main</code>이 바뀌었다면, 그 최신 내용을 이 PR로 끌어와 맞춰줘요.</li>
+        <li><code>Enable auto-merge</code>(자동 병합 켜기) — <strong>지금 당장은 못 합치는 PR에만</strong> 보여요. 켜두면 검사가 다 통과되는 순간 자동으로 병합돼요. 밤새 검사가 끝나길 기다릴 필요가 없어요.</li>
+        <li><code>Merge when ready</code>(준비되면 병합) — <span data-term="merge-queue">merge queue(병합 큐)</span>를 쓰는 저장소에서, 순서를 지켜 안전하게 합치도록 대기열에 세워요.</li>
+      </ul>
+    </div>
+
+    <section class="tut-section" id="merge-methods" data-reveal>
+      <h2 class="tut-section__title">병합 3종: 어떻게 합칠까</h2>
+      <div class="tut-section__body">
+        <p>병합 버튼 옆 작은 삼각형(▾)을 누르면, 합치는 방식을 세 가지 중에서 고를 수 있어요. 원문 라벨 그대로 익혀두면 화면에서 바로 찾을 수 있어요.</p>
+        <ul>
+          <li><code>Create a merge commit</code>(병합 커밋 만들기) — PR의 커밋들을 <strong>그대로 두고</strong> 합침 지점 하나를 새로 찍어요. 발자국이 온전히 남아요.</li>
+          <li><code>Squash and merge</code>(스쿼시 병합) — PR의 여러 커밋을 <strong>하나로 눌러 합쳐요</strong>. 기록이 깔끔해져서, 작은 PR에 많이 써요. (우리 #57 화면의 기본값이에요.)</li>
+          <li><code>Rebase and merge</code>(리베이스 병합) — 커밋들을 <strong>합침 지점 없이 나란히</strong> 얹어요. 한 줄로 이어진 기록을 좋아하는 팀이 써요.</li>
+        </ul>
+        <p>비개발자라면 "무엇을 고를까"보다 "<strong>우리 팀이 정한 기본값을 따른다</strong>"가 맞는 태도예요. 대부분의 팀은 셋 중 하나를 기본으로 정해두거든요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="development-link" data-reveal>
+      <h2 class="tut-section__title">이슈와 PR을 손으로 잇기: Development</h2>
+      <div class="tut-section__body">
+        <p><code>Closes #42</code> 같은 키워드를 안 적었더라도, 이슈와 PR을 <strong>수동으로 연결</strong>할 수 있어요. P02에서 봤던 이슈 사이드바의 <strong>Development</strong>(개발) 칸 기억나죠? 거기서 이 이슈를 고치는 PR이나 브랜치를 직접 골라 이어줄 수 있어요.</p>
+        <ul>
+          <li>이슈 #42 오른쪽 사이드바 → <strong>Development</strong> 칸의 톱니(⚙) → PR #57 선택.</li>
+          <li>연결해두면 이슈에서 "이 문제를 지금 저 PR에서 고치는 중"이 보이고, 앞서 배운 <code>linked:pr</code> 검색에도 잡혀요.</li>
+        </ul>
+        <p>정리하면, 이슈와 PR을 잇는 길은 둘이에요. <strong>PR 본문에 닫기 키워드</strong>를 적는 자동 방식과, <strong>이슈의 Development 칸</strong>에서 고르는 수동 방식. 상황에 맞게 쓰면 돼요.</p>
+      </div>
+    </section>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">P04 한 장 요약</h2>
+      <p class="cheat-card__sub">PR 4탭 · Draft · 닫기 키워드 · merge box</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Conversation</span><span class="cheat-card__desc">겉표지. 설명·댓글·리뷰 결과가 시간순으로.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Commits</span><span class="cheat-card__desc">담긴 저장 지점 목록. #57은 2개.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Checks</span><span class="cheat-card__desc">자동 통과 검사 결과(빌드·테스트).</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Files changed</span><span class="cheat-card__desc">바뀐 코드를 줄 단위로. 리뷰의 무대. #57은 2개.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Draft → Ready</span><span class="cheat-card__desc">초안엔 리뷰 요청 안 감. Ready for review 시 CODEOWNERS 알림.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Closes #42</span><span class="cheat-card__desc">default 브랜치(main) 대상일 때만 이슈 자동 닫힘.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">merge box</span><span class="cheat-card__desc">required checks 초록불이면 병합 버튼 켜짐. Update branch·auto-merge.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">병합 3종</span><span class="cheat-card__desc">Create a merge commit · Squash and merge · Rebase and merge.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Development</span><span class="cheat-card__desc">이슈 사이드바에서 PR을 수동 연결.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="issue-triage.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">P03 잘 쓴 이슈, 나쁜 이슈</span>
+      </a>
+      <a class="pager__card pager__card--next" href="pr-review.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">P05 Files changed에서 리뷰하기</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#tabs">PR 네 개의 탭</a>
+      <a class="sidebar-toc__link" href="#draft">Draft → Ready for review</a>
+      <a class="sidebar-toc__link" href="#closing-keywords">닫기 키워드 Closes #42</a>
+      <a class="sidebar-toc__link" href="#mergebox">병합 상자(merge box)</a>
+      <a class="sidebar-toc__link" href="#merge-methods">병합 3종</a>
+      <a class="sidebar-toc__link" href="#development-link">Development 수동 연결</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → gh-ui -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
+</body>
+</html>

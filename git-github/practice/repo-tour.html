@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P01 저장소 한 바퀴, 나는 어느 탭에 사나 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="동네 도서관 웹사이트 저장소를 예로, GitHub 저장소 상단 탭(Code·Issues·Pull requests·Actions·Projects)이 각각 무엇을 보는 곳인지, 비개발자는 주로 어디에 사는지 한 바퀴 둘러봐요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 6분할: tokens → base → layout → components → pages → gh-ui -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+<link rel="stylesheet" href="../css/gh-ui.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">실전 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="repo-tour.html" aria-current="page">P01 저장소 한 바퀴</a>
+          <a class="gh-dropdown__link" href="issue-anatomy.html">P02 이슈 화면 해부</a>
+          <a class="gh-dropdown__link" href="issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+          <a class="gh-dropdown__link" href="pr-anatomy.html">P04 PR 화면 해부</a>
+          <a class="gh-dropdown__link" href="pr-review.html">P05 Files changed 리뷰</a>
+          <a class="gh-dropdown__link" href="projects-ops.html">P06 보드 운영</a>
+          <a class="gh-dropdown__link" href="milestone-release.html">P07 Milestone과 릴리스</a>
+          <a class="gh-dropdown__link" href="nondev-playbook.html">P08 비개발자 플레이북</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">실전 · P01 · GitHub 협업</p>
+  <h1 class="page-header__title">저장소 한 바퀴, 나는 어느 탭에 사나</h1>
+  <p class="page-header__subhead">GitHub 저장소는 방이 여러 개 있는 사무실 같아요. 각 방(탭)이 무엇을 하는 곳인지 알면, 길을 잃지 않아요. 우리 팀의 '동네 도서관 웹사이트'를 예로 한 바퀴 둘러봐요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>저장소(repository)는 팀이 함께 쓰는 사무실이에요. 문을 열고 들어가면 위쪽에 방 이름표가 죽 붙어 있어요 — 작업실, 요청 게시판, 검토실, 자동화실, 상황판. GitHub에서는 이 이름표를 <strong>탭(tab)</strong>이라고 불러요. 오늘은 이 방들을 하나씩 열어보기만 할 거예요. 안에서 뭘 하는지는 다음 페이지들에서 차근차근 배워요.</p>
+    </div>
+
+    <section class="tut-section" id="scenario" data-reveal>
+      <h2 class="tut-section__title">우리가 함께 볼 저장소와 세 사람</h2>
+      <div class="tut-section__body">
+        <p>이 <strong>실전(P)</strong> 시리즈는 처음부터 끝까지 하나의 이야기를 따라가요. 매번 새 예제로 갈아타지 않으니 마음 편히 따라오세요. 무대는 이 저장소예요.</p>
+        <p><strong>저장소:</strong> <code>dongne-library/library-web</code> — 동네 도서관 웹사이트를 새로 단장하는 프로젝트예요. 주소창에는 <code>github.com/dongne-library/library-web</code> 로 보여요. 앞의 <code>dongne-library</code> 는 '누구의 저장소인가'(조직 이름), 뒤의 <code>library-web</code> 은 '어떤 저장소인가'(저장소 이름)예요.</p>
+        <p>등장인물은 세 사람이에요. 이 중 <strong>지원</strong> 님이 우리(독자)의 분신이에요. 코드를 직접 짜지 않는 기획자이지만, GitHub 안에서 할 일이 아주 많답니다.</p>
+        <ul>
+          <li><span class="ghui-avatar" style="--avatar-bg:#8250df">지</span> <strong>지원</strong> — 기획/PM. 코드는 안 짜지만 이슈를 열고, 우선순위를 정하고, 진행 상황을 챙겨요. 바로 여러분이에요.</li>
+          <li><span class="ghui-avatar" style="--avatar-bg:#1f883d">민</span> <strong>민수</strong> — 개발자. 실제 코드를 고치고 PR을 올려요.</li>
+          <li><span class="ghui-avatar" style="--avatar-bg:#0969da">하</span> <strong>하늘</strong> — 디자이너. 화면과 버튼 모양을 챙기고, 민수의 PR을 리뷰해요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- mock UI: 저장소 탭 바 (핀 없음, 정적) -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-issue__meta" style="border-bottom:0;margin-bottom:12px;padding-bottom:0">
+          <span class="ghui-avatar" style="--avatar-bg:#8250df">지</span>
+          <span><strong>dongne-library</strong> / <strong>library-web</strong></span>
+          <span class="ghui-badge ghui-badge--pending">Public</span>
+        </div>
+        <nav class="ghui-repo-tabs" aria-label="저장소 탭">
+          <a href="#" class="ghui-repo-tab">Code</a>
+          <a href="#" class="ghui-repo-tab is-active">Issues <span class="ghui-repo-tab__count">2</span></a>
+          <a href="#" class="ghui-repo-tab">Pull requests <span class="ghui-repo-tab__count">1</span></a>
+          <a href="#" class="ghui-repo-tab">Actions</a>
+          <a href="#" class="ghui-repo-tab">Projects <span class="ghui-repo-tab__count">1</span></a>
+        </nav>
+      </div>
+    </div>
+
+    <section class="tut-section" id="tabs" data-reveal>
+      <h2 class="tut-section__title">상단 탭 다섯 방, 한 바퀴</h2>
+      <div class="tut-section__body">
+        <p>저장소 위쪽 이름표를 왼쪽부터 열어볼게요. 지금은 '여긴 뭐 하는 방인지'만 기억하면 충분해요.</p>
+        <ul>
+          <li><strong>Code</strong>(코드) — 실제 파일과 폴더가 사는 방이에요. 개발자가 가장 많이 오가는 곳이죠. <code>src/</code> 폴더, <code>README</code> 같은 소개 문서가 여기 있어요. 비개발자도 문서(README)를 읽거나 고칠 때 잠깐 들러요.</li>
+          <li><strong>Issues</strong>(이슈) — '해야 할 일'과 '고쳐야 할 문제'를 적어두는 게시판이에요. "로그인 버튼이 안 눌려요" 같은 요청이 카드처럼 쌓여요. 지금 <span class="ghui-repo-tab__count" style="display:inline-flex">2</span> 개가 열려 있네요.</li>
+          <li><strong>Pull requests</strong>(풀 리퀘스트) — "이렇게 코드를 바꿨어요, 봐주세요"라는 <strong>변경 제안</strong>이 모이는 검토실이에요. 줄여서 PR이라고 불러요. 리뷰와 병합이 여기서 일어나요.</li>
+          <li><strong>Actions</strong>(액션) — 자동화 로봇이 일하는 방이에요. 코드가 올라오면 자동으로 검사(테스트)를 돌려줘요. 비개발자가 매일 들를 곳은 아니에요. (자세한 건 <a href="../tutorial/github-actions.html">T18</a>에서요.)</li>
+          <li><strong>Projects</strong>(프로젝트) — 포스트잇을 붙이는 상황판(칸반 보드)이에요. 할 일 · 진행 중 · 검토 · 완료로 카드를 옮기며 전체 진행을 한눈에 봐요. 기획자에게 아주 친한 방이에요.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 팁 박스 -->
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>탭 이름 옆에 붙은 동그란 숫자(예: <span class="ghui-repo-tab__count" style="display:inline-flex">2</span>)는 '지금 열려 있는 항목 개수'예요. Issues 옆 2는 '아직 해결 안 된 이슈 2건', Pull requests 옆 1은 '검토를 기다리는 PR 1건'이라는 뜻이에요. 숫자만 봐도 어디에 일이 쌓였는지 감이 와요.</p>
+    </div>
+
+    <section class="tut-section" id="where-you-live" data-reveal>
+      <h2 class="tut-section__title">비개발자는 주로 어느 탭에 사나요?</h2>
+      <div class="tut-section__body">
+        <p>다섯 방을 다 외울 필요는 없어요. 코드를 직접 짜지 않는다면, 여러분(지원 님)이 매일 사는 방은 <strong>세 곳</strong>이에요.</p>
+        <ul>
+          <li><strong>Issues</strong> — 요청과 문제를 적고, 담당자를 정하고, 진행을 추적해요. 여러분의 홈그라운드예요. (다음 페이지 <a href="issue-anatomy.html">P02</a>에서 이슈 화면을 해부해요.)</li>
+          <li><strong>Pull requests</strong> — 개발자가 올린 변경을 확인하고, 필요하면 의견(코멘트)을 남겨요. 승인 버튼을 함부로 누르지 않는 요령은 <a href="pr-review.html">P05</a>에서 배워요.</li>
+          <li><strong>Projects</strong> — 팀 전체의 진행 상황을 상황판으로 관리해요. 카드 옮기기 하나로 회의가 짧아져요.</li>
+        </ul>
+        <p><strong>Code</strong> 와 <strong>Actions</strong> 는 '개발자·로봇의 방'이에요. 가끔 문서를 고치러 Code에 들르는 정도면 충분하고, 나머지는 곁눈으로 익숙해지면 돼요. 억지로 다 알려고 하지 마세요.</p>
+      </div>
+    </section>
+
+    <!-- 알아두면 좋은 박스 -->
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>이 시리즈의 화면들은 진짜 GitHub이 아니라, 학습용으로 다시 그린 '재현 화면'이에요. 창 왼쪽 위 신호등 점과 주소창이 그 표시예요. 실제 GitHub은 색과 위치가 조금 다를 수 있지만, 눌러야 할 자리와 이름은 똑같이 맞춰 두었으니 안심하고 눈에 익혀 두세요.</p>
+    </div>
+
+    <!-- 이렇게도 써요 -->
+    <div class="side-note side-note--case" data-reveal>
+      <span class="side-note__label">이렇게도 써요</span>
+      <p>꼭 코드가 아니어도 돼요. 동아리 회칙, 스터디 자료, 결혼 준비 체크리스트를 GitHub 저장소로 관리하는 사람도 많아요. 그때도 방 구성은 똑같아요 — 할 일은 Issues, 상황판은 Projects. 이름표만 익히면 어떤 저장소든 길을 잃지 않아요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">P01 한 장 요약</h2>
+      <p class="cheat-card__sub">저장소 상단 탭 다섯 방</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Code</span><span class="cheat-card__desc">실제 파일·폴더가 사는 방. 개발자의 홈. 문서(README)는 비개발자도 손봐요.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Issues</span><span class="cheat-card__desc">할 일·문제 게시판. 비개발자의 홈그라운드. (P02에서 해부)</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Pull requests</span><span class="cheat-card__desc">"이렇게 바꿨어요" 변경 제안(PR) 검토실.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Actions</span><span class="cheat-card__desc">자동 검사 로봇의 방. 매일 들를 곳은 아님. (T18)</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Projects</span><span class="cheat-card__desc">할 일·진행 상황판(칸반). 기획자와 친한 방.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">주로 사는 곳</span><span class="cheat-card__desc">비개발자는 Issues · Pull requests · Projects 세 방이면 충분.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="../tutorial/github-issues-pr.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">T16 대화로 코드를 만드는 법</span>
+      </a>
+      <a class="pager__card pager__card--next" href="issue-anatomy.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">P02 이슈 화면 해부: 사이드바 9칸</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#scenario">저장소와 세 사람</a>
+      <a class="sidebar-toc__link" href="#tabs">상단 탭 다섯 방</a>
+      <a class="sidebar-toc__link" href="#where-you-live">비개발자의 탭</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → gh-ui -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
+</body>
+</html>

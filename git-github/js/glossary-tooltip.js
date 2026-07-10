@@ -47,7 +47,12 @@
     'matrix': { term: 'matrix', metaphor: '조합마다 일꾼을 여럿 보내는 격자(OS·버전 조합 등).' },
     'secret': { term: 'secret / variable', metaphor: 'secret은 금고 속 비밀번호, variable은 바꾸기 쉬운 설정값.' },
     'branch-protection': { term: 'branch protection', metaphor: '중요 방(main)에 자물쇠. 검사·리뷰 없이는 직접 넣지 못하게.' },
-    'codeowners': { term: 'CODEOWNERS', metaphor: '"이 폴더는 이 팀이 책임져요"라는 담당자 배정표.' }
+    'codeowners': { term: 'CODEOWNERS', metaphor: '"이 폴더는 이 팀이 책임져요"라는 담당자 배정표.' },
+    'sub-issue': { term: 'sub-issue (하위 이슈)', metaphor: '큰 할 일 쪽지 밑에 작은 할 일 쪽지들을 핀으로 매달기. 부모가 "3개 중 1개 끝"처럼 진행률을 보여줘요.' },
+    'issue-type': { term: 'issue type (이슈 유형)', metaphor: '쪽지를 버그·기능·작업 세 서랍 중 하나에 넣는 분류. 라벨은 여러 장 붙지만 유형은 딱 하나예요.' },
+    'merge-queue': { term: 'merge queue (병합 큐)', metaphor: '승인된 PR들을 한 줄로 세워 한 번에 하나씩, 최신 main에 맞춰 검사한 뒤 들여보내는 개찰구.' },
+    'ruleset': { term: 'ruleset (규칙셋)', metaphor: '브랜치에 거는 이름표 붙은 규칙 묶음. 여러 묶음이 동시에 겹치면 가장 엄격한 쪽이 이겨요.' },
+    'suggested-change': { term: 'suggested change (제안 변경)', metaphor: '리뷰어가 고칠 문장을 대신 써주고, 글쓴이는 복붙 없이 버튼 한 번으로 반영.' }
   };
 
   var tooltipEl = null;

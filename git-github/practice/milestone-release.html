@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P07 Milestone과 릴리스 — Git &amp; GitHub 안내서</title>
+<meta name="description" content="v1.0 오픈 마일스톤으로 날짜 기반 목표를 관리해봐요. 진행률 바가 어떻게 채워지는지, 어디로 들어가는지, Milestone·Iteration·Label을 언제 고르는지, 그리고 PR #57이 병합되면 바가 어떻게 움직이는지까지 이어봐요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<!-- CSS 6분할: tokens → base → layout → components → pages → gh-ui -->
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/base.css">
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/components.css">
+<link rel="stylesheet" href="../css/pages.css">
+<link rel="stylesheet" href="../css/gh-ui.css">
+</head>
+<body>
+<!-- 읽기 진행률 바 (progress.js) -->
+<div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
+
+<!-- GlobalHeader (nav.js: 드롭다운/햄버거. Breadcrumb는 아래 별도) -->
+<header class="global-header">
+  <div class="global-header__inner">
+    <a class="gh-logo" href="../index.html">Git &amp; GitHub 안내서</a>
+    <nav class="gh-nav" aria-label="주요 메뉴">
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">학습트랙 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../tutorial/git-concept.html">T01 버전 관리가 뭔가요?</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-setup.html">T02 설치와 첫 인사</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-basics.html">T03 수정 → 묶기 → 기록</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-staging.html">T04 3개의 방: 스테이징</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-history.html">T05 과거로 여행하기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-branch.html">T06 브랜치</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-merge.html">T07 병합과 충돌</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-rebase.html">T08 리베이스</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-remote.html">T09 원격 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-tag.html">T10 태그</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-undo.html">T11 되돌리기</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-advanced.html">T12 고급 기법</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-config-files.html">T13 설정과 파일들</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-concept.html">T14 Git과 GitHub</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-repo.html">T15 나의 첫 저장소</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-issues-pr.html">T16 Issue와 PR</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-review.html">T17 코드 리뷰</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-actions.html">T18 GitHub Actions</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-security.html">T19 보안</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-workflow-models.html">T20 워크플로우 모델</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-extras.html">T21 GitHub, 더 넓은 세계</a>
+          <a class="gh-dropdown__link" href="../tutorial/git-worktree.html">T22 git worktree</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-projects.html">T23 칸반보드(Projects)</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-org-teams.html">T24 조직·팀·권한</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-approval-workflow.html">T25 PR/Merge, 코드 너머의 결재</a>
+          <a class="gh-dropdown__link" href="../tutorial/github-automation-model.html">T26 gh CLI·자동화·GitOps</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">실전 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="repo-tour.html">P01 저장소 한 바퀴</a>
+          <a class="gh-dropdown__link" href="issue-anatomy.html">P02 이슈 화면 해부</a>
+          <a class="gh-dropdown__link" href="issue-triage.html">P03 잘 쓴 이슈, 나쁜 이슈</a>
+          <a class="gh-dropdown__link" href="pr-anatomy.html">P04 PR 화면 해부</a>
+          <a class="gh-dropdown__link" href="pr-review.html">P05 Files changed 리뷰</a>
+          <a class="gh-dropdown__link" href="projects-ops.html">P06 보드 운영</a>
+          <a class="gh-dropdown__link" href="milestone-release.html" aria-current="page">P07 Milestone과 릴리스</a>
+          <a class="gh-dropdown__link" href="nondev-playbook.html">P08 비개발자 플레이북</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <button class="gh-nav__trigger" type="button" aria-haspopup="true" aria-expanded="false">참조 <span aria-hidden="true">▾</span></button>
+        <div class="gh-dropdown" role="menu">
+          <a class="gh-dropdown__link" href="../ref/command-dictionary.html">명령어 사전</a>
+          <a class="gh-dropdown__link" href="../ref/glossary.html">용어집</a>
+          <a class="gh-dropdown__link" href="../ref/faq.html">FAQ</a>
+          <a class="gh-dropdown__link" href="../ref/cheatsheet.html">치트시트</a>
+        </div>
+      </div>
+      <div class="gh-nav__item">
+        <a class="gh-nav__trigger" href="../cases/index.html">사례</a>
+      </div>
+      <button class="gh-search-btn" type="button" aria-label="검색 열기">🔍</button>
+      <a class="gh-series-link" href="../../tmux/index.html">시리즈: tmux</a>
+    </nav>
+    <button class="gh-hamburger" type="button" aria-expanded="false" aria-controls="mobile-drawer" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- Breadcrumb (nav.js가 non-home 경로에서 자동 생성) -->
+<nav class="breadcrumb" aria-label="경로"></nav>
+
+<!-- 페이지 헤더 -->
+<header class="page-header">
+  <p class="page-header__eyebrow">실전 · P07 · GitHub 협업</p>
+  <h1 class="page-header__title">Milestone과 릴리스</h1>
+  <p class="page-header__subhead">Milestone(마일스톤)은 '언제까지 이만큼'을 묶는 날짜 기반 목표예요. v1.0 오픈 마일스톤의 진행률 바가 어떻게 채워지는지 보고, 비슷해 보이는 Iteration·Label과 어떻게 다른지, 그리고 PR #57 하나가 병합되면 이 바가 어떻게 한 칸 올라가는지까지 이어볼게요.</p>
+</header>
+
+<!-- 2단 레이아웃: 본문 + SidebarTOC -->
+<div class="layout">
+  <main class="layout__main tpl-tutorial">
+
+    <!-- 비유 박스 -->
+    <div class="side-note side-note--metaphor" data-reveal>
+      <span class="side-note__label">비유</span>
+      <p>Milestone은 <strong>여행 일정표의 '3일차: 부산 도착'</strong> 같은 중간 목표예요. 그 날짜까지 해야 할 일들을 한 봉투에 담아두고, 봉투에는 "12개 중 7개 완료"처럼 진척이 표시돼요. 봉투 안 일들이 하나씩 끝날수록 채워지는 막대를 보며, 마감까지 얼마나 왔는지 가늠하는 거예요.</p>
+    </div>
+
+    <section class="tut-section" id="milestone" data-reveal>
+      <h2 class="tut-section__title">v1.0 오픈 마일스톤</h2>
+      <div class="tut-section__body">
+        <p>아래는 <code>v1.0 오픈</code> 마일스톤이에요. 마감일(<code>Due by</code>), 완료율, 진행률 바, 그리고 열려 있는 항목과 닫힌 항목 개수가 한 카드에 모여 있어요. 지금은 전체 12개 중 7개가 닫혀 <strong>58%</strong>까지 찼어요. 이 숫자가 어떻게 나오는지 곧 짚어볼게요.</p>
+      </div>
+    </section>
+
+    <!-- mock UI: .ghui-milestone — JS 없음, 정적. BEFORE 상태(58%, Open 5 / Closed 7) -->
+    <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. v1.0 오픈 마일스톤의 진행률과 개수를 보여줘요.">
+      <div class="ghui-window__chrome">
+        <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+        <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+      </div>
+      <div class="ghui-window__body">
+        <div class="ghui-milestone">
+          <p class="ghui-milestone__title">v1.0 오픈</p>
+          <p class="ghui-milestone__due">Due by 2026년 8월 14일 · 58% complete</p>
+          <div class="ghui-milestone__bar" role="img" aria-label="진행률 58퍼센트"><div class="ghui-milestone__bar-fill" style="width:58%"></div></div>
+          <div class="ghui-milestone__counts"><span><b>5</b> Open</span><span><b>7</b> Closed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="tut-section" id="access" data-reveal>
+      <h2 class="tut-section__title">어디로 들어가나</h2>
+      <div class="tut-section__body">
+        <p>마일스톤 목록은 이슈나 PR 목록 화면에서 들어가요. <code>Issues</code>(이슈) 또는 <code>Pull requests</code>(풀 리퀘스트) 탭을 연 뒤, <strong>목록 오른쪽 위</strong>의 <code>Milestones</code>(마일스톤) 버튼을 누르면, 저장소의 모든 마일스톤이 진행률 바와 함께 죽 나와요. 거기서 <code>v1.0 오픈</code>을 누르면, 그 마일스톤에 묶인 이슈·PR만 모아 볼 수 있어요.</p>
+        <p>새 마일스톤은 그 목록 화면의 <code>New milestone</code>(새 마일스톤)으로 만들고, 제목·마감일·설명을 적어요. 그다음 개별 이슈·PR의 사이드바 <code>Milestone</code> 칸에서 이 마일스톤을 골라 붙이면 돼요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="progress" data-reveal>
+      <h2 class="tut-section__title">진행률 바는 어떻게 채워질까</h2>
+      <div class="tut-section__body">
+        <p>진행률 바는 어렵게 생각할 것 없어요. <strong>닫힌 항목 ÷ 전체 항목(이슈·PR 모두 포함)으로 표시됩니다.</strong> v1.0 오픈은 전체 12개(열린 5 + 닫힌 7) 중 닫힌 게 7개라, 바가 7/12만큼 채워져 있는 거예요.</p>
+        <p>여기서 '항목'은 <strong>이슈만이 아니라 PR도 함께</strong> 센다는 점만 기억하면 돼요. 마일스톤에 붙은 PR이 병합되어 닫히면, 그것도 '닫힌 항목' 한 개로 세어져 바가 올라가요.</p>
+      </div>
+    </section>
+
+    <div class="side-note side-note--tip" data-reveal>
+      <span class="side-note__label">팁</span>
+      <p>진행률은 "몇 개 중 몇 개가 닫혔나"를 보여주는 <strong>개수 기준</strong>이에요. 큰 이슈든 작은 이슈든 <strong>한 개는 한 개</strong>로 세어져요. 그러니 바가 절반이라고 해서 "일의 무게가 딱 절반 남았다"는 뜻은 아니에요. 남은 항목 중에 무거운 게 있을 수 있으니, 숫자와 함께 남은 목록도 같이 보는 게 좋아요.</p>
+    </div>
+
+    <section class="tut-section" id="choose" data-reveal>
+      <h2 class="tut-section__title">Milestone · Iteration · Label, 언제 무엇을</h2>
+      <div class="tut-section__body">
+        <p>세 가지가 "일을 묶는다"는 점에서 비슷해 보이지만, 묶는 기준이 달라요.</p>
+        <ul>
+          <li><code>Milestone</code>(마일스톤) — <strong>날짜 기반 목표</strong>를 묶어요. "8월 14일 v1.0 오픈까지"처럼 마감이 있는 한 덩어리의 릴리스·목표에 써요. 진행률 바가 딸려 와요.</li>
+          <li><code>Iteration</code>(반복) — <strong>반복되는 스프린트 주기</strong>를 묶어요. "이번 주", "다음 2주"처럼 계속 돌아오는 기간 단위로 일을 나눌 때 써요. Projects의 필드예요.</li>
+          <li><code>Label</code>(라벨) — <strong>시간과 무관한 분류</strong>예요. <code>bug</code>, <code>priority:high</code>처럼 성격·종류로 붙이는 꼬리표라, 여러 개를 겹쳐 달 수 있어요.</li>
+        </ul>
+        <p>정리하면, <strong>마감이 있는 한 번의 목표</strong>는 마일스톤, <strong>돌아오는 주기</strong>는 반복, <strong>성격 분류</strong>는 라벨이에요. #42에 붙은 <code>v1.0 오픈</code>은 마감이 있는 릴리스라서 마일스톤이 맞아요.</p>
+      </div>
+    </section>
+
+    <section class="tut-section" id="throughline" data-reveal>
+      <h2 class="tut-section__title">PR #57이 병합되면 바가 움직여요</h2>
+      <div class="tut-section__body">
+        <p>이제 앞 페이지들의 이야기가 여기서 하나로 이어져요. 흐름을 되짚어 볼게요.</p>
+        <ul>
+          <li>지원 님이 「로그인 버튼이 안 눌려요」 <strong>이슈 #42</strong>를 열었고, 여기에 <code>v1.0 오픈</code> 마일스톤이 붙어 있어요.</li>
+          <li>민수 님이 이 문제를 고친 <strong>PR #57</strong>을 올렸고, 본문에 <code>Closes #42</code>가 적혀 있어요.</li>
+          <li>하늘 님의 리뷰가 끝나고 <strong>PR #57이 병합</strong>되면, 닫기 키워드 덕분에 <strong>이슈 #42가 자동으로 닫혀요</strong>.</li>
+          <li>#42가 닫히는 순간, 마일스톤의 '닫힌 항목'이 하나 늘어요. 그래서 진행률 바가 <strong>7/12(58%)에서 8/12로 올라가요</strong>.</li>
+        </ul>
+        <p>즉 위 mock의 <code>58%</code> 바는 PR #57이 병합되기 <strong>직전</strong>의 모습이에요. 리뷰 하나, 병합 하나가 이슈를 닫고 마일스톤 숫자를 밀어 올리는 이 연결이, GitHub 협업의 뼈대예요.</p>
+      </div>
+    </section>
+
+    <div class="side-note side-note--extra" data-reveal>
+      <span class="side-note__label">알아두면 좋은</span>
+      <p>여기서 말한 자동으로 닫히는 규칙은 앞서 <a href="pr-anatomy.html">P04</a>에서 다룬 것과 같아요. <code>Closes #42</code> 같은 닫기 키워드는 <strong>그 PR이 default 브랜치를 대상으로 할 때만</strong> 이슈를 자동으로 닫아요. PR #57은 <code>fix/login-hitbox</code> → <code>main</code>이라 default 브랜치가 맞으니, 병합과 동시에 #42가 닫히고 바가 움직여요.</p>
+    </div>
+
+    <!-- 치트시트 카드 -->
+    <div class="cheat-card" data-reveal>
+      <h2 class="cheat-card__title">P07 한 장 요약</h2>
+      <p class="cheat-card__sub">마일스톤 · 진행률 · 릴리스 결속</p>
+      <div class="cheat-card__list">
+        <div class="cheat-card__row"><span class="cheat-card__cmd">들어가는 길</span><span class="cheat-card__desc">Issues 또는 Pull requests → 우측 상단 Milestones.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">진행률</span><span class="cheat-card__desc">닫힌 항목 ÷ 전체 항목(이슈·PR 모두 포함)으로 표시.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">v1.0 오픈</span><span class="cheat-card__desc">Due 2026년 8월 14일 · Open 5 / Closed 7 · 58%.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Milestone</span><span class="cheat-card__desc">마감 있는 한 번의 목표. 진행률 바가 딸려 옴.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Iteration</span><span class="cheat-card__desc">돌아오는 스프린트 주기. Projects 필드.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">Label</span><span class="cheat-card__desc">시간과 무관한 성격 분류. 여러 개 겹침 가능.</span></div>
+        <div class="cheat-card__row"><span class="cheat-card__cmd">결속</span><span class="cheat-card__desc">PR #57 병합 → #42 닫힘 → 바 7/12 → 8/12.</span></div>
+      </div>
+    </div>
+
+    <!-- PrevNextPager -->
+    <nav class="pager" aria-label="이전/다음 페이지">
+      <a class="pager__card" href="projects-ops.html">
+        <span class="pager__label">← 이전</span>
+        <span class="pager__title">P06 보드 운영: 뷰·필드·자동화</span>
+      </a>
+      <a class="pager__card pager__card--next" href="nondev-playbook.html">
+        <span class="pager__label">다음 →</span>
+        <span class="pager__title">P08 비개발자 플레이북</span>
+      </a>
+    </nav>
+  </main>
+
+  <!-- SidebarTOC -->
+  <aside class="sidebar-toc" aria-label="이 페이지에서">
+    <p class="sidebar-toc__title">이 페이지에서</p>
+    <div class="sidebar-toc__list">
+      <a class="sidebar-toc__link" href="#milestone">v1.0 오픈 마일스톤</a>
+      <a class="sidebar-toc__link" href="#access">어디로 들어가나</a>
+      <a class="sidebar-toc__link" href="#progress">진행률 바</a>
+      <a class="sidebar-toc__link" href="#choose">Milestone·Iteration·Label</a>
+      <a class="sidebar-toc__link" href="#throughline">PR #57과 바의 움직임</a>
+    </div>
+  </aside>
+</div>
+
+<!-- GlobalFooter -->
+<footer class="global-footer">
+  <div class="global-footer__inner">
+    <p><strong>Git &amp; GitHub 안내서</strong> · 비개발자를 위한 따뜻한 튜토리얼</p>
+    <p style="margin-top:6px;color:var(--text-secondary)">비유 먼저, 단어 나중 · 코딩 없이 이해하기 · <a href="../../tmux/index.html">시리즈: tmux 가이드</a></p>
+  </div>
+</footer>
+
+<!-- JS: nav → progress → reveal → gh-ui -->
+<script src="../js/nav.js" defer></script>
+<script src="../js/progress.js" defer></script>
+<script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
+</body>
+</html>
