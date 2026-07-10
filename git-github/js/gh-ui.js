@@ -180,18 +180,6 @@
     var state = { active: false, pending: [] };
     var panel = null;
 
-    /* split / unified 모드 토글 (표현 전환) */
-    var modeBtns = Array.prototype.slice.call(root.querySelectorAll('[data-gh-mode]'));
-    modeBtns.forEach(function (mb) {
-      mb.addEventListener('click', function () {
-        modeBtns.forEach(function (b) { b.classList.remove('is-active'); });
-        mb.classList.add('is-active');
-        var mode = mb.getAttribute('data-gh-mode');
-        root.setAttribute('data-gh-diff-mode', mode);
-        announce(live, mode === 'split' ? '분할 보기로 전환했어요.' : '통합 보기로 전환했어요.');
-      });
-    });
-
     function updateReviewBtn() {
       var n = state.pending.length;
       if (reviewCount) {

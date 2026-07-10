@@ -201,12 +201,8 @@ P02의 사이드바 9항목은 반드시 이 방식을 쓴다. `.ghui-window__bo
 루트는 `.ghui-diff` **그 자체**에 `data-asset="gh-diff"` 를 단다(JS가 root에 리뷰 패널을 삽입한다).
 
 ```html
-<div class="ghui-diff" data-asset="gh-diff" data-gh-diff-mode="unified">
+<div class="ghui-diff" data-asset="gh-diff">
   <div class="ghui-diff__toolbar">
-    <div class="ghui-diff__modes">
-      <button type="button" class="ghui-diff__mode is-active" data-gh-mode="unified">Unified</button>
-      <button type="button" class="ghui-diff__mode" data-gh-mode="split">Split</button>
-    </div>
     <button type="button" class="ghui-diff__review-btn" data-gh-review>Review changes <span class="ghui-diff__review-count" data-gh-review-count hidden>0</span></button>
   </div>
   <div class="ghui-diff__file-head">
@@ -229,7 +225,7 @@ P02의 사이드바 9항목은 반드시 이 방식을 쓴다. `.ghui-window__bo
 - `+`/`-` 기호는 CSS `::before` 가 그린다. 본문 텍스트에 직접 쓰지 말 것.
 - 꺾쇠·앰퍼샌드는 `&lt;` `&gt;` `&amp;` 로 이스케이프.
 - JS가 각 `.ghui-diff__row[data-gh-line]` 에 hover 시 나타나는 파란 `+` 버튼을 주입한다. 직접 만들지 말 것.
-- **알려진 한계**: `data-gh-diff-mode="split"` 에 대응하는 CSS가 없어 Split 토글은 시각적으로 바뀌지 않고 스크린리더 안내만 나간다. IMPL-009의 갭이다. **CSS를 추가해 고치지 말 것.** 대신 P05 본문에서 실제 GitHub의 기어 아이콘 → `Unified`(통합 보기) / `Split`(분할 보기) 를 산문으로 설명한다.
+- **모드 컨트롤 없음**: split/unified 토글 버튼은 IMPL-009에서 제거됐다(대응 CSS가 없어 화면이 바뀌지 않았고, 진짜 좌우 분할은 diff 행 그리드 재설계가 필요하다). mock은 통합 보기만 그린다. **토글 버튼이나 split CSS를 다시 넣지 말 것.** 대신 P05 본문에서 실제 GitHub의 기어 아이콘 → `Unified`(통합 보기) / `Split`(분할 보기) 를 산문으로 설명한다.
 
 ### 3.4 gh-board — 칸반
 

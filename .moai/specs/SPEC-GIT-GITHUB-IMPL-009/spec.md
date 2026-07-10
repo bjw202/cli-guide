@@ -1,6 +1,6 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-009
-version: 1.1.0
+version: 1.2.0
 status: Implemented
 created: 2026-07-10
 updated: 2026-07-10
@@ -56,7 +56,7 @@ IMPL-001(P1)이 정한 공유 셸은 5개 CSS(`tokens` → `base` → `layout` �
 | `.ghui-repo-tabs` | Code / Issues / Pull requests / Actions / Projects 저장소 탭 바 |
 | `.ghui-issue` + `.ghui-sidebar` | 이슈 본문 2단 레이아웃(본문 + 우측 사이드바) |
 | `.ghui-tabs` | PR 4탭(Conversation / Commits / Checks / Files changed) |
-| `.ghui-diff` | split/unified diff, 라인 번호, +/- 배경, 코멘트 삽입 슬롯 |
+| `.ghui-diff` | diff(통합 보기), 라인 번호, +/- 배경, 코멘트 삽입 슬롯 |
 | `.ghui-mergebox` | 체크 상태 목록 + merge 버튼 드롭다운 |
 | `.ghui-board` | 칸반 열 + 카드 |
 | `.ghui-milestone` | 제목·마감일·진행률 바·open/closed 카운트 |
@@ -208,7 +208,8 @@ IMPL-006 `js/pr-flow.js` 패턴 상속(IIFE, `'use strict'`, `data-asset` 진입
 
 ## HISTORY
 
+- 2026-07-10: split/unified 모드 토글 컨트롤 제거 (v1.2.0). `Unified`/`Split` 버튼은 대응 CSS가 없어 눌러도 화면이 바뀌지 않았고(`data-gh-diff-mode` 속성만 토글), 독자에게 거짓 신호를 줬다. 진짜 좌우 분할은 `.ghui-diff__row`의 `44px 44px 1fr` 그리드를 old/new 셀 분리형으로 재설계해야 가능하므로 범위 밖이다. 따라서 `css/gh-ui.css`의 `.ghui-diff__modes`/`.ghui-diff__mode` 규칙, `js/gh-ui.js`의 `modeBtns` 블록, 소비 페이지의 모드 버튼과 `data-gh-diff-mode` 속성을 모두 삭제했다. mock은 통합 보기(unified)만 렌더링하며, Unified/Split 개념은 P05(`practice/pr-review.html`) 산문과 기어(⚙) 메뉴 안내로만 유지한다. `.ghui-diff__toolbar`·`Review changes` 버튼·배치 리뷰(REQ-010)는 그대로다. 어떤 REQ도 모드 컨트롤을 요구하지 않았으므로 수용 기준 변경 없음.
 - 2026-07-10: Run 완료. `css/gh-ui.css`(849줄, 9종 컴포넌트) + `js/gh-ui.js`(566줄, 5종 `data-asset`) 납품. REQ-001~020 전부 충족, 브라우저 실측 검증(콘솔 에러 0). 양방향 격리 확인 — 창 안 `p`=`#1f2328`·링크=`#0969da`, 창 밖 본문 `p`=`#2D2A26`·side-note 크림톤 유지. base.css의 태그 셀렉터 7종(`p`/`h1~h6`/`ul,ol`/`a`/`code,pre`/`img,svg`/`:focus-visible`)이 `.ghui-window` 내부를 오염시키던 것을 스코프 재정의로 무력화(REQ-002). `!important`는 reduced-motion 블록 2줄에 한정. 배치 리뷰(REQ-010) 전이 실측: `+` → `Start a review` → pending 1 → `Add review comment` → `Submit review` → pending 0·제출됨 1. 반응형(REQ-018) 375px에서 이슈 2단→1단, body 가로 스크롤 없음.
   - 검증 중 발견한 결함 1건 수정: mergebox 체크를 실패로 토글해도 라벨의 "통과" 글자가 남아 화면과 상태가 어긋났다. `[data-gh-check-state]`(상태 낱말 갱신)와 `[data-gh-check-name]`(aria-live가 읽을 순수 검사명) 훅을 추가해 해소. IMPL-010의 mergebox 마크업은 이 두 훅을 사용해야 한다.
-  - 알려진 한계: split/unified는 모드 컨트롤과 `data-gh-diff-mode` 전환까지 제공하고 좌우 분할 DOM 재조립은 하지 않는다. 핀 좌표의 실제 지점 정합은 IMPL-010 범위.
+  - 알려진 한계: 핀 좌표의 실제 지점 정합은 IMPL-010 범위. (split/unified 모드 컨트롤은 2026-07-10에 제거됨 — 아래 최신 HISTORY 항목 참조.)
 - 2026-07-10: 최초 작성. 승인 계획서의 "아키텍처: mock UI 시스템" 절을 구현 단계로 정식화. `css/gh-ui.css`(9종 컴포넌트, `.ghui-` 격리) + `js/gh-ui.js`(5종 `data-asset` 인터랙션) 산출물 정의. 핀 어노테이션을 "따라할 수 있게" 만드는 핵심 장치로 배경에 명시. 20개 EARS 수용 기준(REQ-001~REQ-020) 확정. 양방향 오염 금지(REQ-002/003), 배치 리뷰 흐름(REQ-010), 재현 화면 고지(REQ-016), 반응형 접힘(REQ-018)을 정식화. WHAT/WHY에 집중하고 HOW(CSS 좌표·DOM 트리·easing·hex)는 run 단계로 연기. IMPL-001 셸·IMPL-006 JS 패턴 상속, IMPL-010/011/012 하류 의존 명시.

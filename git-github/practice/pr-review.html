@@ -121,12 +121,8 @@
         <div class="ghui-window__address">github.com/dongne-library/library-web</div>
       </div>
       <div class="ghui-window__body">
-        <div class="ghui-diff" data-asset="gh-diff" data-gh-diff-mode="unified">
+        <div class="ghui-diff" data-asset="gh-diff">
           <div class="ghui-diff__toolbar">
-            <div class="ghui-diff__modes">
-              <button type="button" class="ghui-diff__mode is-active" data-gh-mode="unified">Unified</button>
-              <button type="button" class="ghui-diff__mode" data-gh-mode="split">Split</button>
-            </div>
             <button type="button" class="ghui-diff__review-btn" data-gh-review>Review changes <span class="ghui-diff__review-count" data-gh-review-count hidden>0</span></button>
           </div>
 
@@ -225,7 +221,7 @@
 
     <div class="side-note side-note--warn" data-reveal>
       <span class="side-note__label">주의</span>
-      <p>위 재현 화면의 <code>Unified</code>/<code>Split</code> 버튼은 <strong>안내만 바뀌고 화면 모양은 그대로예요</strong>. 이 학습용 mock에는 Split(분할) 보기를 그리는 기능이 아직 없어서, 눌러도 좌우로 나뉘지 않아요(다시 그려지지 않아요). 진짜 GitHub에서는 앞서 말한 <strong>기어(⚙) 메뉴</strong>로 통합/분할을 오갈 수 있으니, 개념만 여기서 익혀두고 실제 전환은 GitHub에서 확인하세요.</p>
+      <p>위 재현 화면은 <strong>통합 보기(Unified) 모습만</strong> 그려요. 이 학습용 mock에는 분할 보기를 그리는 기능이 없어서 전환 버튼도 따로 두지 않았어요. 진짜 GitHub에서는 diff 오른쪽 위 <strong>기어(⚙) 메뉴</strong>에서 <code>Unified</code>(통합 보기)와 <code>Split</code>(분할 보기)을 오갈 수 있으니, 개념만 여기서 익혀두고 실제 전환은 GitHub에서 확인하세요.</p>
     </div>
 
     <section class="tut-section" id="batch-flow" data-reveal>

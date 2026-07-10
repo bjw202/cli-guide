@@ -306,7 +306,7 @@
 .ghui-tabs__panel[hidden] { display: none; }
 
 /* =================================================================
-   7. Diff (REQ-004 / REQ-010): split·unified, 라인번호, +/- 배경,
+   7. Diff (REQ-004 / REQ-010): 라인번호, +/- 배경,
       hover 시 파란 + 버튼, 코멘트 삽입 슬롯, 배치 리뷰 도구
    ================================================================= */
 .ghui-diff {
@@ -352,18 +352,6 @@
   text-align: center;
   font-size: var(--ghui-fs-sm);
 }
-.ghui-diff__modes { display: inline-flex; border: 1px solid var(--ghui-border); border-radius: var(--ghui-radius); overflow: hidden; }
-.ghui-diff__mode {
-  padding: 4px 10px;
-  border: 0;
-  background: var(--ghui-canvas);
-  color: var(--ghui-fg-muted);
-  font-size: var(--ghui-fs-sm);
-  cursor: pointer;
-}
-.ghui-diff__mode + .ghui-diff__mode { border-left: 1px solid var(--ghui-border); }
-.ghui-diff__mode.is-active { background: var(--ghui-accent); color: #fff; font-weight: 600; }
-
 .ghui-diff__file-head {
   display: flex;
   align-items: center;
