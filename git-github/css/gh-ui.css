@@ -809,7 +809,12 @@
     order: -1;   /* 모바일에서 사이드바를 본문 위로 */
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 8px 16px;
+    /* 열 간격은 핀 지름(24px)보다 넓어야 한다. 오른쪽 열 항목에 앵커된 핀이
+       왼쪽 열 항목의 기어 아이콘을 덮지 않도록. */
+    gap: 8px 32px;
+    /* 사이드바가 창 왼쪽 가장자리에 붙으면 항목에 앵커된 핀(left:-14px)이
+       .ghui-window 의 overflow:hidden 에 잘린다. 핀이 들어갈 자리를 비운다. */
+    padding-left: 16px;
   }
   .ghui-sidebar__item {
     flex: 1 1 40%;

@@ -173,7 +173,10 @@
   padding: 0 24px;
 }
 
-.layout__main { min-width: 0; }
+/* min-width:0 만으로는 부족하다. 그리드 아이템이 트랙보다 넓어지면
+   내부 overflow-x:auto 컨테이너(.code-block, .ghui-diff__scroll 등)가
+   무력화되어 body 가로 스크롤이 생긴다. width:100% 로 트랙에 고정한다. */
+.layout__main { min-width: 0; width: 100%; }
 
 /* ---------- GlobalFooter ---------- */
 .global-footer {
