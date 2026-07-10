@@ -1,6 +1,6 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-012
-version: 1.0.0
+version: 1.1.0
 status: Draft
 created: 2026-07-10
 updated: 2026-07-10
@@ -40,7 +40,7 @@ related:
 - **T17**(`github-review.html`): diff mock UI 1장, P05 링크.
 - **T23**(`github-projects.html`): 칸반 보드 mock UI(현재 산문+표뿐), P06 링크.
 
-또한 용어집 `ref/glossary.html`에 `sub-issue`, `issue type`, `merge queue`, `ruleset`, `suggested change` 5개 항목을 추가한다. `js/glossary-tooltip.js`(IMPL-006)가 이 앵커를 참조하므로, 추가되면 P 트랙에서 이 용어를 `data-term`으로 쓸 수 있게 된다.
+또한 용어집 `ref/glossary.html`에 `sub-issue`, `issue type`, `merge queue`, `ruleset`, `suggested change` 5개 항목을 추가한다. 단, `js/glossary-tooltip.js`(IMPL-006)는 이 정의를 **런타임에 fetch하지 않고 인라인 `GLOSSARY` 맵으로 미러링**한다(`file://`에서 CORS로 fetch 불가 — 파일 헤더 주석이 명시). 따라서 P 트랙에서 `data-term`으로 재사용하려면 R02와 인라인 맵 **두 곳 모두**에 5개 항목을 추가해야 한다(REQ-006).
 
 **개념/실전 층위 분리 원칙이 본 SPEC의 설계 근간이다.** T 트랙은 "무엇인가(비유)", P 트랙은 "어디를 누르는가(화면)"를 담당한다. 따라서 T 페이지는 mock UI를 **맛보기 1장**만 두고 깊이(사이드바 9항목 해부, 배치 리뷰 흐름 등)는 P 트랙으로 넘긴다 — 중복 서술을 방지한다.
 
@@ -71,7 +71,13 @@ related:
 ### 3.4 `ref/glossary.html` (R02)
 
 - 신규 용어 5항목 추가: `sub-issue`, `issue type`, `merge queue`, `ruleset`, `suggested change`.
-- 각 항목은 `js/glossary-tooltip.js`가 참조할 수 있는 앵커를 가진다(P 트랙에서 `data-term`으로 사용 가능).
+- 각 항목은 `article.glossary__item`으로 `id` 앵커(`.glossary__term`·`.glossary__metaphor`·`.glossary__def` 포함)를 가진다(P 트랙에서 `data-term`으로 사용 가능).
+
+### 3.5 `js/glossary-tooltip.js` (IMPL-006 인라인 미러 갱신)
+
+- 인라인 `GLOSSARY` 객체에 R02와 **동일한 5개 키**를 추가한다. 키는 R02 항목의 `id` 앵커 슬러그와 1:1로 일치한다(예: `sub-issue`, `issue-type`, `merge-queue`, `ruleset`, `suggested-change`). 각 키는 `term`·`metaphor` 필드를 가지며, `term`은 R02 `.glossary__term`, `metaphor`는 R02 대응 항목의 `.glossary__metaphor` 본문과 일치한다(기존 엔트리 관례대로 앞의 "비유 — " 도입부는 제외).
+- **이는 fetch가 아니라 수기 미러다.** `glossary-tooltip.js` 헤더 주석("file://에서 fetch 불가(CORS)하므로 인라인 임베드")대로, `file://`에서 `ref/glossary.html`을 런타임 fetch할 수 없어 데이터를 인라인 임베드한다. R02에만 5항목을 추가하고 인라인 맵을 갱신하지 않으면 `GLOSSARY[key]`가 `undefined`가 되어 `show()`가 조기 반환(툴팁 미표시)한다.
+- 따라서 R02(§3.4)와 본 인라인 맵은 **항상 동기화**되어야 한다(REQ-006, REQ-012). 빌드 단계가 없으므로 동기화는 수기로 이뤄진다.
 
 ---
 
@@ -89,7 +95,7 @@ related:
 
 - **REQ-005 (용어집 5항목 추가)**: WHEN 독자가 `ref/glossary.html`을 열면, THEN `sub-issue`, `issue type`, `merge queue`, `ruleset`, `suggested change` 5개 용어 항목이 정의와 함께 존재 SHALL.
 
-- **REQ-006 (glossary 앵커 `data-term` 연동)**: WHEN P 트랙 페이지의 용어 요소가 신규 5개 용어를 `data-term`으로 참조하면, THEN `js/glossary-tooltip.js`가 `ref/glossary.html`에 추가된 해당 용어 정의를 툴팁으로 표시 SHALL.
+- **REQ-006 (glossary 5항목 미러 일치 — R02 ↔ 인라인 맵)**: WHEN 신규 5개 용어(`sub-issue`, `issue type`, `merge queue`, `ruleset`, `suggested change`)가 도입되면, THEN (a) 5개 항목이 `ref/glossary.html`에 정의와 `id` 앵커를 갖고 존재하고, AND (b) `js/glossary-tooltip.js`의 인라인 `GLOSSARY` 객체에 R02 `id`와 1:1로 일치하는 동일 5개 키가 `term`·`metaphor` 필드와 함께 존재하며, 각 `metaphor`는 대응 R02 항목의 `.glossary__metaphor` 본문과 일치(기존 엔트리 관례상 앞의 "비유 — " 도입부는 제외) SHALL. `js/glossary-tooltip.js`는 R02를 런타임에 fetch하지 않고 인라인 맵만 읽으므로, (b)가 누락되면 `GLOSSARY[key]`가 `undefined`가 되어 P 트랙 툴팁이 표시되지 SHALL NOT.
 
 - **REQ-007 (mock UI 재사용)**: UBIQUITOUS — T16/T17/T23에 삽입되는 모든 mock UI는 IMPL-009의 `.ghui-` 컴포넌트 시스템으로 렌더링 SHALL. 새 mock UI 스타일을 정의하지 SHALL NOT.
 
@@ -100,6 +106,8 @@ related:
 - **REQ-010 (빌드 없음)**: UBIQUITOUS — 모든 보강은 빌드 단계 없이 `file://` 프로토콜에서 직접 동작 SHALL. (Node/npm/bundler 및 외부 라이브러리 의존성 없음.)
 
 - **REQ-011 (tmux 원본 무결성)**: UBIQUITOUS — 본 SPEC의 어떤 수정도 `tmux/` 디렉토리의 원본 파일을 변경하지 SHALL NOT.
+
+- **REQ-012 (미러 동기화 불변식 — R02 ↔ 인라인 맵)**: UBIQUITOUS — R02(`ref/glossary.html`)의 용어 항목과 `js/glossary-tooltip.js`의 인라인 `GLOSSARY` 항목은 언제나 동기화 상태를 유지 SHALL. R02의 용어를 추가·수정·삭제하면 인라인 맵에 동일하게 반영하고, 그 역도 성립 SHALL. 빌드 단계도 런타임 fetch도 없으므로(그 부재가 이 중복의 존재 이유다) 어느 한쪽만 변경하지 SHALL NOT.
 
 ---
 
@@ -113,7 +121,10 @@ related:
 - `cases/index.html`에 P 트랙 연계 사례 추가 → **명시적 범위 외**(계획서 확정: 이번엔 건드리지 않음).
 - T16/T17/T23 외 다른 튜토리얼 페이지 보강 → 범위 밖(3개 페이지 + 용어집만).
 - 신규 용어 5항목의 상세 정의 문구, mock UI 삽입 위치·마크업 → **run 단계** (WHAT이 아닌 HOW).
+- 본 SPEC이 편집하는 네 파일의 **네비게이션 헤더** 수정 → **P11 (IMPL-011)** 소관 (범위 밖).
 - `tmux/` 원본 파일의 어떠한 수정 (REQ-011 위반).
+
+**IMPL-011과의 파일 동시 편집 금지**: IMPL-011(P11)은 본 SPEC이 편집하는 네 파일 — T16 `tutorial/github-issues-pr.html`, T17 `tutorial/github-review.html`, T23 `tutorial/github-projects.html`, R02 `ref/glossary.html` — 의 **네비게이션 헤더**를 소관한다. 두 SPEC은 이 네 파일에서 **동시에 실행하지 SHALL NOT**. 실행 순서: **IMPL-012가 먼저**(mock UI 맛보기·P 링크·용어 5항목·인라인 미러) 완료된 뒤, **IMPL-011의 기계적 네비게이션 일괄 수정(nav sweep)이 뒤따른다**.
 
 ---
 
@@ -127,9 +138,9 @@ related:
 
 ### 6.2 용어집 앵커를 통한 툴팁 재사용 (데이터 단일 소스)
 
-**결정**: 신규 용어 5항목을 `ref/glossary.html`에 추가하고, P 트랙은 이를 `data-term`으로 참조해 `glossary-tooltip.js`(IMPL-006)로 툴팁을 띄운다. 용어 정의를 P 트랙에 별도로 복제하지 않는다.
+**결정**: 신규 용어 5항목을 `ref/glossary.html`(사람이 읽는 단일 소스)에 추가하고, 동일 5항목을 `js/glossary-tooltip.js`의 인라인 `GLOSSARY` 맵에도 미러링한다. P 트랙은 이를 `data-term`으로 참조해 툴팁을 띄우며, 용어 정의를 P 트랙에 별도로 복제하지 않는다.
 
-**근거**: 용어 정의가 용어집과 P 트랙 두 곳에 존재하면 불일치가 생긴다. `glossary-tooltip.js`가 이미 용어집 앵커를 참조하는 구조이므로, 용어집을 단일 소스로 두고 P 트랙이 소비만 하면 정의가 한 곳에서 관리된다. 이것이 REQ-006의 근간이다.
+**근거**: `glossary-tooltip.js`는 `file://`에서 CORS로 `ref/glossary.html`을 런타임 fetch할 수 없어(파일 헤더 주석 명시) 용어 데이터를 인라인 임베드한다. 즉 정의의 권위 있는 단일 소스는 R02이고, 인라인 맵은 그 **수기 미러**다. P 트랙이 정의를 복제하지 않게 하는 대신, R02와 인라인 맵 두 곳은 반드시 동기화되어야 한다. 이 이중화는 빌드 단계도 런타임 fetch도 없다는 제약의 산물이며, 이것이 REQ-006·REQ-012의 근간이다.
 
 ---
 
@@ -137,9 +148,9 @@ related:
 
 - **SPEC-GIT-GITHUB-IMPL-009 (P9)**(선행, 강한 의존): T 페이지에 삽입할 mock UI(`.ghui-` 컴포넌트)가 먼저 존재해야 한다(REQ-007). IMPL-009 완료 후 본 SPEC이 이를 재사용한다.
 - **SPEC-GIT-GITHUB-IMPL-010 (P10)**(선행, 강한 의존): 링크 대상 P02/P04/P05/P06/P07 페이지가 먼저 존재해야 한다. IMPL-010 완료 후 본 SPEC이 T 페이지에서 이를 링크한다.
-- **SPEC-GIT-GITHUB-IMPL-006 (P6)**: `js/glossary-tooltip.js`가 용어집 앵커를 참조하는 구조. 신규 용어 5항목이 이 메커니즘으로 P 트랙에서 툴팁으로 재사용된다(REQ-006).
+- **SPEC-GIT-GITHUB-IMPL-006 (P6)**: `js/glossary-tooltip.js`는 R02 용어 데이터를 인라인 `GLOSSARY` 맵으로 미러링한다(런타임 fetch 아님 — `file://` CORS 제약). 신규 용어 5항목은 R02와 인라인 맵 **양쪽**에 추가되어야 P 트랙에서 `data-term` 툴팁으로 재사용된다(REQ-006, REQ-012).
 - **SPEC-GIT-GITHUB-IMPL-001 (P1)**: T16/T17/T23의 튜토리얼 골격, side-note 6종, `ref/glossary.html` 구조. 보강 대상의 원천.
-- **SPEC-GIT-GITHUB-IMPL-011 (P11)**(느슨한 결합): 사이트 통합. 본 SPEC의 T→P 링크는 네비게이션 통합과 독립적으로 동작하나, 둘 다 P 트랙 도달성을 높인다.
+- **SPEC-GIT-GITHUB-IMPL-011 (P11)**(기능상 느슨한 결합 · 파일상 배타): 사이트 통합. 본 SPEC의 T→P 링크는 네비게이션 통합과 독립적으로 동작하나, 둘 다 P 트랙 도달성을 높인다. 단, IMPL-011은 본 SPEC이 편집하는 네 파일(T16·T17·T23·R02)의 네비게이션 헤더를 소관하므로 **동일 파일 동시 편집 불가** — IMPL-012 선행, IMPL-011 nav sweep 후행(§5).
 - **SPEC-GIT-GITHUB-GUIDE-001 기획 산출물**(입력): 개념/실전 층위 분리 원칙, 오디언스 계약.
 
 ---
@@ -149,7 +160,7 @@ related:
 | 리스크 | 영향 | 완화 |
 |---|---|---|
 | T 페이지가 P 트랙 내용을 과도하게 재현(층위 혼선) | 중복 서술, 유지보수 이중화 | REQ-008로 "맛보기 1장" 원칙을 강제(결정 6.1). 상세는 링크로 위임. run 단계에서 T/P 서술 중복 여부 점검. |
-| 신규 용어 앵커와 `glossary-tooltip.js` 참조 형식 불일치 | P 트랙 툴팁 공백 | REQ-006으로 `data-term` 연동을 검증. run 단계에서 기존 용어 앵커 형식을 그대로 따르는지 확인. |
+| R02(`ref/glossary.html`)와 `glossary-tooltip.js` 인라인 `GLOSSARY` 맵이 조용히 어긋남(한쪽만 갱신) | 정의와 모순되는 툴팁 또는 툴팁 공백(키 `undefined`) | `glossary-tooltip.js`는 R02를 런타임 fetch하지 않고 인라인 미러를 읽음(§3.5). REQ-006으로 양쪽 5키 존재·`metaphor` 일치를, REQ-012로 미러 동기화 불변식을 강제. sync 단계에서 R02 ↔ 인라인 맵 5키 대조를 필수 점검. |
 | P 트랙 미완성 시 T→P 링크가 깨짐 | 404, 진입 다리 단절 | IMPL-010 선행 의존 명시. IMPL-010 완료 후 본 SPEC 실행. |
 | 보강 중 기존 T 페이지 콘텐츠 훼손 | 개념 설명 회귀 | REQ-009 스코프 규율로 보강 지점 외 불변 강제. run 단계에서 diff 최소성 검증. |
 
@@ -169,4 +180,5 @@ related:
 
 ## HISTORY
 
+- 2026-07-10 (v1.1.0): REQ-006 정정 + 산출물 추가. **REQ-006이 원안대로는 성립 불가였음을 수정** — `js/glossary-tooltip.js`는 `ref/glossary.html`을 런타임 fetch하지 않고 인라인 `GLOSSARY` 맵을 임베드한다(헤더 주석: "file://에서 fetch 불가(CORS)하므로 인라인 임베드"). 따라서 R02에만 5항목을 추가하면 `GLOSSARY[key]`가 `undefined`가 되어 툴팁이 침묵한다. REQ-006을 "R02·인라인 맵 양쪽에 5키가 존재하고 `metaphor`가 일치해야 한다"는 검증 가능·참인 조건으로 재서술(EARS 유지). 산출물 §3.5(`js/glossary-tooltip.js` 인라인 미러 갱신) 신설 — 종전 §3의 4개 산출물이 `glossary-tooltip.js`를 누락하고 있었다. 미러 동기화 불변식 REQ-012 신설(빌드·런타임 fetch 부재가 중복의 존재 이유). 결정 6.2·§2 배경·§7 IMPL-006 의존성의 "앵커 참조" 오기술을 "인라인 미러" 실제 메커니즘으로 정정. §8 리스크에 R02 ↔ 인라인 맵 드리프트 위험 반영. §5·§7에 IMPL-011과의 네 파일(T16·T17·T23·R02) 동시 편집 금지·실행 순서(IMPL-012 선행, IMPL-011 nav sweep 후행) 명시. REQ-007/009/011 불변. version 1.0.0 → 1.1.0.
 - 2026-07-10: 최초 작성. 승인 계획서의 "기존 개념 페이지 보강" 절을 구현 단계로 정식화. T16(Issue·PR mock UI 맛보기 + P02/P04/P07 링크), T17(diff mock UI + P05 링크), T23(칸반 보드 mock UI + P06 링크), `ref/glossary.html`(sub-issue·issue type·merge queue·ruleset·suggested change 5항목 추가)을 산출물로 정의. 개념/실전 층위 분리(결정 6.1, "맛보기 1장" 원칙)와 용어집 앵커 툴팁 재사용(결정 6.2, 데이터 단일 소스)을 아키텍처 결정으로 명문화. `cases/index.html` 사례 추가는 명시적 범위 외. 11개 EARS 수용 기준(REQ-001~REQ-011) 확정. WHAT/WHY에 집중하고 HOW(삽입 위치·마크업·용어 정의 문구)는 run 단계로 연기. IMPL-009·IMPL-010 강한 의존, IMPL-006 툴팁 메커니즘, IMPL-001 골격 의존 명시.
