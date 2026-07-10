@@ -1,7 +1,7 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-012
-version: 1.1.0
-status: Draft
+version: 1.2.0
+status: Implemented
 created: 2026-07-10
 updated: 2026-07-10
 author: jw
@@ -180,5 +180,6 @@ related:
 
 ## HISTORY
 
+- 2026-07-10 (v1.2.0): Run 완료 + `data-term` 트리거 연결. T16/T17/T23 mock UI 맛보기와 용어집 5항목(`sub-issue`·`issue-type`·`merge-queue`·`ruleset`·`suggested-change`)을 `ref/glossary.html`과 `js/glossary-tooltip.js` 인라인 맵 양쪽에 추가, `metaphor` 5건 바이트 단위 일치 확인(REQ-006/REQ-012 충족). 다만 REQ-006은 "양쪽 미러 일치"만 요구하므로, 추가 직후에는 본문 어디에서도 `data-term`으로 참조하지 않아 툴팁이 뜰 자리가 없었다. 이후 본문 첫 등장 위치 4곳에 트리거를 연결 — `sub-issue`·`issue-type`(`practice/issue-anatomy.html`), `merge-queue`(`practice/pr-anatomy.html`), `suggested-change`(`practice/pr-review.html`). 이때 실전 페이지 3곳이 `js/glossary-tooltip.js`를 아예 로드하지 않고 있어 `<script>` 태그를 함께 추가했다(`data-term`만으로는 아무 일도 일어나지 않는다). 트리거는 mock UI(`.ghui-window`)와 범례(`.ghui-legend__item`) 바깥의 산문에만 둔다 — 범례 항목은 핀 활성화 클릭 핸들러를 갖고 있어 `role="button"` 트리거를 중첩하면 클릭이 양쪽으로 발화한다. **`ruleset`은 용어집 밖 본문에 등장하지 않아 트리거를 걸지 않았다**; 항목과 인라인 맵은 유지하며, `tutorial/github-org-teams.html`의 branch protection 서술에 ruleset 문장이 추가되면 즉시 사용 가능하다. 표기 정합: `practice/pr-anatomy.html` 본문의 `병합 대기열`을 용어집·툴팁과 같은 `병합 큐`로 통일. 브라우저 실측: 트리거 4/4 툴팁 표시, mock UI·범례 내부 트리거 0개.
 - 2026-07-10 (v1.1.0): REQ-006 정정 + 산출물 추가. **REQ-006이 원안대로는 성립 불가였음을 수정** — `js/glossary-tooltip.js`는 `ref/glossary.html`을 런타임 fetch하지 않고 인라인 `GLOSSARY` 맵을 임베드한다(헤더 주석: "file://에서 fetch 불가(CORS)하므로 인라인 임베드"). 따라서 R02에만 5항목을 추가하면 `GLOSSARY[key]`가 `undefined`가 되어 툴팁이 침묵한다. REQ-006을 "R02·인라인 맵 양쪽에 5키가 존재하고 `metaphor`가 일치해야 한다"는 검증 가능·참인 조건으로 재서술(EARS 유지). 산출물 §3.5(`js/glossary-tooltip.js` 인라인 미러 갱신) 신설 — 종전 §3의 4개 산출물이 `glossary-tooltip.js`를 누락하고 있었다. 미러 동기화 불변식 REQ-012 신설(빌드·런타임 fetch 부재가 중복의 존재 이유). 결정 6.2·§2 배경·§7 IMPL-006 의존성의 "앵커 참조" 오기술을 "인라인 미러" 실제 메커니즘으로 정정. §8 리스크에 R02 ↔ 인라인 맵 드리프트 위험 반영. §5·§7에 IMPL-011과의 네 파일(T16·T17·T23·R02) 동시 편집 금지·실행 순서(IMPL-012 선행, IMPL-011 nav sweep 후행) 명시. REQ-007/009/011 불변. version 1.0.0 → 1.1.0.
 - 2026-07-10: 최초 작성. 승인 계획서의 "기존 개념 페이지 보강" 절을 구현 단계로 정식화. T16(Issue·PR mock UI 맛보기 + P02/P04/P07 링크), T17(diff mock UI + P05 링크), T23(칸반 보드 mock UI + P06 링크), `ref/glossary.html`(sub-issue·issue type·merge queue·ruleset·suggested change 5항목 추가)을 산출물로 정의. 개념/실전 층위 분리(결정 6.1, "맛보기 1장" 원칙)와 용어집 앵커 툴팁 재사용(결정 6.2, 데이터 단일 소스)을 아키텍처 결정으로 명문화. `cases/index.html` 사례 추가는 명시적 범위 외. 11개 EARS 수용 기준(REQ-001~REQ-011) 확정. WHAT/WHY에 집중하고 HOW(삽입 위치·마크업·용어 정의 문구)는 run 단계로 연기. IMPL-009·IMPL-010 강한 의존, IMPL-006 툴팁 메커니즘, IMPL-001 골격 의존 명시.

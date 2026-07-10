@@ -1,7 +1,7 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-011
-version: 1.1.0
-status: Draft
+version: 1.2.0
+status: Implemented
 created: 2026-07-10
 updated: 2026-07-10
 author: jw
@@ -173,5 +173,6 @@ IMPL-010이 신설한 실전 협업 트랙 `practice/`(P01~P08)를 사이트의 
 
 ## HISTORY
 
+- 2026-07-10 (v1.2.0): Run 완료. 40개 페이지에 `실전` 드롭다운, `js/nav.js` `sectionMap`에 `practice: { label: '실전', order: 4 }`, `index.html` 4번째 도어(`practice/repo-tour.html`), 모바일 드로어 `실전` 섹션, 검색 인덱스 `type:"practice"` 8건(98 → 106) 추가. `js/search.js`는 `TAB_TYPE_MAP.practice`와 `typeLabel()`의 `case 'practice': return '실전'`이 함께 필요했다 — 후자가 없으면 `default: return type`이 결과 뱃지에 영문 `practice`를 그대로 찍는다. 검증 중 발견한 누락 1건: `search-tab` 버튼을 추가하지 않아 `TAB_TYPE_MAP.practice`가 도달 불가였고, 직접 보강했다. 이후 `js/nav.js`에서 사전 존재 결함 1건을 발견해 별도 수정 — `initDropdowns()`가 모든 `.gh-nav__trigger`에 무조건 `preventDefault()`를 걸어, 드롭다운이 없는 평범한 링크(`사례`)의 이동을 39개 페이지에서 막고 있었다(`git log -S`로 최초 커밋 `0f77efc` 이래 존재함을 확인). `tauri/js/nav.js`에도 동일 가드를 예방 적용. 브라우저 실측: `사례` 클릭 이동, 드롭다운 3종 토글·`aria-expanded` 정상, Ctrl+K 검색에서 `실전` 탭 결과 2건·뱃지 `실전`, breadcrumb `홈 › 실전 › …` 생성.
 - 2026-07-10 (v1.1.0): 스위프 대상 수 정정. 기존 "27개"는 사전 존재 페이지를 과소집계한 값으로, 저장소 `class="gh-nav"` grep으로 검증한 실제 사전 존재 `gh-nav` 보유 페이지는 **32개**(`index.html` 1 + `tutorial/*.html` 26 + `ref/*.html` 4 + `cases/index.html` 1)다. 여기에 IMPL-010이 커밋한 `practice/*.html` **8개**(nav 변경을 IMPL-011이 소유하도록 `실전` 드롭다운 없이 선적됨)를 더해 **총 40개**가 스위프 대상임을 확정 — P 페이지도 페이저 외 도달 경로가 필요하므로 스위프에 포함. `practice/` 내부에서는 형제 P 페이지를 접두사 없이(`파일명.html`), `tutorial/`로는 `../tutorial/…`로 링크하는 **네 번째 경로 그룹**을 추가하여 기존 3그룹을 4그룹으로 확장. REQ-002(27→40 페이지), REQ-003(3그룹→4그룹, 전수 링크 깨짐 0건 유지) 본문 재기술, REQ-012(practice 형제 링크·현재 페이지 표시) 신설. Section 3 산출물·6.1·6.2 아키텍처 결정·7 의존성(IMPL-010 완료 반영)·8 리스크의 수치·그룹 표기를 40개·4그룹으로 정정. REQ-009 스코프 규율은 대상 수만 40으로 정정(스코프 규율 의미 불변). version 1.0.0→1.1.0.
 - 2026-07-10: 최초 작성. 승인 계획서의 "사이트 통합 (영향 범위)" 절을 구현 단계로 정식화. `js/nav.js` `sectionMap` 확장(`practice: { label: '실전', order: 4 }`), 27개 HTML `gh-nav` `실전` 드롭다운 신설(3그룹 경로), 모바일 드로어 갱신, `index.html` 도어 4개 확장·인라인 검색 인덱스 8항목 추가를 산출물로 정의. 상대경로 3그룹 분리(REQ-003), 검색 검출(REQ-007), breadcrumb 실전 표시(REQ-008)를 정식화. 네비 동적 렌더링 리팩터링 배격(결정 6.1, `file://` JS 실패 시 네비 소실 근거)과 검색 인덱스 인라인 유지(결정 6.3)를 아키텍처 결정으로 명문화. 27파일 반복 편집 누락·경로 접두사 혼동을 리스크로 등록하고 3그룹 분리 + 전수 검증으로 완화. 11개 EARS 수용 기준(REQ-001~REQ-011) 확정. WHAT/WHY에 집중하고 HOW(마크업·CSS 조정 값)는 run 단계로 연기. IMPL-010 강한 의존 명시.

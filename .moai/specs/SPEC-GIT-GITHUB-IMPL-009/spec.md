@@ -1,6 +1,6 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-009
-version: 1.2.0
+version: 1.3.0
 status: Implemented
 created: 2026-07-10
 updated: 2026-07-10
@@ -208,6 +208,7 @@ IMPL-006 `js/pr-flow.js` 패턴 상속(IIFE, `'use strict'`, `data-asset` 진입
 
 ## HISTORY
 
+- 2026-07-10 (v1.3.0): REQ-018 미충족 정정 + 핀 반응형 결함 수정. **아래 v1.2.0 직전 항목의 "375px에서 body 가로 스크롤 없음"은 사실이 아니었다** — 실제 브라우저 실측 결과 `practice/` 8개 전부 위반이었고(`issue-anatomy` 474px, `projects-ops` 1064px), `tutorial/` 등 기존 페이지도 마찬가지였다. 원인은 `css/layout.css`의 `.layout__main`으로, 그리드 아이템이 `min-width:0`만으로는 트랙(375px 뷰포트에서 327px)에 고정되지 않고 콘텐츠 최소 너비까지 늘어나, 그 안의 `overflow-x:auto` 컨테이너(`.code-block`·`.ghui-diff__scroll`·`.ghui-board__scroll`)를 무력화시켰다. `width:100%` 추가로 해소. 잔여 4개 페이지는 `css/components.css` 파일 끝에 모바일 전용 `@media` 블록을 추가해 처리(`.cmd-pill`/`.cheat-card__cmd` 줄바꿈 허용, `.glossary` `overflow-wrap`, `.comparison-table` `table-layout:fixed`) — 이 블록은 각 컴포넌트 기본 규칙보다 뒤에 와야 동일 특이도에서 `white-space`를 덮는다. 또한 768px 이하에서 `.ghui-sidebar`가 row/wrap으로 재배치될 때 항목에 앵커된 핀이 `.ghui-window`의 `overflow:hidden`에 잘리고(9개 중 4개만 창 안) 우측 열 핀이 좌측 열 기어 아이콘을 덮던 문제를 `padding-left:16px` + 열 간격 32px(핀 지름 24px 초과)로 수정. 검증: 40개 페이지 × 375/768/1280px 전부 통과, 핀 9/9 창 안·겹침 0. 수용 기준 변경 없음(REQ-018은 원래부터 이를 요구했다).
 - 2026-07-10: split/unified 모드 토글 컨트롤 제거 (v1.2.0). `Unified`/`Split` 버튼은 대응 CSS가 없어 눌러도 화면이 바뀌지 않았고(`data-gh-diff-mode` 속성만 토글), 독자에게 거짓 신호를 줬다. 진짜 좌우 분할은 `.ghui-diff__row`의 `44px 44px 1fr` 그리드를 old/new 셀 분리형으로 재설계해야 가능하므로 범위 밖이다. 따라서 `css/gh-ui.css`의 `.ghui-diff__modes`/`.ghui-diff__mode` 규칙, `js/gh-ui.js`의 `modeBtns` 블록, 소비 페이지의 모드 버튼과 `data-gh-diff-mode` 속성을 모두 삭제했다. mock은 통합 보기(unified)만 렌더링하며, Unified/Split 개념은 P05(`practice/pr-review.html`) 산문과 기어(⚙) 메뉴 안내로만 유지한다. `.ghui-diff__toolbar`·`Review changes` 버튼·배치 리뷰(REQ-010)는 그대로다. 어떤 REQ도 모드 컨트롤을 요구하지 않았으므로 수용 기준 변경 없음.
 - 2026-07-10: Run 완료. `css/gh-ui.css`(849줄, 9종 컴포넌트) + `js/gh-ui.js`(566줄, 5종 `data-asset`) 납품. REQ-001~020 전부 충족, 브라우저 실측 검증(콘솔 에러 0). 양방향 격리 확인 — 창 안 `p`=`#1f2328`·링크=`#0969da`, 창 밖 본문 `p`=`#2D2A26`·side-note 크림톤 유지. base.css의 태그 셀렉터 7종(`p`/`h1~h6`/`ul,ol`/`a`/`code,pre`/`img,svg`/`:focus-visible`)이 `.ghui-window` 내부를 오염시키던 것을 스코프 재정의로 무력화(REQ-002). `!important`는 reduced-motion 블록 2줄에 한정. 배치 리뷰(REQ-010) 전이 실측: `+` → `Start a review` → pending 1 → `Add review comment` → `Submit review` → pending 0·제출됨 1. 반응형(REQ-018) 375px에서 이슈 2단→1단, body 가로 스크롤 없음.
   - 검증 중 발견한 결함 1건 수정: mergebox 체크를 실패로 토글해도 라벨의 "통과" 글자가 남아 화면과 상태가 어긋났다. `[data-gh-check-state]`(상태 낱말 갱신)와 `[data-gh-check-name]`(aria-live가 읽을 순수 검사명) 훅을 추가해 해소. IMPL-010의 mergebox 마크업은 이 두 훅을 사용해야 한다.

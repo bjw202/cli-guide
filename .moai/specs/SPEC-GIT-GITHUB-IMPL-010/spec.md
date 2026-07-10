@@ -1,7 +1,7 @@
 ---
 id: SPEC-GIT-GITHUB-IMPL-010
-version: 1.0.0
-status: Draft
+version: 1.1.0
+status: Implemented
 created: 2026-07-10
 updated: 2026-07-10
 author: jw
@@ -217,4 +217,5 @@ related:
 
 ## HISTORY
 
+- 2026-07-10 (v1.1.0): Run 완료. `practice/` 8개 HTML(P01~P08, 2,297줄) 납품. 관통 시나리오(`dongne-library/library-web`, 지원/민수/하늘, Issue #42·#38, PR #57, Milestone `v1.0 오픈`) 전 페이지 일관 적용. mock UI는 IMPL-009의 `.ghui-` 컴포넌트만 사용하고 새 스타일을 정의하지 않았다. HOW 계약은 `run-contract.md`(462줄)로 분리해 세 차례 위임 배치가 동일 마크업을 참조하도록 했다 — 특히 핀은 창 기준 px/% 좌표가 아니라 라벨 대상 요소에 앵커(`.ghui-sidebar__item.ghui-annotated`의 첫 자식)하도록 강제했다. 768px 이하에서 `.ghui-issue`가 1단으로 접히고 `.ghui-sidebar`에 `order:-1`이 걸려 창 기준 좌표가 전부 어긋나기 때문이다. 브라우저 실측: 콘솔 에러 0, gh-diff 배치 리뷰 전 구간 동작, 핀 9개 ↔ 범례 9개 ↔ `aria-describedby` 9개 일치. 발견·수정한 결함 1건 — P01의 `Public` 칩이 이슈 Open 상태용 초록 `ghui-badge--open`을 쓰고 있어 `ghui-badge--pending`으로 교체.
 - 2026-07-10: 최초 작성. 승인 계획서의 "관통 시나리오"·"페이지 구성"·"정확성 원칙" 절을 구현 단계로 정식화. `practice/` 신규 디렉터리 + 8개 HTML(P01~P08) 산출물 정의. 관통 시나리오 `dongne-library/library-web`(지원/민수/하늘, Issue #42/#38, PR #57, Milestone `v1.0 오픈`, Project `도서관 리뉴얼 보드`)를 REQ-001·REQ-002로 결속. 2026년 조사 결과(Issue types 2025-04 GA·최대 25개, Sub-issues 100개·8단계, 검색 qualifier, `Closes` default 브랜치 함정, merge box 원문 라벨, 배치 리뷰 흐름, Projects 필드·자동화, Milestone 선택 기준)를 페이지별 REQ로 반영. 문서 미확정 3항목(자동화 목록·진행률 산식·Slice by 출시일) 방어적 서술을 REQ-015/018/019/020으로 정식화. UI 라벨 원문 병기(REQ-021), mock UI 재사용(REQ-023) 명시. 26개 EARS 수용 기준(REQ-001~REQ-026) 확정. WHAT/WHY에 집중하고 HOW(카피·좌표·DOM)는 run 단계로 연기. IMPL-009 강한 의존, IMPL-001 골격 상속, IMPL-011/012 후행 의존 명시.
