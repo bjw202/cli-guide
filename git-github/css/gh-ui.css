@@ -1,0 +1,849 @@
+/* =================================================================
+   SPEC-GIT-GITHUB-IMPL-009 — GitHub mock UI 기반 시스템 (gh-ui.css)
+   .ghui- 네임스페이스로 완전 격리된 GitHub 화면 재현 스타일.
+   9종 컴포넌트 + 핀 어노테이션. P 트랙/보강 T 페이지에서만 로드.
+
+   격리 원칙 (REQ-001/002/003):
+   - GitHub Primer 계열 변수는 :root 가 아니라 .ghui-window 스코프 안에서만
+     재정의한다(결정 6.2). 창 안은 GitHub 회색톤, 창 밖은 사이트 크림톤.
+   - 모든 셀렉터는 .ghui- 접두사로 시작한다. 태그 단독 셀렉터·:root 재정의 없음.
+   - base.css/components.css 의 태그 셀렉터 오염을 .ghui-window 스코프에서
+     명시 재설정으로 무력화한다(하단 "오염 차단" 절).
+
+   색 대비 (REQ-017, WCAG AA 4.5:1) — 계산 근거는 각 변수 주석 참조.
+   ================================================================= */
+
+/* =================================================================
+   1. 스코프드 변수 재정의 (.ghui-window 안에서만, REQ-001 / 결정 6.2)
+   ================================================================= */
+.ghui-window {
+  /* 표면/경계 — GitHub Primer light 계열 */
+  --ghui-canvas: #ffffff;
+  --ghui-canvas-subtle: #f6f8fa;
+  --ghui-canvas-inset: #f6f8fa;
+  --ghui-border: #d1d9e0;
+  --ghui-border-muted: #d8dee4;
+
+  /* 전경(텍스트) */
+  --ghui-fg: #1f2328;          /* on #fff = 15.3:1, on #f6f8fa = 14.3:1 (AAA) */
+  --ghui-fg-muted: #59636e;    /* on #fff = 6.1:1, on #f6f8fa = 5.7:1 (AA 충족) */
+
+  /* 강조/링크 */
+  --ghui-accent: #0969da;      /* on #fff = 5.2:1 (AA 충족) */
+  --ghui-accent-subtle: #ddf4ff;
+
+  /* 상태색 — 아래 값들은 흰색 텍스트를 얹었을 때의 대비를 함께 기재.
+     GitHub 원색을 그대로 쓰되 모두 4.5:1 이상임을 확인함(REQ-017). */
+  --ghui-open: #1f883d;        /* 배경, white 텍스트 = 4.5:1 (AA 경계 충족) */
+  --ghui-merged: #8250df;      /* 배경, white 텍스트 = 5.0:1 */
+  --ghui-closed: #cf222e;      /* 배경, white 텍스트 = 5.4:1 */
+  --ghui-attention: #9a6700;   /* 배경, white 텍스트 = 4.9:1 */
+
+  /* diff 배경 — 밝은 배경 위 --ghui-fg(#1f2328) 텍스트로 15:1 근접 */
+  --ghui-diff-add-bg: #e6ffec;
+  --ghui-diff-del-bg: #ffebe9;
+  --ghui-diff-add-num: #ccffd8;
+  --ghui-diff-del-num: #ffd7d5;
+
+  /* mock UI 자체 px 스케일 — 사이트 --fs-* 를 쓰지 않는다(GitHub 본문은 작다). */
+  --ghui-fs: 14px;
+  --ghui-fs-sm: 12px;
+  --ghui-radius: 6px;
+
+  position: relative;               /* 핀(.ghui-pin) 절대배치 기준 (REQ-006) */
+  display: block;
+  margin: 24px 0;
+  border: 1px solid var(--ghui-border);
+  border-radius: 10px;
+  background: var(--ghui-canvas);
+  color: var(--ghui-fg);
+  font-family: var(--font-sans);    /* 폰트는 사이트 것을 상속(요구사항) */
+  font-size: var(--ghui-fs);
+  line-height: 1.5;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(45, 42, 38, 0.06));
+}
+
+/* =================================================================
+   2. 오염 차단 — base.css/components.css 태그 셀렉터 무력화 (REQ-002)
+   base.css 에서 .ghui-window 안으로 상속되는 태그 규칙을 명시 재설정.
+   발견된 태그 셀렉터: a, a:hover, ul, ol, code, pre, h1~h4, p, img, svg,
+   :focus-visible. (components.css 태그 셀렉터는 @media print 한정이므로
+   화면 렌더링에는 무해하나, 링크색은 여기서 함께 중화한다.)
+   all: revert / !important 남발 없이 필요한 속성만 정확히 되돌린다.
+   ================================================================= */
+.ghui-window p {
+  margin: 0;
+  color: inherit;
+  font-size: var(--ghui-fs);
+  line-height: 1.5;
+}
+.ghui-window h1,
+.ghui-window h2,
+.ghui-window h3,
+.ghui-window h4,
+.ghui-window h5,
+.ghui-window h6 {
+  margin: 0;
+  color: inherit;
+  font-weight: 600;          /* base.css 700 → GitHub 헤더는 600 */
+  font-size: inherit;
+  line-height: 1.25;
+}
+.ghui-window ul,
+.ghui-window ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;          /* GitHub UI 목록은 불릿 없음 — 명시 고정 */
+  color: inherit;
+}
+.ghui-window li { color: inherit; }
+.ghui-window a {
+  color: var(--ghui-accent); /* base.css 사이트 인디고 → GitHub 블루 */
+  text-decoration: none;
+  border-bottom: 0;          /* base.css 의 border-bottom 밑줄 애니메이션 제거 */
+  transition: none;
+}
+.ghui-window a:hover {
+  text-decoration: underline;
+  border-bottom: 0;          /* base.css a:hover border-bottom-color 무력화 */
+}
+.ghui-window code,
+.ghui-window pre {
+  font-family: var(--font-mono);
+  font-size: var(--ghui-fs-sm);  /* base.css --fs-mono(15px) → 12px */
+}
+.ghui-window img,
+.ghui-window svg { display: inline-block; vertical-align: middle; }
+.ghui-window button {
+  font-family: inherit;
+  font-size: var(--ghui-fs-sm);
+}
+/* 포커스 링만 mock 톤으로(사이트 인디고 대신 GitHub 블루). 굵기는 접근성 유지. */
+.ghui-window :focus-visible {
+  outline: 2px solid var(--ghui-accent);
+  outline-offset: 1px;
+}
+
+/* =================================================================
+   3. 브라우저 크롬 + 주소창 (REQ-005 / REQ-016)
+   신호등 점은 fake-terminal.js .fterm__dot 패턴 참고.
+   ================================================================= */
+.ghui-window__chrome {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--ghui-canvas-subtle);
+  border-bottom: 1px solid var(--ghui-border);
+}
+.ghui-window__dots { display: flex; gap: 6px; flex: none; }
+.ghui-window__dot { width: 11px; height: 11px; border-radius: 50%; }
+.ghui-window__dot--r { background: #ff6b5e; }
+.ghui-window__dot--y { background: #ffc233; }
+.ghui-window__dot--g { background: #4ed466; }
+.ghui-window__address {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 12px;
+  background: var(--ghui-canvas);
+  border: 1px solid var(--ghui-border);
+  border-radius: 999px;
+  font-size: var(--ghui-fs-sm);
+  color: var(--ghui-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ghui-window__address::before {
+  content: "\1F512";           /* 자물쇠 — https 느낌 */
+  margin-right: 6px;
+  font-size: 11px;
+}
+.ghui-window__body { padding: 16px; }
+
+/* =================================================================
+   4. 저장소 탭 바 (REQ-004): Code / Issues / Pull requests / Actions / Projects
+   ================================================================= */
+.ghui-repo-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ghui-border);
+  overflow-x: auto;
+}
+.ghui-repo-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--ghui-fg);
+  font-size: var(--ghui-fs);
+  white-space: nowrap;
+}
+.ghui-repo-tab.is-active {
+  border-bottom-color: #fd8c73;   /* GitHub 활성 탭 주황 인디케이터 */
+  font-weight: 600;
+}
+.ghui-repo-tab__count {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(27, 31, 36, 0.08);
+  color: var(--ghui-fg-muted);
+  font-size: var(--ghui-fs-sm);
+  font-weight: 500;
+}
+
+/* =================================================================
+   5. 이슈 2단 레이아웃 (REQ-004 / REQ-018)
+   ================================================================= */
+.ghui-issue {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 256px;
+  gap: 16px;
+  align-items: start;
+}
+.ghui-issue__main { min-width: 0; }
+.ghui-issue__title {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+.ghui-issue__num { color: var(--ghui-fg-muted); font-weight: 300; }
+.ghui-issue__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--ghui-border);
+  font-size: var(--ghui-fs-sm);
+  color: var(--ghui-fg-muted);
+}
+.ghui-issue__comment {
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  overflow: hidden;
+}
+.ghui-issue__comment-head {
+  padding: 8px 12px;
+  background: var(--ghui-canvas-subtle);
+  border-bottom: 1px solid var(--ghui-border);
+  font-size: var(--ghui-fs-sm);
+  color: var(--ghui-fg-muted);
+}
+.ghui-issue__comment-body { padding: 12px; }
+.ghui-issue__comment-body p + p { margin-top: 10px; }
+
+/* 사이드바 (라벨 + 기어 + 값) */
+.ghui-sidebar { display: flex; flex-direction: column; gap: 0; }
+.ghui-sidebar__item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ghui-border-muted);
+}
+.ghui-sidebar__item:first-child { padding-top: 0; }
+.ghui-sidebar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: var(--ghui-fs-sm);
+  font-weight: 600;
+  color: var(--ghui-fg);
+}
+.ghui-sidebar__gear {
+  color: var(--ghui-fg-muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: default;
+}
+.ghui-sidebar__value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: var(--ghui-fs-sm);
+  color: var(--ghui-fg-muted);
+}
+.ghui-sidebar__empty { color: var(--ghui-fg-muted); font-style: normal; }
+
+/* =================================================================
+   6. PR 탭 (REQ-009): Conversation / Commits / Checks / Files changed
+   ================================================================= */
+.ghui-tabs__list {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--ghui-border);
+  overflow-x: auto;
+}
+.ghui-tabs__tab {
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ghui-fg);
+  font-size: var(--ghui-fs);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ghui-tabs__tab[aria-selected="true"],
+.ghui-tabs__tab.is-active {
+  border-bottom-color: #fd8c73;
+  font-weight: 600;
+}
+.ghui-tabs__count {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(27, 31, 36, 0.08);
+  color: var(--ghui-fg-muted);
+  font-size: var(--ghui-fs-sm);
+}
+.ghui-tabs__panel { padding: 16px 4px; }
+.ghui-tabs__panel[hidden] { display: none; }
+
+/* =================================================================
+   7. Diff (REQ-004 / REQ-010): split·unified, 라인번호, +/- 배경,
+      hover 시 파란 + 버튼, 코멘트 삽입 슬롯, 배치 리뷰 도구
+   ================================================================= */
+.ghui-diff {
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  overflow: hidden;
+  font-family: var(--font-mono);
+}
+.ghui-diff__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: var(--ghui-canvas-subtle);
+  border-bottom: 1px solid var(--ghui-border);
+  font-family: var(--font-sans);
+}
+.ghui-diff__review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  border-radius: var(--ghui-radius);
+  background: var(--ghui-open);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ghui-diff__review-btn[disabled] {
+  background: var(--ghui-canvas-subtle);
+  color: var(--ghui-fg-muted);
+  border-color: var(--ghui-border);
+  cursor: not-allowed;
+}
+.ghui-diff__review-count {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  font-size: var(--ghui-fs-sm);
+}
+.ghui-diff__modes { display: inline-flex; border: 1px solid var(--ghui-border); border-radius: var(--ghui-radius); overflow: hidden; }
+.ghui-diff__mode {
+  padding: 4px 10px;
+  border: 0;
+  background: var(--ghui-canvas);
+  color: var(--ghui-fg-muted);
+  font-size: var(--ghui-fs-sm);
+  cursor: pointer;
+}
+.ghui-diff__mode + .ghui-diff__mode { border-left: 1px solid var(--ghui-border); }
+.ghui-diff__mode.is-active { background: var(--ghui-accent); color: #fff; font-weight: 600; }
+
+.ghui-diff__file-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--ghui-canvas-subtle);
+  border-bottom: 1px solid var(--ghui-border);
+  font-family: var(--font-sans);
+  font-size: var(--ghui-fs-sm);
+}
+.ghui-diff__file-name { font-family: var(--font-mono); color: var(--ghui-fg); }
+.ghui-diff__viewed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ghui-fg-muted);
+  cursor: pointer;
+}
+
+/* diff 본문 — 가로 스크롤 컨테이너 (REQ-018) */
+.ghui-diff__scroll { overflow-x: auto; }
+.ghui-diff__body { min-width: 480px; }
+.ghui-diff__row {
+  display: grid;
+  grid-template-columns: 44px 44px 1fr;
+  position: relative;
+}
+.ghui-diff__row--add { background: var(--ghui-diff-add-bg); }
+.ghui-diff__row--del { background: var(--ghui-diff-del-bg); }
+.ghui-diff__ln {
+  padding: 0 8px;
+  text-align: right;
+  color: var(--ghui-fg-muted);
+  font-size: var(--ghui-fs-sm);
+  user-select: none;
+  border-right: 1px solid transparent;
+}
+.ghui-diff__row--add .ghui-diff__ln { background: var(--ghui-diff-add-num); }
+.ghui-diff__row--del .ghui-diff__ln { background: var(--ghui-diff-del-num); }
+.ghui-diff__content {
+  padding: 0 8px 0 20px;
+  white-space: pre;
+  color: var(--ghui-fg);
+  font-size: var(--ghui-fs-sm);
+  position: relative;
+}
+.ghui-diff__row--add .ghui-diff__content::before { content: "+"; position: absolute; left: 6px; color: var(--ghui-open); }
+.ghui-diff__row--del .ghui-diff__content::before { content: "-"; position: absolute; left: 6px; color: var(--ghui-closed); }
+
+/* hover/focus 시 라인번호 위에 뜨는 파란 + 버튼 */
+.ghui-diff__addbtn {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ghui-radius);
+  background: var(--ghui-accent);
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast, 0.18s) ease;
+  z-index: 2;
+}
+.ghui-diff__row:hover .ghui-diff__addbtn,
+.ghui-diff__addbtn:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 코멘트 삽입 행 */
+.ghui-diff__comment-row {
+  grid-column: 1 / -1;
+  padding: 10px 12px;
+  background: var(--ghui-canvas);
+  border-top: 1px solid var(--ghui-border);
+  border-bottom: 1px solid var(--ghui-border);
+  font-family: var(--font-sans);
+}
+.ghui-diff__comment-form { display: flex; flex-direction: column; gap: 8px; }
+.ghui-diff__comment-form textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 8px;
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  font-family: var(--font-sans);
+  font-size: var(--ghui-fs);
+  color: var(--ghui-fg);
+  resize: vertical;
+}
+.ghui-diff__comment-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.ghui-diff__comment {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-sans);
+}
+.ghui-diff__comment-text { color: var(--ghui-fg); font-size: var(--ghui-fs); }
+.ghui-diff__comment-note { color: var(--ghui-fg-muted); font-size: var(--ghui-fs-sm); }
+
+/* 리뷰 제출 패널 */
+.ghui-diff__review-panel {
+  padding: 12px;
+  border-top: 1px solid var(--ghui-border);
+  background: var(--ghui-canvas-subtle);
+  font-family: var(--font-sans);
+}
+.ghui-diff__review-panel textarea {
+  width: 100%;
+  min-height: 56px;
+  padding: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  font-family: var(--font-sans);
+  font-size: var(--ghui-fs);
+}
+.ghui-diff__review-opts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.ghui-diff__review-opt { display: flex; align-items: flex-start; gap: 8px; font-size: var(--ghui-fs); }
+.ghui-diff__review-opt small { display: block; color: var(--ghui-fg-muted); font-size: var(--ghui-fs-sm); }
+
+/* =================================================================
+   8. 공용 버튼/배지/라벨/아바타 원자 (REQ-004)
+   ================================================================= */
+.ghui-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  border-radius: var(--ghui-radius);
+  background: var(--ghui-canvas-subtle);
+  color: var(--ghui-fg);
+  font-size: var(--ghui-fs);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ghui-btn:hover { background: #eef1f4; }
+.ghui-btn--primary { background: var(--ghui-open); color: #fff; border-color: rgba(27, 31, 36, 0.15); font-weight: 600; }
+.ghui-btn--primary:hover { background: #1a7f37; }
+.ghui-btn[disabled] { opacity: 1; background: var(--ghui-canvas-subtle); color: var(--ghui-fg-muted); cursor: not-allowed; }
+
+.ghui-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  /* 배경색은 HTML 인라인 style="--label-bg:#d73a4a" 로 주입 (REQ 원자 요구) */
+  background: var(--label-bg, var(--ghui-canvas-subtle));
+  color: var(--label-fg, #fff);
+  font-size: var(--ghui-fs-sm);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.ghui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--ghui-canvas-subtle);
+  color: #fff;
+  font-size: var(--ghui-fs-sm);
+  font-weight: 600;
+}
+.ghui-badge--open { background: var(--ghui-open); }
+.ghui-badge--merged { background: var(--ghui-merged); }
+.ghui-badge--closed { background: var(--ghui-closed); }
+.ghui-badge--draft { background: #6e7781; }
+/* pending — 회색 배경 위 어두운 텍스트(5.7:1) */
+.ghui-badge--pending { background: var(--ghui-canvas-subtle); color: var(--ghui-fg-muted); border: 1px solid var(--ghui-border); }
+
+.ghui-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--avatar-bg, #6e7781);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  flex: none;
+  text-transform: uppercase;
+}
+.ghui-avatar--md { width: 28px; height: 28px; font-size: 12px; }
+
+/* =================================================================
+   9. Mergebox (REQ-012)
+   ================================================================= */
+.ghui-mergebox {
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  overflow: hidden;
+}
+.ghui-mergebox__checks { padding: 4px 0; }
+.ghui-mergebox__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--ghui-border-muted);
+  font-size: var(--ghui-fs);
+}
+.ghui-mergebox__check:last-child { border-bottom: 0; }
+.ghui-mergebox__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+}
+.ghui-mergebox__check.is-pass .ghui-mergebox__toggle { background: var(--ghui-open); }
+.ghui-mergebox__check.is-pass .ghui-mergebox__toggle::before { content: "\2713"; }   /* ✓ */
+.ghui-mergebox__check.is-fail .ghui-mergebox__toggle { background: var(--ghui-closed); }
+.ghui-mergebox__check.is-fail .ghui-mergebox__toggle::before { content: "\2715"; }   /* ✕ */
+.ghui-mergebox__check.is-wait .ghui-mergebox__toggle { background: var(--ghui-attention); }
+.ghui-mergebox__check.is-wait .ghui-mergebox__toggle::before { content: "\2022"; }   /* • */
+.ghui-mergebox__check-label { flex: 1 1 auto; }
+.ghui-mergebox__check.is-fail .ghui-mergebox__check-label { color: var(--ghui-fg); }
+
+.ghui-mergebox__action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px;
+  background: var(--ghui-canvas-subtle);
+  border-top: 1px solid var(--ghui-border);
+}
+.ghui-mergebox__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: var(--ghui-fs);
+}
+.ghui-mergebox__status-dot { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+.ghui-mergebox.is-ready .ghui-mergebox__status-dot { background: var(--ghui-open); }
+.ghui-mergebox.is-blocked .ghui-mergebox__status-dot { background: var(--ghui-closed); }
+.ghui-mergebox__merge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 6px 16px;
+  border: 1px solid rgba(27, 31, 36, 0.15);
+  border-radius: var(--ghui-radius);
+  background: var(--ghui-open);
+  color: #fff;
+  font-weight: 600;
+  font-size: var(--ghui-fs);
+  cursor: pointer;
+}
+.ghui-mergebox__merge:hover { background: #1a7f37; }
+.ghui-mergebox__caret { font-size: 10px; }
+.ghui-mergebox__merge[disabled] {
+  background: var(--ghui-canvas-subtle);
+  color: var(--ghui-fg-muted);
+  border-color: var(--ghui-border);
+  cursor: not-allowed;
+}
+.ghui-mergebox__reason {
+  width: 100%;
+  color: var(--ghui-closed);
+  font-size: var(--ghui-fs-sm);
+}
+
+/* =================================================================
+   10. Projects 보드 (REQ-011)
+   ================================================================= */
+.ghui-board__scroll { overflow-x: auto; }
+.ghui-board {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 240px;
+  gap: 12px;
+  align-items: start;
+  min-width: min-content;
+}
+.ghui-board__col {
+  background: var(--ghui-canvas-subtle);
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  padding: 8px;
+}
+.ghui-board__col-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 10px;
+  font-size: var(--ghui-fs-sm);
+  font-weight: 600;
+  color: var(--ghui-fg);
+}
+.ghui-board__col-count {
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(27, 31, 36, 0.08);
+  color: var(--ghui-fg-muted);
+  font-weight: 500;
+}
+.ghui-board__cards { display: flex; flex-direction: column; gap: 8px; min-height: 24px; }
+.ghui-board__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--ghui-canvas);
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--ghui-fs-sm);
+  transition: box-shadow var(--dur-fast, 0.18s) ease, transform var(--dur-fast, 0.18s) ease;
+}
+.ghui-board__card:hover { box-shadow: var(--shadow-sm, 0 2px 8px rgba(45, 42, 38, 0.06)); }
+.ghui-board__card.is-moving { transform: scale(1.02); }
+.ghui-board__card-title { color: var(--ghui-fg); font-size: var(--ghui-fs); font-weight: 500; }
+.ghui-board__card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--ghui-fg-muted); }
+.ghui-board__card-status { color: var(--ghui-fg-muted); font-size: var(--ghui-fs-sm); }
+.ghui-board__card-status b { color: var(--ghui-fg); font-weight: 600; }
+
+/* =================================================================
+   11. Milestone (REQ-004)
+   ================================================================= */
+.ghui-milestone {
+  border: 1px solid var(--ghui-border);
+  border-radius: var(--ghui-radius);
+  padding: 16px;
+}
+.ghui-milestone__title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.ghui-milestone__due { font-size: var(--ghui-fs-sm); color: var(--ghui-fg-muted); margin-bottom: 12px; }
+.ghui-milestone__bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ghui-border-muted);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.ghui-milestone__bar-fill { height: 100%; background: var(--ghui-open); border-radius: 999px; }
+.ghui-milestone__counts { display: flex; gap: 16px; font-size: var(--ghui-fs-sm); color: var(--ghui-fg-muted); }
+.ghui-milestone__counts b { color: var(--ghui-fg); font-weight: 600; }
+
+/* =================================================================
+   12. 핀 어노테이션 (REQ-006/007/015)
+   ================================================================= */
+.ghui-annotated { position: relative; }
+.ghui-pin {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--accent, #3D5AFE);   /* 사이트 인디고 — mock 위에서 눈에 띄게 */
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);      /* data-* 좌표 중심 정렬 */
+  z-index: 5;
+  transition: transform var(--dur-fast, 0.18s) ease, box-shadow var(--dur-fast, 0.18s) ease;
+}
+.ghui-pin.is-active,
+.ghui-pin:hover {
+  background: var(--primary, #FF8A5B);
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.ghui-legend {
+  counter-reset: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-tip, #5FC3BA);
+  border-radius: var(--r-md, 14px);
+  background: var(--note-tip, #E6F7F4);   /* 창 밖: 사이트 크림/민트 톤 유지 (REQ-003) */
+}
+.ghui-legend__cap { font-weight: 700; font-size: var(--fs-small, 13px); margin-bottom: 8px; color: var(--text-primary, #2D2A26); }
+.ghui-legend__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: var(--r-sm, 8px);
+  color: var(--text-primary, #2D2A26);
+  font-size: var(--fs-body-sm, 16px);
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background var(--dur-fast, 0.18s) ease;
+}
+.ghui-legend__item + .ghui-legend__item { margin-top: 2px; }
+.ghui-legend__item::before {
+  content: attr(data-ghui-legend);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent, #3D5AFE);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.ghui-legend__item.is-active {
+  background: rgba(255, 138, 91, 0.18);
+}
+.ghui-legend__item.is-active::before { background: var(--primary, #FF8A5B); }
+.ghui-legend__item:focus-visible { outline: 3px solid var(--accent, #3D5AFE); outline-offset: 2px; }
+
+/* 스크린리더 전용 — .sr-only 는 base.css 에도 있지만 mock 로드 페이지 독립성 위해 재정의 안전판 */
+.ghui-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* aria-live 영역 (시각적으로 숨김) */
+.ghui-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+/* =================================================================
+   13. 반응형 (REQ-018): 768px 이하 2단 → 1단, 넓은 UI 가로 스크롤
+   ================================================================= */
+@media (max-width: 768px) {
+  .ghui-issue {
+    grid-template-columns: 1fr;
+  }
+  .ghui-sidebar {
+    order: -1;   /* 모바일에서 사이드바를 본문 위로 */
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+  }
+  .ghui-sidebar__item {
+    flex: 1 1 40%;
+    border-bottom: 0;
+    padding: 8px 0;
+  }
+  .ghui-board__scroll,
+  .ghui-diff__scroll { -webkit-overflow-scrolling: touch; }
+}
+
+/* =================================================================
+   14. 모션 축소 (REQ-014)
+   ================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .ghui-window *,
+  .ghui-legend__item,
+  .ghui-pin,
+  .ghui-board__card,
+  .ghui-diff__addbtn {
+    transition: none !important;
+    animation: none !important;
+  }
+  /* 축소 모드에서도 + 버튼은 항상 접근 가능하도록 상시 노출 */
+  .ghui-diff__addbtn { opacity: 1; pointer-events: auto; }
+}
