@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="../css/layout.css">
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages.css">
+<!-- mock UI 시스템 (IMPL-009): P 트랙과 동일한 .ghui- 컴포넌트 재사용 -->
+<link rel="stylesheet" href="../css/gh-ui.css">
 </head>
 <body>
 <!-- 읽기 진행률 바 (progress.js) -->
@@ -114,6 +116,44 @@
       <div class="tut-section__body">
         <p>GitHub의 PR 화면에서 코드는 한 줄씩 보여요. 리뷰어는 <strong>review comments(리뷰 코멘트)</strong>로 코드 특정 줄에 코멘트를 달아요. "이 변수 이름이 헷갈려요"처럼요. 줄 단위로 달기 때문에 어느 부분에 대한 말인지 명확해요.</p>
         <p>더 강력한 도구가 <strong>suggestions(제안)</strong>이에요. 리뷰어가 "이렇게 바꾸면 어떨까요?" 하고 코드를 직접 제안하면, 작성자는 <strong>클릭 한 번</strong>으로 그 제안을 적용할 수 있어요. 복사-붙여넣기 없이, 제안 그대로 커밋에 반영돼요. 수정이 부드럽게 이어지는 비결이에요.</p>
+
+        <!-- diff mock UI 맛보기 (IMPL-009 gh-diff) — 라인 hover 시 파란 + 로 코멘트를 담아 Review changes 로 제출해 보세요. 두 파일 전체 흐름은 P05로 위임 -->
+        <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. PR 57번 파일 하나를 줄 단위로 보여주는 맛보기예요.">
+          <div class="ghui-window__chrome">
+            <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+            <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+          </div>
+          <div class="ghui-window__body">
+            <div class="ghui-diff" data-asset="gh-diff" data-gh-diff-mode="unified">
+              <div class="ghui-diff__toolbar">
+                <button type="button" class="ghui-diff__review-btn" data-gh-review>Review changes <span class="ghui-diff__review-count" data-gh-review-count hidden>0</span></button>
+              </div>
+              <div class="ghui-diff__file-head">
+                <span class="ghui-diff__file-name">src/components/LoginButton.jsx</span>
+                <label class="ghui-diff__viewed"><input type="checkbox"> Viewed</label>
+              </div>
+              <div class="ghui-diff__scroll"><div class="ghui-diff__body">
+                <div class="ghui-diff__row" data-gh-line>
+                  <span class="ghui-diff__ln">11</span><span class="ghui-diff__ln">11</span>
+                  <code class="ghui-diff__content">  return (</code>
+                </div>
+                <div class="ghui-diff__row ghui-diff__row--del" data-gh-line>
+                  <span class="ghui-diff__ln">12</span><span class="ghui-diff__ln"></span>
+                  <code class="ghui-diff__content">    &lt;button className="login" onClick={login}&gt;</code>
+                </div>
+                <div class="ghui-diff__row ghui-diff__row--add" data-gh-line>
+                  <span class="ghui-diff__ln"></span><span class="ghui-diff__ln">12</span>
+                  <code class="ghui-diff__content">    &lt;button className="login login--lg" onClick={login}&gt;</code>
+                </div>
+                <div class="ghui-diff__row" data-gh-line>
+                  <span class="ghui-diff__ln">13</span><span class="ghui-diff__ln">13</span>
+                  <code class="ghui-diff__content">      로그인</code>
+                </div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+        <p>이건 리뷰 화면 <strong>맛보기</strong>예요. <code>Start a review</code>(리뷰 시작) → pending(대기) → <code>Submit review</code>(리뷰 제출)로 이어지는 배치 리뷰 흐름을 직접 밟아보는 실전은 <a class="case-callout-link" href="../practice/pr-review.html">P05 Files changed에서 리뷰하기에서 만나요 →</a></p>
       </div>
     </section>
 
@@ -241,5 +281,6 @@ package.json     @frontend-lead</code></pre>
 <script src="../js/nav.js" defer></script>
 <script src="../js/progress.js" defer></script>
 <script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
 </body>
 </html>

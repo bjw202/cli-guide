@@ -13,6 +13,8 @@
 <link rel="stylesheet" href="../css/layout.css">
 <link rel="stylesheet" href="../css/components.css">
 <link rel="stylesheet" href="../css/pages.css">
+<!-- mock UI 시스템 (IMPL-009): P 트랙과 동일한 .ghui- 컴포넌트 재사용 -->
+<link rel="stylesheet" href="../css/gh-ui.css">
 </head>
 <body>
 <div class="reading-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="읽기 진행률"></div>
@@ -116,6 +118,60 @@
       <div class="tut-section__body">
         <p>화이트보드의 '할 일 / 하는 중 / 검토 / 완료' 칸은 어디서 왔을까요? 이건 <strong>Status(상태)</strong>라는 <strong>단일 선택(single-select) 필드</strong>예요. 카드마다 상태를 하나 고르게 되어 있고, 같은 상태를 가진 카드끼리 한 칸(열)에 모여요.</p>
         <p>기본값은 보통 <code>Todo</code> / <code>In Progress</code> / <code>Review</code> / <code>Done</code> 같은 값이지만, 이름도 개수도 우리 팀 방식대로 바꿀 수 있어요. 예를 들어 행정팀이라면 '접수 / 검토 / 결재대기 / 완료'로 고쳐 쓸 수 있죠. 카드를 다른 칸으로 끌어다 놓으면, 그 카드의 Status 값이 자동으로 바뀌어요.</p>
+
+        <!-- 칸반 보드 mock UI 맛보기 (IMPL-009 gh-board) — 카드를 눌러 다음 칸으로 옮겨보세요. 뷰·필드·자동화 운영은 P06으로 위임 -->
+        <div class="ghui-window" role="figure" aria-label="재현 화면입니다. 실제 GitHub이 아니라 학습용으로 다시 그린 화면이에요. 도서관 리뉴얼 보드의 네 열과 카드를 보여주는 맛보기예요.">
+          <div class="ghui-window__chrome">
+            <div class="ghui-window__dots"><span class="ghui-window__dot ghui-window__dot--r"></span><span class="ghui-window__dot ghui-window__dot--y"></span><span class="ghui-window__dot ghui-window__dot--g"></span></div>
+            <div class="ghui-window__address">github.com/dongne-library/library-web</div>
+          </div>
+          <div class="ghui-window__body">
+            <div class="ghui-board__scroll">
+              <div class="ghui-board" data-asset="gh-board">
+
+                <div class="ghui-board__col" data-gh-col="Todo">
+                  <div class="ghui-board__col-head">Todo <span class="ghui-board__col-count" data-gh-count>0</span></div>
+                  <div class="ghui-board__cards">
+                    <article class="ghui-board__card" data-gh-card-title="#38 대출 연장 기능">
+                      <div class="ghui-board__card-title">대출 연장 기능 #38</div>
+                      <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#8250df">지</span> 지원</div>
+                      <div class="ghui-board__card-status">Status: <b data-gh-status>Todo</b></div>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="ghui-board__col" data-gh-col="In Progress">
+                  <div class="ghui-board__col-head">In Progress <span class="ghui-board__col-count" data-gh-count>0</span></div>
+                  <div class="ghui-board__cards">
+                    <article class="ghui-board__card" data-gh-card-title="#42 로그인 버튼이 안 눌려요">
+                      <div class="ghui-board__card-title">로그인 버튼이 안 눌려요 #42</div>
+                      <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#1f883d">민</span> 민수</div>
+                      <div class="ghui-board__card-status">Status: <b data-gh-status>In Progress</b></div>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="ghui-board__col" data-gh-col="Review">
+                  <div class="ghui-board__col-head">Review <span class="ghui-board__col-count" data-gh-count>0</span></div>
+                  <div class="ghui-board__cards">
+                    <article class="ghui-board__card" data-gh-card-title="PR #57 로그인 버튼 클릭 영역 수정">
+                      <div class="ghui-board__card-title">로그인 버튼 클릭 영역 수정 PR #57</div>
+                      <div class="ghui-board__card-meta"><span class="ghui-avatar" style="--avatar-bg:#0969da">하</span> 하늘 리뷰 중</div>
+                      <div class="ghui-board__card-status">Status: <b data-gh-status>Review</b></div>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="ghui-board__col" data-gh-col="Done">
+                  <div class="ghui-board__col-head">Done <span class="ghui-board__col-count" data-gh-count>0</span></div>
+                  <div class="ghui-board__cards"></div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+        <p>이건 보드 <strong>맛보기</strong>예요. 카드를 눌러 다음 칸으로 옮겨보세요. 뷰(보드·표·로드맵)와 필드, 자동화까지 보드를 운영하는 실전은 <a class="case-callout-link" href="../practice/projects-ops.html">P06 보드 운영에서 만나요 →</a></p>
       </div>
     </section>
 
@@ -254,5 +310,6 @@
 <script src="../js/nav.js" defer></script>
 <script src="../js/progress.js" defer></script>
 <script src="../js/reveal.js" defer></script>
+<script src="../js/gh-ui.js" defer></script>
 </body>
 </html>
