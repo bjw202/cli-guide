@@ -28,7 +28,8 @@
     tutorial: ['tutorial'],
     reference: ['reference', 'glossary'],          // glossary 흡수
     case: ['case'],
-    command: ['command']
+    command: ['command'],
+    practice: ['practice']
   };
 
   /* ---------------------------------------------------
@@ -158,6 +159,7 @@
       case 'glossary': return '용어';
       case 'case': return '사례';
       case 'command': return '명령어';
+      case 'practice': return '실전';
       case 'home': return '홈';
       default: return type;
     }

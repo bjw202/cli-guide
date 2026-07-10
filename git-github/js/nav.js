@@ -134,6 +134,7 @@
       tutorial: { label: '튜토리얼', order: 1 },
       ref: { label: '참조', order: 2 },
       cases: { label: '사례 갤러리', order: 3 },
+      practice: { label: '실전', order: 4 },
     };
 
     // 페이지 제목: <title> 태그에서 추출, 없으면 파일명
