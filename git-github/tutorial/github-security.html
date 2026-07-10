@@ -186,6 +186,7 @@
           <li><strong>브랜치 최신화</strong>: 병합 전 main의 최신 변경을 가져와야 허용.</li>
         </ul>
         <p>Settings → Branches에서 'Add branch protection rule'로 설정해요. 조직 단위로 정책을 일괄 적용할 수도 있어요.</p>
+        <p>요즘 GitHub은 이 규칙들을 <span data-term="ruleset"><strong>ruleset(규칙셋)</strong></span>이라는 이름 붙은 묶음으로 관리해요. 위에서 본 classic branch protection의 후신이자 더 넓은 개념이에요. 묶음마다 이름을 달고 변경 이력이 남으며, 한 브랜치에 여러 묶음이 동시에 걸리면 효과가 합쳐져 <strong>가장 엄격한 규칙</strong>이 이겨요. 곧바로 강제하지 않고 'evaluate' 모드로 먼저 시험 적용해, 규칙을 켰을 때 무엇이 막히는지 미리 볼 수도 있어요.</p>
       </div>
       <pre class="code-block"><code>// branch protection rule — GitHub 설정의 핵심 항목
 // Settings → Branches → Add rule
@@ -353,5 +354,6 @@ Do not allow bypassing the above settings: ON</code></pre>
 <script src="../js/nav.js" defer></script>
 <script src="../js/progress.js" defer></script>
 <script src="../js/reveal.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
 </body>
 </html>
