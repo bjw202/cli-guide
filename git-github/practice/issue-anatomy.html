@@ -232,7 +232,7 @@
       <h2 class="tut-section__title">Labels와 Type, 뭐가 다른가요?</h2>
       <div class="tut-section__body">
         <p>둘 다 '이슈를 분류하는' 자리라 헷갈려요. 차이는 이래요. <strong>Labels(라벨)</strong> 는 우리 팀이 자유롭게 만들어 여러 개 붙일 수 있는 색깔 꼬리표예요(<code>bug</code>, <code>priority:high</code>, <code>design</code>…). <strong>Type(유형)</strong> 은 조직 차원에서 정한 <strong>딱 하나</strong>의 공식 분류예요.</p>
-        <p>Issue types(이슈 유형)는 2025년 4월에 정식 출시됐어요. 기본으로 <code>Bug</code>(버그) / <code>Feature</code>(기능) / <code>Task</code>(작업) 세 종류가 준비돼 있고, 조직 관리자가 <code>Settings</code>(설정) → <code>Planning</code>(계획) → <code>Issue types</code>(이슈 유형) 에서 새 유형을 추가할 수 있어요. 한 조직당 최대 25개까지 만들 수 있어요.</p>
+        <p><span data-term="issue-type">Issue types(이슈 유형)</span>는 2025년 4월에 정식 출시됐어요. 기본으로 <code>Bug</code>(버그) / <code>Feature</code>(기능) / <code>Task</code>(작업) 세 종류가 준비돼 있고, 조직 관리자가 <code>Settings</code>(설정) → <code>Planning</code>(계획) → <code>Issue types</code>(이슈 유형) 에서 새 유형을 추가할 수 있어요. 한 조직당 최대 25개까지 만들 수 있어요.</p>
       </div>
     </section>
 
@@ -250,7 +250,7 @@ Task     작업: 그 밖의 해야 할 잡일
     <section class="tut-section" id="sub-issues" data-reveal>
       <h2 class="tut-section__title">Sub-issues: 큰 일을 잘게 쪼개기</h2>
       <div class="tut-section__body">
-        <p>#42는 버튼 하나 문제라 단순하지만, 어떤 일은 너무 커서 이슈 하나로는 벅차요. 예를 들어 이슈 <strong>#38 「대출 연장 기능」</strong>은 화면·서버·알림까지 여러 갈래로 나뉘어요. 이럴 때 <strong>하위 이슈(Sub-issues)</strong>로 잘게 쪼개요.</p>
+        <p>#42는 버튼 하나 문제라 단순하지만, 어떤 일은 너무 커서 이슈 하나로는 벅차요. 예를 들어 이슈 <strong>#38 「대출 연장 기능」</strong>은 화면·서버·알림까지 여러 갈래로 나뉘어요. 이럴 때 <span data-term="sub-issue"><strong>하위 이슈(Sub-issues)</strong></span>로 잘게 쪼개요.</p>
         <p>#38에는 하위 이슈 3개가 달려 있고, 그중 1개가 완료됐어요. 그래서 진행률이 <strong>1/3</strong> 로 보여요. 부모 이슈를 열면 자식들의 체크 상태가 한눈에 모여, "이 큰 일이 얼마나 진행됐나"를 바로 알 수 있어요.</p>
         <ul>
           <li><code>Create sub-issue</code>(하위 이슈 만들기) 버튼으로 자식 이슈를 새로 만들거나, 이미 있는 이슈를 자식으로 붙여요.</li>
@@ -326,5 +326,6 @@ Task     작업: 그 밖의 해야 할 잡일
 <script src="../js/progress.js" defer></script>
 <script src="../js/reveal.js" defer></script>
 <script src="../js/gh-ui.js" defer></script>
+<script src="../js/glossary-tooltip.js" defer></script>
 </body>
 </html>
